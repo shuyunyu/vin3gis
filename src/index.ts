@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { stats } from './tools/stats';
 
-stats.showPanel(0);
+stats.enableTogglePanel = false;
+stats.showAllPanel();
 document.body.appendChild(stats.dom);
 
 // console.log(state);

@@ -124,16 +124,24 @@ class Stats {
 
     private memPanel: Panel;
 
+    private _enableTogglePanel: boolean = true;
+
+    //是否允许切换面板
+    public set enableTogglePanel (val: boolean) {
+        this._enableTogglePanel = val;
+        this.container.removeEventListener('click', this.planeClickListener);
+        this.container.style.cssText = 'position:fixed;top:0;left:0;opacity:0.9;z-index:10000';
+        if (this._enableTogglePanel) {
+            this.container.addEventListener('click', this.planeClickListener, false);
+            this.container.style.cssText = 'position:fixed;top:0;left:0;cursor:pointer;opacity:0.9;z-index:10000';
+        }
+    }
+
     constructor () {
         let mode = 0;
         let container = document.createElement('div');
         container.style.cssText = 'position:fixed;top:0;left:0;cursor:pointer;opacity:0.9;z-index:10000';
-        container.addEventListener('click', (event) => {
-
-            event.preventDefault();
-            this.showPanel(++mode % container.children.length);
-
-        }, false);
+        container.addEventListener('click', this.planeClickListener, false);
         this.container = container;
 
         let beginTime = (performance || Date).now(), prevTime = beginTime, frames = 0;
@@ -154,6 +162,12 @@ class Stats {
         this.frames = frames;
         this.fpsPanel = fpsPanel;
         this.msPanel = msPanel;
+    }
+
+    private planeClickListener (event: MouseEvent) {
+        event.preventDefault();
+        this.showPanel(++this.mode % this.container.children.length);
+
     }
 
     public begin () {
@@ -203,6 +217,14 @@ class Stats {
         }
 
         this.mode = id;
+    }
+
+    public showAllPanel () {
+        for (let i = 0; i < this.container.children.length; i++) {
+            const child = this.container.children[i];
+            //@ts-ignore
+            child.style.display = "block";
+        }
     }
 
     public addPanel (panel: Panel) {
