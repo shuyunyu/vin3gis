@@ -1,0 +1,37 @@
+{
+  "name": "three-study",
+  "version": "0.0.1",
+  "description": "three.js study project.",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "webpack-dev-server --hot",
+    "server": "webpack-dev-server --hot",
+    "build": "webpack --config webpack.config.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@124.223.202.45:yumubai/three-study.git"
+  },
+  "keywords": [
+    "gis"
+  ],
+  "author": "yumubai",
+  "license": "ISC",
+  "dependencies": {
+    "three": "^0.146.0"
+  },
+  "devDependencies": {
+    "add-asset-html-webpack-plugin": "^5.0.2",
+    "copy-webpack-plugin": "^10.2.4",
+    "css-loader": "^6.7.1",
+    "html-webpack-plugin": "^5.5.0",
+    "style-loader": "^3.3.1",
+    "ts-loader": "^9.2.8",
+    "typescript": "^4.6.3",
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "webpack": "^5.71.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.7.4"
+  }
+}
