@@ -6,6 +6,8 @@ class Panel {
 
     private canvas: HTMLCanvasElement;
 
+    private name: string;
+
     private min: number;
 
     private max: number;
@@ -79,6 +81,8 @@ class Panel {
 
         this.fg = fg;
         this.bg = bg;
+
+        this.name = name;
     }
 
     public update (value: number, maxValue: number) {
@@ -90,7 +94,7 @@ class Panel {
         this.context.globalAlpha = 1;
         this.context.fillRect(0, 0, this.WIDTH, this.GRAPH_Y);
         this.context.fillStyle = this.fg;
-        this.context.fillText(Math.round(value) + ' ' + name + ' (' + Math.round(this.min) + '-' + Math.round(this.max) + ')', this.TEXT_X, this.TEXT_Y);
+        this.context.fillText(Math.round(value) + ' ' + this.name + ' (' + Math.round(this.min) + '-' + Math.round(this.max) + ')', this.TEXT_X, this.TEXT_Y);
 
         this.context.drawImage(this.canvas, this.GRAPH_X + this.PR, this.GRAPH_Y, this.GRAPH_WIDTH - this.PR, this.GRAPH_HEIGHT, this.GRAPH_X, this.GRAPH_Y, this.GRAPH_WIDTH - this.PR, this.GRAPH_HEIGHT);
 
