@@ -1,9 +1,8 @@
 import * as THREE from 'three';
-import { stats } from './tools/stats';
+import { Director, director } from './core/director';
+import { DebugTools } from './tools/debug_tools';
 
-stats.enableTogglePanel = false;
-stats.showAllPanel();
-document.body.appendChild(stats.dom);
+DebugTools.showStatsPanel();
 
 // console.log(state);
 
@@ -22,18 +21,15 @@ scene.add(mesh);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setAnimationLoop(animation);
+
 document.body.appendChild(renderer.domElement);
 
 // animation
 
-function animation (time) {
-    stats.begin();
-
+director.addEventListener(Director.EVENT_DRAW_FRAME, (time) => {
+    time = Date.now();
     mesh.rotation.x = time / 2000;
     mesh.rotation.y = time / 1000;
 
     renderer.render(scene, camera);
-
-    stats.end();
-}
+})
