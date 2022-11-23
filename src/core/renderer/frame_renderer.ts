@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { Camera, Renderer, Scene } from "three";
+import { Camera, OrthographicCamera, PerspectiveCamera, Renderer, Scene } from "three";
 
 /**
  * 帧渲染器
@@ -14,7 +14,7 @@ export class FrameRenderer {
         return this._scene;
     }
 
-    private _camera: Camera;
+    private _camera: PerspectiveCamera | OrthographicCamera;
 
     public get camera () {
         return this._camera;
@@ -28,7 +28,7 @@ export class FrameRenderer {
 
     private _destroyed: boolean = false;
 
-    public constructor (scene: Scene, camera: Camera, target: HTMLElement) {
+    public constructor (scene: Scene, camera: PerspectiveCamera | OrthographicCamera, target: HTMLElement) {
         this._renderer = new THREE.WebGLRenderer({ antialias: true });
         this._scene = scene;
         this._camera = camera;
