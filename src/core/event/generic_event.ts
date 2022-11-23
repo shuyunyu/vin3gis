@@ -26,7 +26,7 @@ export class GenericEvent<T> extends Event {
     }
 
     //@ts-ignore
-    public once (listener: Function, context?: any): void {
+    public once (listener: (arg: T) => void, context?: any): void {
         super.once(this._eventType, listener, context);
     }
 
@@ -36,7 +36,7 @@ export class GenericEvent<T> extends Event {
     }
 
     //@ts-ignore
-    public off (listener: Function, context?: any): void {
+    public off (listener: (arg: T) => void, context?: any): void {
         super.off(this._eventType, listener, context);
     }
 
