@@ -50,4 +50,9 @@ export class GenericEvent<T> extends Event {
         super.invoke(this._eventType, arg);
     }
 
+    //@ts-ignore
+    public emit (arg: T): void {
+        super.emit(this._eventType, arg);
+    }
+
 }

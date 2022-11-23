@@ -10,7 +10,15 @@ export class FrameRenderer {
 
     private _scene: Scene;
 
+    public get scene () {
+        return this._scene;
+    }
+
     private _camera: Camera;
+
+    public get camera () {
+        return this._camera;
+    }
 
     private _target: HTMLElement;
 
@@ -40,6 +48,8 @@ export class FrameRenderer {
         if (this._camera instanceof THREE.PerspectiveCamera) {
             this._camera.aspect = width / height;
             this._camera.updateProjectionMatrix();
+        } else if (this._camera instanceof THREE.OrthographicCamera) {
+
         }
     }
 

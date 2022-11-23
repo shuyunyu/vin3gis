@@ -129,4 +129,14 @@ export class Event {
         this.dispatchEvent.call(this, arguments);
     }
 
+    /**
+     * 派发事件
+     * 同dispatchEvent
+     * @param event 
+     * @param args 
+     */
+    public emit (event: EventType, ...args: any) {
+        this.dispatchEvent.call(this, args);
+    }
+
 }
