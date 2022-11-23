@@ -22,8 +22,13 @@ export class FrameRenderer {
 
     private _target: HTMLElement;
 
+    //renderer's domElement
     public get domElement () {
         return this._renderer.domElement;
+    }
+
+    public get interactionElement () {
+        return this._renderer.domElement.parentElement;
     }
 
     private _destroyed: boolean = false;

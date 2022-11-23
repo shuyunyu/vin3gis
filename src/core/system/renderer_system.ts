@@ -2,6 +2,9 @@ import { SystemDefines } from "../../@types/core/system/system";
 import { FrameRenderer } from "../renderer/frame_renderer";
 import { System } from "./system";
 
+/**
+ * 渲染系统
+ */
 export class RendererSystem extends System {
 
     private static _instance?: RendererSystem;

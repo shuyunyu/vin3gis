@@ -56,11 +56,11 @@ export class Director extends Event {
      * @param dt 
      */
     private tick (dt: number) {
-        this.dispatchEvent(Director.EVENT_BEGIN_FRAME);
+        this.dispatchEvent(Director.EVENT_BEGIN_FRAME, dt);
         this._systems.forEach(sys => sys.update(dt));
         this._systems.forEach(sys => sys.postUpdate(dt));
-        this.dispatchEvent(Director.EVENT_DRAW_FRAME);
-        this.dispatchEvent(Director.EVENT_END_FRAME);
+        this.dispatchEvent(Director.EVENT_DRAW_FRAME, dt);
+        this.dispatchEvent(Director.EVENT_END_FRAME, dt);
     }
 
     /**
