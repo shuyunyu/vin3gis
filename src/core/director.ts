@@ -1,4 +1,5 @@
 import { Event } from "./event/event";
+import { System } from "./system/system";
 
 export class Director extends Event {
 
@@ -9,6 +10,9 @@ export class Director extends Event {
         this._instance = new Director();
         return this._instance;
     }
+
+    //初始化事件
+    public static readonly EVENT_INIT = "director_init";
 
     //一帧开始时所触发的事件
     public static readonly EVENT_BEGIN_FRAME = "director_begine_frame";
@@ -23,10 +27,20 @@ export class Director extends Event {
 
     private _deltaTime: number;
 
+    private _systems: System[] = [];
+
     private constructor () {
         super();
+    }
+
+    /**
+     * 初始化
+     */
+    public init () {
+        this._systems.forEach(sys => sys.init());
         this._startTime = performance.now();
         requestAnimationFrame(() => this.step());
+        this.dispatchEvent(Director.EVENT_INIT);
     }
 
     /**
@@ -43,6 +57,8 @@ export class Director extends Event {
      */
     private tick (dt: number) {
         this.dispatchEvent(Director.EVENT_BEGIN_FRAME);
+        this._systems.forEach(sys => sys.update(dt));
+        this._systems.forEach(sys => sys.postUpdate(dt));
         this.dispatchEvent(Director.EVENT_DRAW_FRAME);
         this.dispatchEvent(Director.EVENT_END_FRAME);
     }
@@ -56,6 +72,17 @@ export class Director extends Event {
         this._deltaTime = now > this._startTime ? (now - this._startTime) / 1000 : 0;
         this._startTime = now;
         return this._deltaTime;
+    }
+
+    /**
+     * 注册系统
+     * @param system 
+     */
+    public registerSystem (system: System) {
+        if (this._systems.indexOf(system) === -1) {
+            this._systems.push(system);
+            this._systems.sort((s1, s2) => s2.priority - s1.priority);
+        }
     }
 
 }

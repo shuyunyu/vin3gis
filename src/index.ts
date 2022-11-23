@@ -1,7 +1,10 @@
 import * as THREE from 'three';
-import { Director, director } from './core/director';
+import { director, Director } from './core/director';
+import { Game } from './core/system/game';
+import { rendererSystem } from './core/system/renderer_system';
 import { DebugTools } from './tools/debug_tools';
 
+Game.start();
 DebugTools.showStatsPanel();
 
 // console.log(state);
@@ -19,19 +22,14 @@ const material = new THREE.MeshNormalMaterial();
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-
-document.body.appendChild(renderer.domElement);
+rendererSystem.render(document.body, scene, camera);
 
 // animation
 
-director.addEventListener(Director.EVENT_DRAW_FRAME, (time) => {
-    time = Date.now();
+director.addEventListener(Director.EVENT_DRAW_FRAME, () => {
+    let time = Date.now();
     mesh.rotation.x = time / 2000;
     mesh.rotation.y = time / 1000;
-
-    renderer.render(scene, camera);
 })
 
 director.once(Director.EVENT_DRAW_FRAME, () => {
