@@ -15,16 +15,29 @@
       overflow: hidden;
     }
 
-    canvas{
-        width: 100%;
-        height: 100%;
+    .output-div{
+      position: absolute;
+      z-index: 10;
+      width: 50%;
+      height: 100%;
     }
+
+    #output-div-1{
+        left: 0;
+    }
+
+    #output-div-2{
+        right: 0;
+    }
+    
   </style>
 
 </head>
 
 <body>
-  <!-- <canvas id="main-canvas"></canvas> -->
+
+  <div class="output-div" id="output-div-1"></div>
+  <div class="output-div" id="output-div-2"></div>
 
   <!-- <script src="./test/test.js"></script> -->
 </body>

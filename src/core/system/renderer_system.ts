@@ -1,5 +1,3 @@
-import * as THREE from "three";
-import { Camera, Renderer, Scene } from "three";
 import { SystemDefines } from "../../@types/core/system/system";
 import { FrameRenderer } from "../renderer/frame_renderer";
 import { System } from "./system";
@@ -14,9 +12,7 @@ export class RendererSystem extends System {
         return this._instance;
     }
 
-    private _renderer: Renderer;
-
-    private _frameRenderer?: FrameRenderer;
+    private _renderers: FrameRenderer[] = [];
 
     private constructor () {
         super();
@@ -24,28 +20,37 @@ export class RendererSystem extends System {
     }
 
     public init (): void {
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        this._renderer = renderer;
-        this.initEventListener();
-    }
-
-    private initEventListener () {
-        window.addEventListener('resize', () => this.onWindowResize());
+        global.addEventListener('resize', () => this.onWindowResize());
     }
 
     private onWindowResize () {
-        this._renderer.setSize(window.innerWidth, window.innerHeight);
+        this._renderers.forEach(r => r.updateRenderSize());
     }
 
-    public render (target: HTMLElement, scene: Scene, camera: Camera) {
-        if (this._frameRenderer) this._frameRenderer.destroy();
-        this._frameRenderer = new FrameRenderer(this._renderer, scene, camera);
-        target.appendChild(this._renderer.domElement);
+    /**
+     * 添加渲染目标
+     * @param target 
+     */
+    public addRenderTarget (target: FrameRenderer) {
+        if (this._renderers.indexOf(target) === -1) {
+            this._renderers.push(target);
+            target.updateRenderSize();
+        }
+    }
+
+    /**
+     * 移除渲染目标
+     * @param target 
+     */
+    public removeRenderTarget (target: FrameRenderer) {
+        const index = this._renderers.indexOf(target);
+        if (index > -1) {
+            this._renderers.splice(index, 1)[0].destroy();
+        }
     }
 
     public update (dt: number): void {
-        this._frameRenderer?.update(dt);
+        this._renderers.forEach(r => r.update(dt));
     }
 
 }
