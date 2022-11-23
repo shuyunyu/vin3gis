@@ -10,11 +10,6 @@ export class Director extends Event {
         return this._instance;
     }
 
-    private constructor () {
-        super();
-        requestAnimationFrame(() => this.step());
-    }
-
     //一帧开始时所触发的事件
     public static readonly EVENT_BEGIN_FRAME = "director_begine_frame";
 
@@ -24,15 +19,43 @@ export class Director extends Event {
     //绘制一帧
     public static readonly EVENT_DRAW_FRAME = "director_draw_frame";
 
-    private step () {
-        this.tick(0);
+    private _startTime: number;
+
+    private _deltaTime: number;
+
+    private constructor () {
+        super();
+        this._startTime = performance.now();
         requestAnimationFrame(() => this.step());
     }
 
-    public tick (dt: number) {
+    /**
+     * 单步调用
+     */
+    private step () {
+        this.tick(this.calcDeltaTime());
+        requestAnimationFrame(() => this.step());
+    }
+
+    /**
+     * 执行主逻辑
+     * @param dt 
+     */
+    private tick (dt: number) {
         this.dispatchEvent(Director.EVENT_BEGIN_FRAME);
         this.dispatchEvent(Director.EVENT_DRAW_FRAME);
         this.dispatchEvent(Director.EVENT_END_FRAME);
+    }
+
+    /**
+     * 计算两帧之间的时间差
+     * @returns 
+     */
+    private calcDeltaTime () {
+        const now = performance.now();
+        this._deltaTime = now > this._startTime ? (now - this._startTime) / 1000 : 0;
+        this._startTime = now;
+        return this._deltaTime;
     }
 
 }
