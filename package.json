@@ -19,6 +19,7 @@
   "author": "yumubai",
   "license": "ISC",
   "dependencies": {
+    "@types/three": "^0.146.0",
     "three": "^0.146.0"
   },
   "devDependencies": {
