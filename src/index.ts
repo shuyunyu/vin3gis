@@ -33,3 +33,7 @@ director.addEventListener(Director.EVENT_DRAW_FRAME, (time) => {
 
     renderer.render(scene, camera);
 })
+
+director.once(Director.EVENT_DRAW_FRAME, () => {
+    console.log("direction draw frame.")
+})
