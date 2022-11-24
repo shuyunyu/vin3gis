@@ -1,6 +1,6 @@
-import { director } from "../director";
-import { interactionSystem } from "./interaction_system";
-import { rendererSystem } from "./renderer_system";
+import { director } from "./director";
+import { interactionSystem } from "./system/interaction_system";
+import { rendererSystem } from "./system/renderer_system";
 
 export class Game {
 

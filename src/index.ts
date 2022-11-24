@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { director, Director } from './core/director';
 import { FrameRenderer } from './core/renderer/frame_renderer';
-import { Game } from './core/system/game';
+import { Game } from './core/game';
 import { interactionSystem } from './core/system/interaction_system';
 import { rendererSystem } from './core/system/renderer_system';
 import { DebugTools } from './tools/debug_tools';
