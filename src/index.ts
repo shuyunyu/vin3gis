@@ -16,7 +16,7 @@ DebugTools.showStatsPanel();
 
 // init
 
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10);
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 1000);
 // const camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 1, 1000);
 camera.position.z = 1;
 
@@ -26,7 +26,12 @@ const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
 const material = new THREE.MeshNormalMaterial();
 
 const mesh = new THREE.Mesh(geometry, material);
+mesh.position.y = 0.1
 scene.add(mesh);
+
+const gridHelper = new THREE.GridHelper(50, 50);
+// gridHelper.position.y = 0;
+scene.add(gridHelper);
 
 const mainFrameRenderer = new FrameRenderer(scene, camera, document.body);
 rendererSystem.addRenderTarget(mainFrameRenderer);
