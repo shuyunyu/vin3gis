@@ -5,6 +5,7 @@ import { Game } from './core/game';
 import { interactionSystem } from './core/system/interaction_system';
 import { rendererSystem } from './core/system/renderer_system';
 import { DebugTools } from './tools/debug_tools';
+import { XHRCancelToken, XHRRequest, XHRResponse } from './core/xhr/XHRRequest';
 
 const div1 = document.getElementById('output-div-1');
 const div2 = document.getElementById('output-div-2');
@@ -62,3 +63,14 @@ director.addEventListener(Director.EVENT_BEGIN_FRAME, (dt: number) => {
 director.once(Director.EVENT_DRAW_FRAME, () => {
     console.log("direction draw frame.")
 })
+
+// XHRRequest.get({
+//     url: "http://111.231.106.169/smedicalAPI/statistic/covid/global/v1/overall",
+//     cancelToken: new XHRCancelToken((cancelFunc: Function) => {
+//         setTimeout(() => {
+//             cancelFunc();
+//         }, 1000)
+//     })
+// }).then((res: XHRResponse) => {
+//     console.log(res);
+// });
