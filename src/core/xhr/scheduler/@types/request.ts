@@ -1,0 +1,19 @@
+import { XHRRequestOptions, XHRResponse } from "../../xhr_request";
+
+//请求任务优先级
+export enum RequestTaskPriority {
+    LOW = 0,
+    MEDIUM = 1000,
+    HIGH = 10000
+}
+
+//请求类型
+export type RequestTaskType = string;
+
+export interface RequestTaskOptions extends XHRRequestOptions {
+    taskType: RequestTaskType;//任务类型
+    priority?: number;//任务优先级
+    throttle?: boolean;//是否需要考虑并发限制
+    throttleServer?: boolean;//是否需要考虑每个服务器的并发限制
+    onComplete: (response: XHRResponse) => void; //任务完成时的回调
+}

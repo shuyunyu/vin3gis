@@ -5,7 +5,8 @@ import { Game } from './core/game';
 import { interactionSystem } from './core/system/interaction_system';
 import { rendererSystem } from './core/system/renderer_system';
 import { DebugTools } from './tools/debug_tools';
-import { XHRCancelToken, XHRRequest, XHRResponse } from './core/xhr/XHRRequest';
+import { RequestTask } from './core/xhr/scheduler/request_task';
+import { XHRResponse } from './core/xhr/xhr_request';
 
 const div1 = document.getElementById('output-div-1');
 const div2 = document.getElementById('output-div-2');
@@ -64,13 +65,16 @@ director.once(Director.EVENT_DRAW_FRAME, () => {
     console.log("direction draw frame.")
 })
 
-// XHRRequest.get({
-//     url: "http://111.231.106.169/smedicalAPI/statistic/covid/global/v1/overall",
-//     cancelToken: new XHRCancelToken((cancelFunc: Function) => {
-//         setTimeout(() => {
-//             cancelFunc();
-//         }, 1000)
-//     })
-// }).then((res: XHRResponse) => {
-//     console.log(res);
-// });
+const testXHR = () => {
+    RequestTask.cerate({
+        taskType: "test",
+        url: "http://111.231.106.169/smedicalAPI/statistic/covid/global/v1/overall",
+        onComplete: (res: XHRResponse) => {
+            console.log(res);
+            // setTimeout(_ => {
+            //     testXHR();
+            // }, 100)
+        }
+    }).execute();
+}
+testXHR();
