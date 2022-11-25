@@ -8,6 +8,7 @@ import { DebugTools } from './tools/debug_tools';
 import { RequestTask } from './core/xhr/scheduler/request_task';
 import { XHRResponse } from './core/xhr/xhr_request';
 import { RequestTaskResult } from './core/xhr/scheduler/@types/request';
+import { RequestScheduler } from './core/xhr/scheduler/request_scheduler';
 
 const div1 = document.getElementById('output-div-1');
 const div2 = document.getElementById('output-div-2');
@@ -60,6 +61,7 @@ director.addEventListener(Director.EVENT_BEGIN_FRAME, (dt: number) => {
     // mesh.rotation.x = time / 2000;
     // mesh.rotation.y = time / 1000;
     // cameraControls.update(dt);
+    RequestScheduler.update();
 });
 
 director.once(Director.EVENT_DRAW_FRAME, () => {
@@ -78,4 +80,15 @@ const testXHR = () => {
         }
     }).execute();
 }
-testXHR();
+// testXHR();
+
+RequestScheduler.createRequestTask({
+    taskType: "test",
+    url: "http://111.231.106.169/smedicalAPI/statistic/covid/global/v1/overall",
+    onComplete: (res: RequestTaskResult) => {
+        console.log(res);
+        // setTimeout(_ => {
+        //     testXHR();
+        // }, 100)
+    }
+});

@@ -3,7 +3,7 @@ import { RequestTaskOptions, RequestTaskPriority, RequestTaskStatus, RequestTask
 import { RequestServer } from "./request_server";
 
 /**
- * 定义单个请求任务
+ * 单个请求任务
  */
 export class RequestTask {
 
@@ -14,6 +14,9 @@ export class RequestTask {
 
     //任务池大小
     public static MAX_POOL_SIZE = 100;
+
+    //单个请求任务完成时的回调
+    public static onTaskComplete?: (task: RequestTask) => void;
 
     //任务类型
     private _taskType: RequestTaskType;
@@ -101,6 +104,7 @@ export class RequestTask {
                     status: RequestTaskStatus.SUCCESS,
                     taskType: this.taskType
                 });
+                RequestTask.onTaskComplete && RequestTask.onTaskComplete(this);
             } else {
                 if (RequestTask.DEBUG) {
                     console.log(`[${RequestTask.name}] [abort]: `, response.config.url);
@@ -110,6 +114,7 @@ export class RequestTask {
                     status: RequestTaskStatus.ABORT,
                     taskType: this.taskType
                 });
+                RequestTask.onTaskComplete && RequestTask.onTaskComplete(this);
             }
             this.recycle();
         }).catch(err => {
@@ -119,6 +124,7 @@ export class RequestTask {
                 status: RequestTaskStatus.ERROR,
                 taskType: this.taskType
             });
+            RequestTask.onTaskComplete && RequestTask.onTaskComplete(this);
         });
         return this;
     }
