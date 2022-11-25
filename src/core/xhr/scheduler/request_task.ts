@@ -1,5 +1,5 @@
 import { XHRCancelToken, XHRRequest, XHRResponse } from "../xhr_request";
-import { RequestTaskOptions, RequestTaskPriority, RequestTaskType } from "./@types/request";
+import { RequestTaskOptions, RequestTaskPriority, RequestTaskStatus, RequestTaskType } from "./@types/request";
 import { RequestServer } from "./request_server";
 
 /**
@@ -49,6 +49,12 @@ export class RequestTask {
     //取消此任务的执行方法
     private _cancelFunc?: Function;
 
+    //标识 是否是有效的请求
+    //没有被取消
+    public get isValid () {
+        return !!this._cancelFunc;
+    }
+
     private constructor (options: RequestTaskOptions) {
         this.init(options);
     }
@@ -90,15 +96,29 @@ export class RequestTask {
     public execute () {
         XHRRequest.create(this._options).then((response: XHRResponse) => {
             if (!response.abort) {
-                this._options.onComplete.call(null, response);
+                this._options.onComplete({
+                    response: response,
+                    status: RequestTaskStatus.SUCCESS,
+                    taskType: this.taskType
+                });
             } else {
                 if (RequestTask.DEBUG) {
                     console.log(`[${RequestTask.name}] [abort]: `, response.config.url);
                 }
+                this._options.onComplete({
+                    response: response,
+                    status: RequestTaskStatus.ABORT,
+                    taskType: this.taskType
+                });
             }
             this.recycle();
         }).catch(err => {
             console.log(`[${RequestTask.name}] [error]: `, err);
+            this._options.onComplete({
+                error: err,
+                status: RequestTaskStatus.ERROR,
+                taskType: this.taskType
+            });
         });
         return this;
     }

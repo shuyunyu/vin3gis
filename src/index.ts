@@ -7,6 +7,7 @@ import { rendererSystem } from './core/system/renderer_system';
 import { DebugTools } from './tools/debug_tools';
 import { RequestTask } from './core/xhr/scheduler/request_task';
 import { XHRResponse } from './core/xhr/xhr_request';
+import { RequestTaskResult } from './core/xhr/scheduler/@types/request';
 
 const div1 = document.getElementById('output-div-1');
 const div2 = document.getElementById('output-div-2');
@@ -69,7 +70,7 @@ const testXHR = () => {
     RequestTask.cerate({
         taskType: "test",
         url: "http://111.231.106.169/smedicalAPI/statistic/covid/global/v1/overall",
-        onComplete: (res: XHRResponse) => {
+        onComplete: (res: RequestTaskResult) => {
             console.log(res);
             // setTimeout(_ => {
             //     testXHR();
