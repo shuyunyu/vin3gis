@@ -19,11 +19,15 @@ export class RequestScheduler {
     //当前正在进行的请求数量
     private static _curRequestCount: number = 0;
 
+    public static get curRequestCount () {
+        return this._curRequestCount;
+    }
+
     //记录任务类型对应的任务排序方法
     private static _taskTypeCompareFnMap: Map<RequestTaskType, (a: RequestTask, b: RequestTask) => number> = new Map();
 
     //默认的任务排序方法
-    private static _defaultTaskCompareFn = (a: RequestTask, b: RequestTask) => a.priority = b.priority;
+    private static _defaultTaskCompareFn = (a: RequestTask, b: RequestTask) => b.priority - a.priority;
 
     //任务类型->任务
     private static _taskTypeMap: Map<RequestTaskType, RequestTask[]> = new Map();
