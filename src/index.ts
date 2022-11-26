@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { director, Director } from './core/director';
 import { FrameRenderer } from './core/renderer/frame_renderer';
-import { Game } from './core/game';
+import { Engine } from './core/engine';
 import { interactionSystem } from './core/system/interaction_system';
 import { rendererSystem } from './core/system/renderer_system';
 import { DebugTools } from './tools/debug_tools';
@@ -13,7 +13,7 @@ import { RequestScheduler } from './core/xhr/scheduler/request_scheduler';
 const div1 = document.getElementById('output-div-1');
 const div2 = document.getElementById('output-div-2');
 
-Game.start();
+Engine.start();
 DebugTools.showStatsPanel();
 
 // console.log(state);
