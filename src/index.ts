@@ -12,7 +12,7 @@ import { SystemDefines } from './@types/core/system/system';
 const div1 = document.getElementById('output-div-1');
 const div2 = document.getElementById('output-div-2');
 
-Engine.start();
+Engine.init();
 DebugTools.showStatsPanel();
 
 // console.log(state);

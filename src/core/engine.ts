@@ -5,7 +5,7 @@ import { requestSystem } from "./system/request_system";
 
 export class Engine {
 
-    public static start () {
+    public static init () {
         director.registerSystem(rendererSystem);
         director.registerSystem(interactionSystem);
         director.registerSystem(requestSystem);
