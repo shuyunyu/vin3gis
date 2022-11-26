@@ -28,7 +28,8 @@ const scene = new THREE.Scene();
 
 const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
 
-AssetLoader.loadRasterTileTexture({ url: "https://threejs.org/examples/textures/crate.gif" }).then(texture => {
+//http://webst02.is.autonavi.com/appmaptile?style=6&x=48&y=29&z=6
+AssetLoader.loadRasterTileTexture({ url: "http://webst02.is.autonavi.com/appmaptile?style=6&x=48&y=29&z=6" }).then(texture => {
 
     const material = new THREE.MeshBasicMaterial({ map: texture });
 
