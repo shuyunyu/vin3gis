@@ -32,3 +32,10 @@ export interface RequestTaskOptions extends XHRRequestOptions {
     throttleServer?: boolean;//是否需要考虑每个服务器的并发限制
     onComplete: (result: RequestTaskResult) => void; //任务完成时的回调
 }
+
+//定义被 RequestSchedulere调度的任务
+//主要是为了使得requestTask.execute方法不在RequestScheduler的外部调用
+export interface IScheduleRequestTask {
+    priority: number;//任务优先级
+    abort: () => void;//终止此任务
+}

@@ -1,4 +1,4 @@
-import { RequestTaskOptions, RequestTaskType } from "./@types/request";
+import { IScheduleRequestTask, RequestTaskOptions, RequestTaskType } from "./@types/request";
 import { RequestTask } from "./request_task";
 
 /**
@@ -122,7 +122,7 @@ export class RequestScheduler {
             this._taskTypeMap.set(task.taskType, []);
         }
         this._taskTypeMap.get(task.taskType).push(task);
-        return task;
+        return task as IScheduleRequestTask;
     }
 
 }
