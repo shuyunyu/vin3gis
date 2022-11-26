@@ -83,9 +83,13 @@ director.once(Director.EVENT_DRAW_FRAME, () => {
 
 let totalRequestDown = 0;
 const testRequest = (index: number) => {
+    const z = Math.floor(Math.random() * 15);
+    const x = Math.floor(Math.random() * 15);
+    const y = Math.floor(Math.random() * 15);
     requestSystem.request({
         taskType: SystemDefines.RequestTaskeType.RASTER_TILE,
-        url: "http://111.231.106.169/smedicalAPI/statistic/covid/global/v1/overall",
+        imageTask: true,
+        url: `http://webst03.is.autonavi.com/appmaptile?style=6&x=${x}&y=${y}&z=${z}`,
         priority: 1000 - index,
         throttle: true,
         throttleServer: true,

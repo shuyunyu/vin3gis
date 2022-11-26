@@ -52,10 +52,19 @@ export class RequestTask {
     //取消此任务的执行方法
     private _cancelFunc?: Function;
 
+    private _isValid: boolean = true;
+
     //标识 是否是有效的请求
     //没有被取消
     public get isValid () {
-        return !!this._cancelFunc;
+        return this._isValid;
+    }
+
+    //标识是否是图片请求任务
+    private _imageTask: boolean;
+
+    public get imageTask () {
+        return this._imageTask;
     }
 
     private constructor (options: RequestTaskOptions) {
@@ -84,19 +93,22 @@ export class RequestTask {
     private init (options: RequestTaskOptions) {
         this._taskType = options.taskType;
         this.priority = options.priority ?? RequestTaskPriority.LOW;
+        this._imageTask = options.imageTask ?? false;
         this._options = Object.assign({}, options);
         //@ts-ignore
         this._url = XHRRequest.getRequestUrl(options);
         this._server = RequestServer.getServer(this._url);
+        this._isValid = true;
         this._options.cancelToken = new XHRCancelToken((cancelFunc: Function) => {
             this._cancelFunc = cancelFunc;
         });
     }
 
     /**
-     * 执行此任务
+     * 执行xhr请求
+     * @returns 
      */
-    public execute () {
+    private executeXHRRequest () {
         XHRRequest.create(this._options).then((response: XHRResponse) => {
             if (!response.abort) {
                 this._options.onComplete({
@@ -104,7 +116,6 @@ export class RequestTask {
                     status: RequestTaskStatus.SUCCESS,
                     taskType: this.taskType
                 });
-                RequestTask.onTaskComplete && RequestTask.onTaskComplete(this);
             } else {
                 if (RequestTask.DEBUG) {
                     console.log(`[${RequestTask.name}] [abort]: `, response.config.url);
@@ -114,9 +125,8 @@ export class RequestTask {
                     status: RequestTaskStatus.ABORT,
                     taskType: this.taskType
                 });
-                RequestTask.onTaskComplete && RequestTask.onTaskComplete(this);
             }
-            this.recycle();
+            this.onTaskComplete();
         }).catch(err => {
             console.log(`[${RequestTask.name}] [error]: `, err);
             this._options.onComplete({
@@ -124,8 +134,62 @@ export class RequestTask {
                 status: RequestTaskStatus.ERROR,
                 taskType: this.taskType
             });
-            RequestTask.onTaskComplete && RequestTask.onTaskComplete(this);
+            this.onTaskComplete();
         });
+    }
+
+    /**
+     * 执行图片请求
+     */
+    private executeImageRequest () {
+        const img = new Image();
+        if (global.location.protocol !== 'file:') {
+            img.crossOrigin = 'anonymous';
+        }
+        const scope = this;
+        function loadCallback () {
+            img.removeEventListener('load', loadCallback);
+            img.removeEventListener('error', errorCallback);
+            if (scope._isValid) {
+                scope._options.onComplete({
+                    image: img,
+                    status: RequestTaskStatus.SUCCESS,
+                    taskType: scope.taskType
+                });
+            } else {
+                //has been aborted.
+                scope._options.onComplete({
+                    image: img,
+                    status: RequestTaskStatus.ABORT,
+                    taskType: scope.taskType
+                })
+            }
+            scope.onTaskComplete();
+        }
+        function errorCallback (err: any) {
+            img.removeEventListener('load', loadCallback);
+            img.removeEventListener('error', errorCallback);
+            scope._options.onComplete({
+                error: err,
+                status: RequestTaskStatus.ERROR,
+                taskType: scope.taskType
+            });
+            scope.onTaskComplete();
+        }
+        img.addEventListener('load', loadCallback);
+        img.addEventListener('error', errorCallback);
+        img.src = this._url;
+    }
+
+    /**
+     * 执行此任务
+     */
+    public execute () {
+        if (!this.imageTask) {
+            this.executeXHRRequest();
+        } else {
+            this.executeImageRequest();
+        }
         return this;
     }
 
@@ -133,11 +197,19 @@ export class RequestTask {
      * 终止任务
      */
     public abort () {
+        this._isValid = false;
         if (this._cancelFunc) {
             this._cancelFunc();
             this._cancelFunc = null;
-            this.recycle();
         }
+    }
+
+    /**
+     * 请求任务完成
+     */
+    private onTaskComplete () {
+        RequestTask.onTaskComplete && RequestTask.onTaskComplete(this);
+        this.recycle();
     }
 
     /**
@@ -153,6 +225,8 @@ export class RequestTask {
         this._options = null;
         this._taskType = null;
         this.priority = null;
+        this._isValid = null;
+        this._imageTask = null;
     }
 
 }
