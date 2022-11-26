@@ -11,8 +11,12 @@ export namespace SystemDefines {
 
     //请求任务类型
     export enum RequestTaskeType {
+        IMAGE = "image",
         RASTER_TILE = "raster_tile",
-        JSON = "json"
+        JSON = "json",
+        BLOB = "blob",
+        ARRAYBUFFER = "arraybuffer",
+        OTHER = "other"
     }
 
 }

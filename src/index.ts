@@ -8,6 +8,7 @@ import { DebugTools } from './tools/debug_tools';
 import { requestSystem } from './core/system/request_system';
 import { RequestTaskResult } from './core/xhr/scheduler/@types/request';
 import { SystemDefines } from './@types/core/system/system';
+import { AssetLoader } from './core/asset/asset_loader';
 
 const div1 = document.getElementById('output-div-1');
 const div2 = document.getElementById('output-div-2');
@@ -26,24 +27,31 @@ camera.position.z = 1;
 const scene = new THREE.Scene();
 
 const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-const material = new THREE.MeshNormalMaterial();
 
-const mesh = new THREE.Mesh(geometry, material);
-mesh.position.y = 0.1
-scene.add(mesh);
+AssetLoader.loadRasterTileTexture({ url: "https://threejs.org/examples/textures/crate.gif" }).then(texture => {
 
-const gridHelper = new THREE.GridHelper(50, 50);
-// gridHelper.position.y = 0;
-scene.add(gridHelper);
+    const material = new THREE.MeshBasicMaterial({ map: texture });
 
-const mainFrameRenderer = new FrameRenderer(scene, camera, document.body);
-rendererSystem.addRenderTarget(mainFrameRenderer);
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.y = 0.1
+    scene.add(mesh);
 
-interactionSystem.enableInteraction(mainFrameRenderer);
+    const gridHelper = new THREE.GridHelper(50, 50);
+    // gridHelper.position.y = 0;
+    scene.add(gridHelper);
 
-global.mainFrameRenderer = mainFrameRenderer;
-global.rendererSystem = rendererSystem;
-global.interactionSystem = interactionSystem;
+    const mainFrameRenderer = new FrameRenderer(scene, camera, document.body);
+    rendererSystem.addRenderTarget(mainFrameRenderer);
+
+    interactionSystem.enableInteraction(mainFrameRenderer);
+
+    global.mainFrameRenderer = mainFrameRenderer;
+    global.rendererSystem = rendererSystem;
+    global.interactionSystem = interactionSystem;
+
+});
+
+
 
 // const frameRenderer1 = new FrameRenderer(scene, camera, div1);
 // const frameRenderer2 = new FrameRenderer(scene, camera, div2);

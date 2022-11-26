@@ -29,8 +29,12 @@ export class RequestSystem extends System {
     }
 
     public init () {
+        RequestScheduler.setTaskTypeCompareFn(SystemDefines.RequestTaskeType.IMAGE, RequestSystem.descCompareFn);
         RequestScheduler.setTaskTypeCompareFn(SystemDefines.RequestTaskeType.RASTER_TILE, RequestSystem.descCompareFn);
         RequestScheduler.setTaskTypeCompareFn(SystemDefines.RequestTaskeType.JSON, RequestSystem.descCompareFn);
+        RequestScheduler.setTaskTypeCompareFn(SystemDefines.RequestTaskeType.BLOB, RequestSystem.descCompareFn);
+        RequestScheduler.setTaskTypeCompareFn(SystemDefines.RequestTaskeType.ARRAYBUFFER, RequestSystem.descCompareFn);
+        RequestScheduler.setTaskTypeCompareFn(SystemDefines.RequestTaskeType.OTHER, RequestSystem.descCompareFn);
     }
 
     public update (dt: number) {
