@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { Camera, OrthographicCamera, PerspectiveCamera, Renderer, Scene } from "three";
+import { Camera, OrthographicCamera, PerspectiveCamera, Renderer, Scene, WebGLRendererParameters } from "three";
 
 /**
  * 帧渲染器
@@ -33,8 +33,10 @@ export class FrameRenderer {
 
     private _destroyed: boolean = false;
 
-    public constructor (scene: Scene, camera: PerspectiveCamera | OrthographicCamera, target: HTMLElement) {
-        this._renderer = new THREE.WebGLRenderer({ antialias: true });
+    public constructor (scene: Scene, camera: PerspectiveCamera | OrthographicCamera, target: HTMLElement, rendererParams?: WebGLRendererParameters) {
+        this._renderer = new THREE.WebGLRenderer(Object.assign({ antialias: true }, rendererParams));
+        //@ts-ignore
+        this._renderer.setPixelRatio(window.devicePixelRatio);
         this._scene = scene;
         this._camera = camera;
         this._target = target;
