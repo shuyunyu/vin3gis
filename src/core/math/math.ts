@@ -97,4 +97,39 @@ export class math {
         return val < min ? min : val > max ? max : val;
     }
 
+    public static negativePiToPi (angle: number) {
+        if (angle >= -this.PI && angle <= this.PI) {
+            // Early exit if the input is already inside the range. This avoids
+            // unnecessary math which could introduce floating point error.
+            return angle;
+        }
+        return this.zeroToTwoPi(angle + this.PI) - this.PI;
+    }
+
+    public static zeroToTwoPi (angle: number) {
+        if (angle >= 0 && angle <= this.TWO_PI) {
+            // Early exit if the input is already inside the range. This avoids
+            // unnecessary math which could introduce floating point error.
+            return angle;
+        }
+        var mod = this.mod(angle, this.TWO_PI);
+        if (
+            Math.abs(mod) < this.EPSILON14 &&
+            Math.abs(angle) > this.EPSILON14
+        ) {
+            return this.TWO_PI;
+        }
+        return mod;
+    }
+
+    public static mod (m: number, n: number) {
+        if (Math.sign(m) === Math.sign(n) && Math.abs(m) < Math.abs(n)) {
+            // Early exit if the input does not need to be modded. This avoids
+            // unnecessary math which could introduce floating point error.
+            return m;
+        }
+
+        return ((m % n) + n) % n;
+    }
+
 }
