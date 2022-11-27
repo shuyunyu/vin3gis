@@ -10,3 +10,10 @@ export interface ICartesian3Like extends ICartesian2Like {
 export interface ICartesian4Like extends ICartesian3Like {
     w: number;
 }
+
+export interface IQuatLike {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+}
