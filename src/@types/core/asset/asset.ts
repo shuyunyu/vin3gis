@@ -3,11 +3,11 @@ import { SystemDefines } from "../system/system";
 export namespace AssetDefines {
 
     /**
-     * 加载贴图的参数
+     * 加载资源的参数
      */
-    export type LoadTextureParams = {
+    export type LoadAssetParams = {
         url: string;
-        taskType?: SystemDefines.RequestTaskeType.IMAGE | SystemDefines.RequestTaskeType.RASTER_TILE,
+        taskType?: SystemDefines.RequestTaskeType,
         params?: any;
     }
 

@@ -121,17 +121,15 @@ export class RequestTask {
                         status: RequestTaskStatus.SUCCESS,
                         taskType: this.taskType
                     });
-                    this.onTaskComplete();
                 } else {
-                    RequestUtil.createImageFromResponse(response, (image: HTMLImageElement) => {
-                        this._options.onComplete({
-                            image: image,
-                            status: RequestTaskStatus.SUCCESS,
-                            taskType: this.taskType
-                        });
-                        this.onTaskComplete();
+                    const image = RequestUtil.createImageFromResponse(response);
+                    this._options.onComplete({
+                        image: image,
+                        status: RequestTaskStatus.SUCCESS,
+                        taskType: this.taskType
                     });
                 }
+                this.onTaskComplete();
             } else {
                 if (RequestTask.DEBUG) {
                     console.log(`[${RequestTask.name}] [abort]: `, response.config.url);

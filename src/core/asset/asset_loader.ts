@@ -10,11 +10,12 @@ import { RequestTaskResult, RequestTaskStatus } from "../xhr/scheduler/@types/re
 export class AssetLoader {
 
     /**
-     * 加载贴图资源
+     * 加载图片资源
+     * @param params 
      * @returns 
      */
-    public static loadTexture (params: AssetDefines.LoadTextureParams) {
-        return new Promise<Texture>((resolve, reject) => {
+    public static loadImage (params: AssetDefines.LoadAssetParams) {
+        return new Promise<HTMLImageElement>((resolve, reject) => {
             requestSystem.request({
                 url: params.url,
                 taskType: params.taskType || SystemDefines.RequestTaskeType.IMAGE,
@@ -22,14 +23,31 @@ export class AssetLoader {
                 params: params.params,
                 onComplete: (result: RequestTaskResult) => {
                     if (result.status === RequestTaskStatus.SUCCESS) {
-                        const texture = new Texture();
-                        texture.image = result.image;
-                        texture.needsUpdate = true;
-                        resolve(texture);
+                        result.image.onload = () => {
+                            result.image.onload = null;
+                            resolve(result.image);
+                        }
                     } else {
-                        reject("load texture failed.");
+                        reject("load image failed.");
                     }
                 }
+            });
+        });
+    }
+
+    /**
+     * 加载贴图资源
+     * @returns 
+     */
+    public static loadTexture (params: AssetDefines.LoadAssetParams) {
+        return new Promise<Texture>((resolve, reject) => {
+            this.loadImage(params).then((image: HTMLImageElement) => {
+                const texture = new Texture();
+                texture.image = image;
+                texture.needsUpdate = true;
+                resolve(texture);
+            }).catch(err => {
+                reject("load texture failed.");
             })
         });
     }
@@ -39,7 +57,7 @@ export class AssetLoader {
      * @param params 
      * @returns 
      */
-    public static loadRasterTileTexture (params: AssetDefines.LoadTextureParams) {
+    public static loadRasterTileTexture (params: AssetDefines.LoadAssetParams) {
         return this.loadTexture(Object.assign(params, { taskType: SystemDefines.RequestTaskeType.RASTER_TILE }));
     }
 
