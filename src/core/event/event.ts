@@ -81,8 +81,10 @@ export class Event {
      * @param args 
      */
     public dispatchEvent (event: EventType, ...args: any) {
-        const listeners = this._listenerRecord[event];
-        if (listeners) {
+        let listeners = this._listenerRecord[event];
+        if (listeners && listeners.length) {
+            //复制一份 防止remove之后导致遍历数组变化
+            listeners = listeners.slice(0);
             listeners.forEach(l => {
                 l.listener.apply(l.context, args);
                 if (l.once) this._toRemoveListeners.push({ event: event, listener: l });

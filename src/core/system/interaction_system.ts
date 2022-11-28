@@ -1,6 +1,5 @@
-import CameraControls from "camera-controls";
-import * as THREE from "three";
 import { SystemDefines } from "../../@types/core/system/system";
+import { OrbitControls } from "../controls/obrit_controls";
 import { FrameRenderer } from "../renderer/frame_renderer";
 import { System } from "./system";
 
@@ -17,7 +16,7 @@ export class InteractionSystem extends System {
         return this._instance;
     }
 
-    private _rendererControls: { renderer: FrameRenderer, controls: CameraControls }[] = [];
+    private _rendererControls: { renderer: FrameRenderer, controls: OrbitControls }[] = [];
 
     private constructor () {
         super();
@@ -25,7 +24,7 @@ export class InteractionSystem extends System {
     }
 
     public init () {
-        CameraControls.install({ THREE: THREE });
+
     }
 
     /**
@@ -35,9 +34,10 @@ export class InteractionSystem extends System {
     public enableInteraction (target: FrameRenderer) {
         const index = this.findControlsIndex(target)
         if (index === -1) {
-            const controls = new CameraControls(target.camera, target.interactionElement);
+            const controls = new OrbitControls(target.camera, target.interactionElement);
             this._rendererControls.push({ renderer: target, controls: controls });
         } else {
+            //@ts-ignore
             this._rendererControls[index].controls.enabled = true;
         }
     }
@@ -50,6 +50,7 @@ export class InteractionSystem extends System {
         const index = this.findControlsIndex(target);
         if (index > -1) {
             const rc = this._rendererControls.splice(index, 1)[0];
+            //@ts-ignore
             rc.controls.dispose();
         }
     }
@@ -59,7 +60,8 @@ export class InteractionSystem extends System {
     }
 
     public update (dt: number) {
-        this._rendererControls.forEach(rc => rc.controls.update(dt));
+        //@ts-ignore
+        this._rendererControls.forEach(rc => rc.controls.update());
     }
 
 }
