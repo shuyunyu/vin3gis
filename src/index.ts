@@ -33,6 +33,8 @@ AssetLoader.loadRasterTileTexture({ url: "http://webst02.is.autonavi.com/appmapt
 
     const material = new THREE.MeshBasicMaterial({ map: texture });
 
+    // const material = new THREE.MeshNormalMaterial();
+
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.y = 0.1
     scene.add(mesh);

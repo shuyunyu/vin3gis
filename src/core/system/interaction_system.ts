@@ -1,5 +1,6 @@
+import { IOrbitControls } from "../../@types/core/controls/controls";
 import { SystemDefines } from "../../@types/core/system/system";
-import { OrbitControls } from "../controls/obrit_controls";
+import { MapControls, OrbitControls } from "../controls/obrit_controls";
 import { FrameRenderer } from "../renderer/frame_renderer";
 import { System } from "./system";
 
@@ -16,7 +17,18 @@ export class InteractionSystem extends System {
         return this._instance;
     }
 
-    private _rendererControls: { renderer: FrameRenderer, controls: OrbitControls }[] = [];
+    //默认交互配置
+    private _config: SystemDefines.InteractionConfig = {
+        type: SystemDefines.InteractionType.MAP,
+        prop: {
+            enableDamping: true,
+            mouseButtons: {
+                MIDDLE: undefined
+            }
+        }
+    }
+
+    private _rendererControls: { renderer: FrameRenderer, controls: IOrbitControls }[] = [];
 
     private constructor () {
         super();
@@ -31,13 +43,36 @@ export class InteractionSystem extends System {
      * 开启交互
      * @param target 
      */
-    public enableInteraction (target: FrameRenderer) {
+    public enableInteraction (target: FrameRenderer, interactionConfig?: SystemDefines.InteractionConfig) {
         const index = this.findControlsIndex(target)
         if (index === -1) {
-            const controls = new OrbitControls(target.camera, target.interactionElement);
+            interactionConfig = interactionConfig ?? this._config;
+            let controls: IOrbitControls;
+            if (interactionConfig.type === SystemDefines.InteractionType.ORBIT) {
+                //@ts-ignore
+                controls = new OrbitControls(target.camera, target.interactionElement) as IOrbitControls
+            } else {
+                //@ts-ignore
+                controls = new MapControls(target.camera, target.interactionElement) as IOrbitControls;
+            }
+
+            //set controls's prop
+            if (interactionConfig.prop) {
+                for (let key in interactionConfig.prop) {
+                    const val = interactionConfig.prop[key];
+                    //if prop val is object like mouseButtons
+                    if (typeof val === "object") {
+                        for (let k in val) {
+                            controls[key][k] = val[k];
+                        }
+                    } else {
+                        controls[key] = val;
+                    }
+                }
+            }
+
             this._rendererControls.push({ renderer: target, controls: controls });
         } else {
-            //@ts-ignore
             this._rendererControls[index].controls.enabled = true;
         }
     }
@@ -50,7 +85,6 @@ export class InteractionSystem extends System {
         const index = this.findControlsIndex(target);
         if (index > -1) {
             const rc = this._rendererControls.splice(index, 1)[0];
-            //@ts-ignore
             rc.controls.dispose();
         }
     }
@@ -60,7 +94,6 @@ export class InteractionSystem extends System {
     }
 
     public update (dt: number) {
-        //@ts-ignore
         this._rendererControls.forEach(rc => rc.controls.update());
     }
 

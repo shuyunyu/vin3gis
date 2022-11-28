@@ -1,3 +1,5 @@
+import { ControlsProperty } from "../controls/controls"
+
 export namespace SystemDefines {
 
     //系统优先级
@@ -17,6 +19,18 @@ export namespace SystemDefines {
         BLOB = "blob",
         ARRAYBUFFER = "arraybuffer",
         OTHER = "other"
+    }
+
+    //交互类型
+    export enum InteractionType {
+        ORBIT,
+        MAP
+    }
+
+    //渲染配置
+    export type InteractionConfig = {
+        type: InteractionType,
+        prop: ControlsProperty
     }
 
 }

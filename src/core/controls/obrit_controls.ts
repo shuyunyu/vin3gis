@@ -1,6 +1,5 @@
 //@ts-nocheck
 import {
-    Camera,
     MOUSE,
     Quaternion,
     Spherical,
@@ -23,7 +22,7 @@ const _endEvent = { type: 'end' };
 
 class OrbitControls extends EventDispatcher {
 
-    constructor (object: Camera, domElement: HTMLElement) {
+    constructor (object, domElement) {
 
         super();
 
