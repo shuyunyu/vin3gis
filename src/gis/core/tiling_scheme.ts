@@ -1,3 +1,4 @@
+import { Box3, Sphere } from "three";
 import { Cartesian2 } from "./cartesian/cartesian2";
 import { Cartographic } from "./cartographic";
 import { Rectangle } from "./geometry/rectangle";
@@ -19,10 +20,10 @@ export interface ITilingScheme {
     tileXYToRectangle (x: number, y: number, level: number): Rectangle;
     //将瓦片转换为 本地坐标系 的 Rectangle    creator单位
     tileXYToNativeRectangle (x: number, y: number, level: number): Rectangle;
-    //将瓦片转换为 本地坐标系 的 AABB
-    // tileXYToNativeAABB (x: number, y: number, level: number): geometry.AABB;
+    //将瓦片转换为 本地坐标系 的 Box3
+    tileXYToNativeAABB (x: number, y: number, level: number): Box3;
     //将瓦片转换为 本地坐标系 的 Shpere
-    // tileXYToNativeShpere (x: number, y: number, level: number): geometry.Sphere;
+    tileXYToNativeShpere (x: number, y: number, level: number): Sphere;
     //将 cartographic 转换为对应等级下的XY瓦片
     positionToTileXY (position: Cartographic, level: number): Cartesian2 | undefined;
 }
