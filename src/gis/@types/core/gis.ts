@@ -17,3 +17,11 @@ export interface IQuatLike {
     z: number;
     w: number;
 }
+
+//四叉树瓦片 加载状态
+export enum QuadtreeTileLoadState {
+    START = 0,
+    LOADING,
+    DONE,
+    FAILED
+}
