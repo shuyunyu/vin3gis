@@ -1,9 +1,13 @@
-import { Camera, Frustum, Quaternion, Ray, Vector3 } from "three";
+import { Frustum, PerspectiveCamera, Quaternion, Ray, Vector3 } from "three";
 import { Partial, RTS } from "../../../@types/global/global";
+import { VecConstants } from "../../../core/constants/vec_constants";
+import { math } from "../../../core/math/math";
+import { CameraUtils } from "../../../core/utils/camera_utils";
 import { Cartesian3 } from "../cartesian/cartesian3";
 import { Transform } from "../transform/transform";
 
 const vec3_1 = new Vector3();
+const vec3_2 = new Vector3();
 
 const vec3_1_1 = new Vector3();
 
@@ -23,7 +27,7 @@ const tempRay = new Ray();
  */
 export class FrameState {
 
-    public camera: Camera;
+    public camera: PerspectiveCamera;
 
     public domEle: HTMLElement;
 
@@ -74,19 +78,19 @@ export class FrameState {
 
     public frustum: Frustum;
 
-    constructor (camera: Camera, domEle: HTMLElement) {
+    constructor (camera: PerspectiveCamera, domEle: HTMLElement) {
         this.camera = camera;
         this.domEle = domEle;
         this.cameraWorldPosition = camera.getWorldPosition(vec3_1);
         this.cameraPositionWC = Transform.worldCar3ToGeoCar3(this.cameraWorldPosition, scratchCameraPosWC);
         this.cameraWorldQuat = camera.getWorldQuaternion(quat_1);
         this.canvasSize = { width: domEle.clientWidth, height: domEle.clientHeight };
-        let viewLineRay = this.camera.screenPointToRay(ResourceCenter.containerWidth / 2, ResourceCenter.containerHeight / 2, tempRay);
-        this.cameraDirection = viewLineRay.d.clone().normalize();
-        this.cameraDirectionWC = Vec3.normalize(new Cartesian3(), Transform.worldVec3ToCartesian3(this.cameraDirection, scratchDirectionWC));
-        this.frustum = camera.camera.frustum;
+        let viewLineRay = CameraUtils.screenPointToRay(VecConstants.ZERO_VEC2, this.camera, tempRay);
+        this.cameraDirection = vec3_2.copy(viewLineRay.direction).normalize();
+        this.cameraDirectionWC = Transform.worldCar3ToEarthVec3(this.cameraDirection, scratchDirectionWC).normalize();
+        this.frustum = camera.frustum;
         this.cameraChanged = FrameState.renderedFrameCount === 0 || !this.cameraWorldPosition.equals(FrameState.preCameraState.position) || !this.cameraWorldQuat.equals(FrameState.preCameraState.rotation!);
-        this.sseDenominator = 2 * Math.tan(Util.toRadians(camera.fov * 0.5));
+        this.sseDenominator = 2 * Math.tan(math.toRadians(camera.fov * 0.5));
     }
 
     public endFrame () {
