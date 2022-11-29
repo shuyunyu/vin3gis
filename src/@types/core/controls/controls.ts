@@ -1,5 +1,5 @@
 import { MOUSE } from "three";
-import { DeepPartial } from "../partial";
+import { DeepPartial } from "../../global/global";
 
 export interface IControlsProperty {
     enabled: boolean;
