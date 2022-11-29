@@ -1,8 +1,8 @@
 import { Box3, Sphere } from "three";
-import { Cartesian2 } from "./cartesian/cartesian2";
-import { Cartographic } from "./cartographic";
-import { Rectangle } from "./geometry/rectangle";
-import { IProjection } from "./projection/projection";
+import { Cartesian2 } from "../cartesian/cartesian2";
+import { Cartographic } from "../cartographic";
+import { Rectangle } from "../geometry/rectangle";
+import { IProjection } from "../projection/projection";
 
 /**
  * 规定瓦片 方案的 接口
