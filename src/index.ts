@@ -119,3 +119,20 @@ globalThis.testRequest = () => {
         testRequest(i);
     }
 }
+
+// globalThis.testCreateObj = () => {
+//     const count = 50;
+//     const list: Box3[] = [];
+//     let start = performance.now();
+//     for (let i = 0; i < count; i++) {
+//         const box3 = new Box3(new Vector3(0, 0, 0), new Vector3(1, 1, 1));
+//         list.push(box3);
+//     }
+//     console.log(`创建${count}个,耗时[${performance.now() - start}] ms.`);
+//     list.forEach(b => box3Pool.recycle(b));
+//     start = performance.now();
+//     for (let i = 0; i < count; i++) {
+//         const box3 = box3Pool.create({ max: new Vector3(0, 0, 0), min: new Vector3(1, 1, 1) });
+//     }
+//     console.log(`从对象池创建${count}个,耗时[${performance.now() - start}] ms.`);
+// }
