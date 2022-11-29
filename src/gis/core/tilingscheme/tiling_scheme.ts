@@ -9,7 +9,11 @@ import { IProjection } from "../projection/projection";
  */
 export interface ITilingScheme {
     //投影
-    projection: IProjection
+    projection: IProjection;
+    //瓦片宽度
+    tileWidth: number;
+    //瓦片高度
+    tileHeight: number;
     //获取指定等级下的分辨率 米/像素
     getResolutionAtLevel (level: number): number;
     //获取指定等级下 X方向的瓦片数目
@@ -18,7 +22,7 @@ export interface ITilingScheme {
     getNumberOfYTilesAtLevel (level: number): number;
     //将瓦片转换为投影坐标系的 Recgangle 米制单位
     tileXYToRectangle (x: number, y: number, level: number): Rectangle;
-    //将瓦片转换为 本地坐标系 的 Rectangle    creator单位
+    //将瓦片转换为 本地坐标系 的 Rectangle    threejs单位
     tileXYToNativeRectangle (x: number, y: number, level: number): Rectangle;
     //将瓦片转换为 本地坐标系 的 Box3
     tileXYToNativeAABB (x: number, y: number, level: number): Box3;

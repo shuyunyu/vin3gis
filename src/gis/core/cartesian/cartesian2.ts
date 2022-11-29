@@ -1,3 +1,4 @@
+import { Vector2 } from "three";
 import { math } from "../../../core/math/math";
 import { ICartesian2Like, ICartesian3Like } from "../../@types/core/gis";
 import { Cartesian3 } from "./cartesian3";
@@ -300,6 +301,12 @@ export class Cartesian2 implements ICartesian2Like {
         return Math.sqrt(Math.pow(this.x - car2.x, 2) + Math.pow(this.y - car2.y, 2));
     }
 
+    public toVec2 (out?: Vector2) {
+        out = out || new Vector2();
+        out.set(this.x, this.y);
+        return out;
+    }
+
     public static fromArray (arr: number[], out?: Cartesian2) {
         out = out || new Cartesian2();
         out.set(arr[0], arr[1]);
@@ -593,6 +600,9 @@ export class Cartesian2 implements ICartesian2Like {
         return Math.acos(cosine);
     }
 
+    public static toVec2 (car2: Cartesian2, out?: Vector2) {
+        return car2.toVec2(out);
+    }
 
 }
 
