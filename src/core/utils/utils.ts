@@ -16,7 +16,7 @@ export class Utils {
      * @param right 
      * @returns 
      */
-    public static equalRTS (left: RTS, right: RTS) {
+    public static equalsRTS (left: RTS, right: RTS) {
         return left.position.equals(right.position) && left.rotation.equals(right.rotation!) && left.scale.equals(right.scale);
     }
 

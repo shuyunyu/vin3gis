@@ -14,8 +14,8 @@ export class CameraUtils {
         if (updateCamera) {
             camera.updateMatrix();
             camera.updateMatrixWorld();
+            camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
         }
-        camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
         out = out || new Frustum();
         out.setFromProjectionMatrix(mat4_1.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
         return out;

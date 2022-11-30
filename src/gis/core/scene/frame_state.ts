@@ -1,5 +1,5 @@
 import { Frustum, PerspectiveCamera, Quaternion, Ray, Vector3 } from "three";
-import { Partial, RTS } from "../../../@types/global/global";
+import { RTS } from "../../../@types/global/global";
 import { VecConstants } from "../../../core/constants/vec_constants";
 import { math } from "../../../core/math/math";
 import { CameraUtils } from "../../../core/utils/camera_utils";
@@ -37,7 +37,7 @@ export class FrameState {
     /**
      * 上一帧摄像机位置及欧拉角信息
      */
-    public static preCameraState: Partial<RTS> = Object.create(null);
+    public static preCameraState: RTS = Object.create(null);
 
     public static renderedFrameCount: number = 0;
 
@@ -88,7 +88,7 @@ export class FrameState {
         this.cameraDirection = vec3_2.copy(viewLineRay.direction).normalize();
         this.cameraDirectionWC = Transform.worldCar3ToEarthVec3(this.cameraDirection, scratchDirectionWC).normalize();
         this.frustum = CameraUtils.getFrustum(this.camera);
-        this.cameraChanged = FrameState.renderedFrameCount === 0 || !Utils.equalRTS(this.cameraWorldRTS, FrameState.preCameraState);
+        this.cameraChanged = FrameState.renderedFrameCount === 0 || !Utils.equalsRTS(this.cameraWorldRTS, FrameState.preCameraState);
         this.sseDenominator = 2 * Math.tan(math.toRadians(camera.fov * 0.5));
     }
 
