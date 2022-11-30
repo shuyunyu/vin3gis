@@ -6,7 +6,7 @@ export type DeepPartial<T> = T extends Function
     ? { [P in keyof T]?: DeepPartial<T[P]> }
     : T;
 
-export type Constructor<T> = new (...args: any[]) => T;
+export type Constructor<T = unknown> = new (...args: any[]) => T;
 
 export type Partial<T> = T extends Function
     ? T :

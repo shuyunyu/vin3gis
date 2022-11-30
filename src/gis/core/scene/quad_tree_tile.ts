@@ -2,6 +2,7 @@ import { Box3, Sphere } from "three";
 import { Utils } from "../../../core/utils/utils";
 import { QuadtreeTileLoadState } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
+import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { FrameState } from "./frame_state";
 import { TileBoundingRegion } from "./tile_bounding_region";
@@ -252,7 +253,7 @@ export class QuadtreeTile {
     }
 
     /**
-     * 判断瓦片释放可以渲染
+     * 判断瓦片是否可以渲染
      */
     public canRender (imageryProviderCollection: ImageryTileProviderCollection, considerAllProvider?: boolean) {
         let imageryProviders = imageryProviderCollection.toArray();

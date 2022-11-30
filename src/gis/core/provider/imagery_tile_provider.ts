@@ -1,5 +1,5 @@
 import { GenericEvent } from "../../../core/event/generic_event";
-import { RequestTask } from "../../../core/xhr/scheduler/request_task";
+import { IScheduleRequestTask, RequestTaskStatus } from "../../../core/xhr/scheduler/@types/request";
 import { Rectangle } from "../geometry/rectangle";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { QuadtreeTileQueue } from "../scene/quad_tree_tile_queue";
@@ -44,7 +44,7 @@ export interface IImageryTileProvider {
     //验证瓦片的缩放等级是否在限制的缩放等级之内
     validateTileLevelIsInRange (level: number): boolean;
     //请求 图片资源
-    requestTileImageAsset (x: number, y: number, level: number, priority: number, onComplete: (img: HTMLImageElement) => void): RequestTask | undefined;
+    requestTileImageAsset (x: number, y: number, level: number, priority: number, onComplete: (img: HTMLImageElement, state: RequestTaskStatus) => void): IScheduleRequestTask | undefined;
     //计算瓦片可见性
     computeTileVisibility (tile: QuadtreeTile): boolean;
     //获取指定等级下的 最大几何误差
