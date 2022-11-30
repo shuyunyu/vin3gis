@@ -1,15 +1,20 @@
-class TileNodeCache {
+import { IImageryTileProvider } from "../provider/imagery_tile_provider";
+import { TileNode } from "../scene/tile_node";
 
-    private static _instance?: TileNodeCache;
+export class TileNodeCache {
 
-    public static get instance () {
-        if (this._instance) return this._instance;
-        this._instance = new TileNodeCache();
-        return this._instance;
+    private _provider: IImageryTileProvider;
+
+    public constructor (provider: IImageryTileProvider) {
+        this._provider = provider;
     }
 
-    private constructor () { }
+    /**
+     * 回收瓦片节点
+     * @param tileNode 
+     */
+    public recyleTileNode (tileNode: TileNode) {
+
+    }
 
 }
-
-export const tileNodeCache = TileNodeCache.instance;

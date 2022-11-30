@@ -5,6 +5,7 @@ import { Rectangle } from "../geometry/rectangle";
 import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { FrameState } from "./frame_state";
+import { GlobeSurfaceTile } from "./globe_surface_tile";
 import { TileBoundingRegion } from "./tile_bounding_region";
 
 /**

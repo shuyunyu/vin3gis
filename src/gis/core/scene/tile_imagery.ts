@@ -53,7 +53,7 @@ export class TileImagery {
         return this._node;
     }
 
-    public set node (val: Node | undefined) {
+    public set node (val: TileNode | undefined) {
         this._node = val;
     }
 
@@ -169,7 +169,7 @@ export class TileImagery {
      */
     public recyleNodeResource () {
         if (Utils.defined(this._node)) {
-            this._imageryProvider.tileNodeCacheManager.recyleTileNode(this._node!);
+            this._imageryProvider.tileNodeCache.recyleTileNode(this._node!);
             this._node = undefined;
         }
         this.releaseTextureResource();
