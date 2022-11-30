@@ -1,3 +1,4 @@
+import { Frustum } from "three";
 import { GenericEvent } from "../../../core/event/generic_event";
 import { IScheduleRequestTask, RequestTaskStatus } from "../../../core/xhr/scheduler/@types/request";
 import { Rectangle } from "../geometry/rectangle";
@@ -17,7 +18,7 @@ export interface IImageryTileProvider {
     //瓦片格式 .png | .jpg
     format: string;
     //是否以base64的方式加载瓦片
-    isBase64: boolean;
+    // isBase64: boolean;
     //是否可见
     visible: boolean;
     //最大缩放等级
@@ -31,7 +32,7 @@ export interface IImageryTileProvider {
     //标识 是否准备完毕
     ready: boolean;
     //装备完成的Promise
-    readyPromise: Promise<boolean>;
+    // readyPromise: Promise<boolean>;
     //瓦片提供范围
     rectangle: Rectangle;
     //瓦片方案
@@ -45,7 +46,7 @@ export interface IImageryTileProvider {
     //请求 图片资源
     requestTileImageAsset (x: number, y: number, level: number, priority: number, onComplete: (img: HTMLImageElement, state: RequestTaskStatus) => void): IScheduleRequestTask | undefined;
     //计算瓦片可见性
-    computeTileVisibility (tile: QuadtreeTile): boolean;
+    computeTileVisibility (tile: QuadtreeTile, frustum: Frustum): boolean;
     //获取指定等级下的 最大几何误差
     getLevelMaximumGeometricError (level: number): number;
     //将瓦片渲染至creator的节点

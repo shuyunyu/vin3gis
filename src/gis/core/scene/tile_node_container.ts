@@ -9,9 +9,9 @@ export class TileNodeContainer {
 
     private _list: UniqueList<TileNode> = new UniqueList();
 
-    //需要挂到场景中的object
     private _object3d: Object3D;
 
+    //需要挂到场景中的object
     public get object3d () {
         return this._object3d;
     }
