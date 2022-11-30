@@ -9,6 +9,11 @@ import { requestSystem } from './core/system/request_system';
 import { RequestTaskResult } from './core/xhr/scheduler/@types/request';
 import { SystemDefines } from './@types/core/system/system';
 import { AssetLoader } from './core/asset/asset_loader';
+import { CameraUtils } from './core/utils/camera_utils';
+import { GeometryUtils } from './gis/utils/geometry_utils';
+import { VecConstants } from './core/constants/vec_constants';
+import { PerspectiveCamera, Vector3 } from 'three';
+import { FrameState } from './gis/core/scene/frame_state';
 
 const div1 = document.getElementById('output-div-1');
 const div2 = document.getElementById('output-div-2');
@@ -27,6 +32,8 @@ camera.position.z = 1;
 const scene = new THREE.Scene();
 
 const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+const box = GeometryUtils.createBox3(new Vector3(0.0, 0.1, 0.0), 0.1, 0.1, 0.1);
+
 
 //http://webst02.is.autonavi.com/appmaptile?style=6&x=48&y=29&z=6
 AssetLoader.loadRasterTileTexture({ url: "http://webst02.is.autonavi.com/appmaptile?style=6&x=48&y=29&z=6" }).then(texture => {
@@ -52,6 +59,23 @@ AssetLoader.loadRasterTileTexture({ url: "http://webst02.is.autonavi.com/appmapt
     global.rendererSystem = rendererSystem;
     global.interactionSystem = interactionSystem;
 
+
+    director.addEventListener(Director.EVENT_BEGIN_FRAME, (dt: number) => {
+        // let time = Date.now();
+        // mesh.rotation.x = time / 2000;
+        // mesh.rotation.y = time / 1000;
+
+        //test frustum
+        let start = performance.now();
+        const frustum = CameraUtils.getFrustum(mainFrameRenderer.camera, false);
+        console.log("intersect: ", frustum.intersectsBox(box), performance.now() - start);
+
+        //test framestate
+        start = performance.now();
+        const frameState = new FrameState(mainFrameRenderer.camera as PerspectiveCamera, mainFrameRenderer.domElement);
+        console.log("create frameState: ", performance.now() - start);
+        frameState.endFrame();
+    });
 });
 
 
@@ -66,11 +90,7 @@ AssetLoader.loadRasterTileTexture({ url: "http://webst02.is.autonavi.com/appmapt
 // CameraControls.install({ THREE: THREE });
 // const cameraControls = new CameraControls(mainFrameRenderer.camera, mainFrameRenderer.interactionElement);
 
-director.addEventListener(Director.EVENT_BEGIN_FRAME, (dt: number) => {
-    // let time = Date.now();
-    // mesh.rotation.x = time / 2000;
-    // mesh.rotation.y = time / 1000;
-});
+
 
 director.once(Director.EVENT_DRAW_FRAME, () => {
     console.log("direction draw frame.")

@@ -3,13 +3,16 @@ import { Partial, RTS } from "../../../@types/global/global";
 import { VecConstants } from "../../../core/constants/vec_constants";
 import { math } from "../../../core/math/math";
 import { CameraUtils } from "../../../core/utils/camera_utils";
+import { Utils } from "../../../core/utils/utils";
 import { Cartesian3 } from "../cartesian/cartesian3";
 import { Transform } from "../transform/transform";
 
 const vec3_1 = new Vector3();
 const vec3_2 = new Vector3();
+const vec3_3 = new Vector3();
 
 const vec3_1_1 = new Vector3();
+const vec3_1_2 = new Vector3();
 
 const quat_1 = new Quaternion();
 
@@ -39,20 +42,15 @@ export class FrameState {
     public static renderedFrameCount: number = 0;
 
     /**
-     * 摄像机的世界坐标
+     * 摄像机的世界RTS
      * 
      */
-    public cameraWorldPosition: Vector3;
+    public cameraWorldRTS: RTS = Object.create(null);
 
     /**
      * 摄像机世界笛卡尔坐标
      */
     public cameraPositionWC: Cartesian3;
-
-    /**
-     * 摄像机的欧拉角
-     */
-    public cameraWorldQuat: Quaternion;
 
     /**
      * 摄像机view line
@@ -81,21 +79,23 @@ export class FrameState {
     constructor (camera: PerspectiveCamera, domEle: HTMLElement) {
         this.camera = camera;
         this.domEle = domEle;
-        this.cameraWorldPosition = camera.getWorldPosition(vec3_1);
-        this.cameraPositionWC = Transform.worldCar3ToGeoCar3(this.cameraWorldPosition, scratchCameraPosWC);
-        this.cameraWorldQuat = camera.getWorldQuaternion(quat_1);
+        this.cameraWorldRTS.position = camera.getWorldPosition(vec3_1);
+        this.cameraPositionWC = Transform.worldCar3ToGeoCar3(this.cameraWorldRTS.position, scratchCameraPosWC);
+        this.cameraWorldRTS.rotation = camera.getWorldQuaternion(quat_1);
+        this.cameraWorldRTS.scale = camera.getWorldScale(vec3_3);
         this.canvasSize = { width: domEle.clientWidth, height: domEle.clientHeight };
         let viewLineRay = CameraUtils.screenPointToRay(VecConstants.ZERO_VEC2, this.camera, tempRay);
         this.cameraDirection = vec3_2.copy(viewLineRay.direction).normalize();
         this.cameraDirectionWC = Transform.worldCar3ToEarthVec3(this.cameraDirection, scratchDirectionWC).normalize();
-        this.frustum = camera.frustum;
-        this.cameraChanged = FrameState.renderedFrameCount === 0 || !this.cameraWorldPosition.equals(FrameState.preCameraState.position) || !this.cameraWorldQuat.equals(FrameState.preCameraState.rotation!);
+        this.frustum = CameraUtils.getFrustum(this.camera);
+        this.cameraChanged = FrameState.renderedFrameCount === 0 || !Utils.equalRTS(this.cameraWorldRTS, FrameState.preCameraState);
         this.sseDenominator = 2 * Math.tan(math.toRadians(camera.fov * 0.5));
     }
 
     public endFrame () {
-        FrameState.preCameraState.position = vec3_1_1.copy(this.cameraWorldPosition);
-        FrameState.preCameraState.rotation = quat_1_1.copy(this.cameraWorldQuat);
+        FrameState.preCameraState.position = vec3_1_1.copy(this.cameraWorldRTS.position);
+        FrameState.preCameraState.rotation = quat_1_1.copy(this.cameraWorldRTS.rotation);
+        FrameState.preCameraState.scale = vec3_1_2.copy(this.cameraWorldRTS.scale);
         FrameState.renderedFrameCount++;
     }
 
