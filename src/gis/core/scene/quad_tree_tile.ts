@@ -3,6 +3,8 @@ import { Utils } from "../../../core/utils/utils";
 import { QuadtreeTileLoadState } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
+import { FrameState } from "./frame_state";
+import { TileBoundingRegion } from "./tile_bounding_region";
 
 /**
  * 四叉树 瓦片
