@@ -12,8 +12,9 @@ import { AssetLoader } from './core/asset/asset_loader';
 import { CameraUtils } from './core/utils/camera_utils';
 import { GeometryUtils } from './gis/utils/geometry_utils';
 import { VecConstants } from './core/constants/vec_constants';
-import { PerspectiveCamera, Vector3 } from 'three';
+import { DoubleSide, Object3D, PerspectiveCamera, Vector3 } from 'three';
 import { FrameState } from './gis/core/scene/frame_state';
+import { math } from './core/math/math';
 
 const div1 = document.getElementById('output-div-1');
 const div2 = document.getElementById('output-div-2');
@@ -41,15 +42,25 @@ const box = GeometryUtils.createBox3(new Vector3(0.0, 0.1, 0.0), 0.1, 0.1, 0.1);
 AssetLoader.loadRasterTileTexture({ url: "https://t0.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL=27&TILEROW=12&TILEMATRIX=5&tk=1d109683f4d84198e37a38c442d68311" }).then(texture1 => {
 
     AssetLoader.loadRasterTileTexture({ url: "https://t3.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL=27&TILEROW=12&TILEMATRIX=5&tk=1d109683f4d84198e37a38c442d68311" }).then(texture => {
-        const material = new THREE.MeshBasicMaterial({ map: texture });
+        const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: DoubleSide });
 
-        const material1 = new THREE.MeshBasicMaterial({ map: texture1 });
+        const material1 = new THREE.MeshBasicMaterial({ map: texture1, transparent: true, side: DoubleSide });
 
         const mesh = new THREE.Mesh(geometry, material);
         const mesh1 = new THREE.Mesh(geometry1, material1);
+        mesh.rotateX(-math.PI_OVER_TWO);
+        mesh1.rotateX(-math.PI_OVER_TWO);
+
+        const o1 = new Object3D();
+        const o2 = new Object3D();
+
+        o1.add(mesh);
+        o2.add(mesh1);
+
         // mesh.position.y = 0.1
-        scene.add(mesh);
-        scene.add(mesh1);
+        scene.add(o1);
+        scene.add(o2);
+
 
         const gridHelper = new THREE.GridHelper(50, 50);
         // gridHelper.position.y = 0;
