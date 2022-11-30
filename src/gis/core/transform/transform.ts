@@ -1,3 +1,4 @@
+import { Vector3 } from "three";
 import { math } from "../../../core/math/math";
 import { ICartesian3Like } from "../../@types/core/gis";
 import { Cartesian3 } from "../cartesian/cartesian3";
@@ -17,10 +18,21 @@ export class Transform {
     /**
      * 转换地球上的Cartesian3为世界坐标中的Cartesian3。
      * 由于取Y平面作为地图平面，而实际上地图平面为Z平面 所以需要转换一下
-     * @param aabb 
+     * 将car3转换为地图平面(Y)上的坐标
      */
     public static earthCar3ToWorldCar3 (vec3: ICartesian3Like, out?: Cartesian3) {
         out = out || new Cartesian3();
+        Cartesian3.rotateX(out, vec3, Cartesian3.ZERO, -math.PI_OVER_TWO);
+        return out;
+    }
+
+    /**
+     * 转换地球上的Cartesian3为世界坐标中的Cartesian3。
+     * 由于取Y平面作为地图平面，而实际上地图平面为Z平面 所以需要转换一下
+     * 将car3转换为地图平面(Y)上的坐标
+     */
+    public static earthCar3ToWorldVec3 (vec3: ICartesian3Like, out?: Vector3) {
+        out = out || new Vector3();
         Cartesian3.rotateX(out, vec3, Cartesian3.ZERO, -math.PI_OVER_TWO);
         return out;
     }

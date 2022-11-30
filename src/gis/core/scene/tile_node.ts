@@ -1,6 +1,7 @@
-import { Texture } from "three";
+import { DoubleSide, Mesh, MeshBasicMaterial, PlaneGeometry, Texture } from "three";
 import { Rectangle } from "../geometry/rectangle";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
+import { Transform } from "../transform/transform";
 import { QuadtreeTile } from "./quad_tree_tile";
 
 /**
@@ -9,8 +10,42 @@ import { QuadtreeTile } from "./quad_tree_tile";
  */
 export class TileNode {
 
-    public constructor () {
+    private _provider: IImageryTileProvider;
 
+    private _mesh: Mesh;
+
+    public get mesh () {
+        return this._mesh;
+    }
+
+    private _recycled: boolean = false;
+
+    public constructor (provider: IImageryTileProvider, mesh: Mesh) {
+        this._provider = provider;
+        this._mesh = mesh;
+        this._recycled = false;
+    }
+
+    /**
+     * 渲染此瓦片节点
+     */
+    public render () {
+        if (this._recycled) return;
+        this._provider.tileNodeContainer.addTileNode(this);
+    }
+
+    /**
+     * 回收此瓦片节点 并释放资源
+     */
+    public recycle () {
+        if (this._recycled) return;
+        this._provider.tileNodeContainer.removeTileNode(this);
+        const mtl = this._mesh.material as MeshBasicMaterial;
+        mtl.dispose();
+        //贴图不销毁 
+        //贴图可能在多个node中使用
+        this._mesh = null;
+        this._provider = null;
     }
 
     /**
@@ -22,8 +57,22 @@ export class TileNode {
      * @returns 
      */
     public static create (provider: IImageryTileProvider, tile: QuadtreeTile, texture: Texture, imageryRectangle: Rectangle) {
+        const mesh = this.createTileMesh(tile, texture);
+        return new TileNode(provider, mesh);
+    }
+
+    /**
+     * 创建瓦片显示用的mesh
+     * @param tile 
+     */
+    private static createTileMesh (tile: QuadtreeTile, texture: Texture) {
         const tileNativeRectangle = tile.nativeRectangle;
-        return new TileNode();
+        const center = tileNativeRectangle.center;
+        const plane = new PlaneGeometry(tileNativeRectangle.width, tileNativeRectangle.height);
+        const mtl = new MeshBasicMaterial({ map: texture, transparent: true, side: DoubleSide });
+        const mesh = new Mesh(plane, mtl);
+        Transform.earthCar3ToWorldVec3(center, mesh.position);
+        return mesh;
     }
 
 }

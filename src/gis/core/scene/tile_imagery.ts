@@ -165,11 +165,11 @@ export class TileImagery {
     }
 
     /**
-     * 释放节点资源
+     * 回收节点资源
      */
     public recyleNodeResource () {
         if (Utils.defined(this._node)) {
-            this._imageryProvider.tileNodeCache.recyleTileNode(this._node!);
+            this._node.recycle();
             this._node = undefined;
         }
         this.releaseTextureResource();
