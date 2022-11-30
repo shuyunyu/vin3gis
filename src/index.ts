@@ -31,51 +31,58 @@ camera.position.z = 1;
 
 const scene = new THREE.Scene();
 
-const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+// const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+const geometry = new THREE.PlaneGeometry(1, 1);
+const geometry1 = new THREE.PlaneGeometry(1, 1);
 const box = GeometryUtils.createBox3(new Vector3(0.0, 0.1, 0.0), 0.1, 0.1, 0.1);
 
 
 //http://webst02.is.autonavi.com/appmaptile?style=6&x=48&y=29&z=6
-AssetLoader.loadRasterTileTexture({ url: "http://webst02.is.autonavi.com/appmaptile?style=6&x=48&y=29&z=6" }).then(texture => {
+AssetLoader.loadRasterTileTexture({ url: "https://t0.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL=27&TILEROW=12&TILEMATRIX=5&tk=1d109683f4d84198e37a38c442d68311" }).then(texture1 => {
 
-    const material = new THREE.MeshBasicMaterial({ map: texture });
+    AssetLoader.loadRasterTileTexture({ url: "https://t3.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL=27&TILEROW=12&TILEMATRIX=5&tk=1d109683f4d84198e37a38c442d68311" }).then(texture => {
+        const material = new THREE.MeshBasicMaterial({ map: texture });
 
-    // const material = new THREE.MeshNormalMaterial();
+        const material1 = new THREE.MeshBasicMaterial({ map: texture1 });
 
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.y = 0.1
-    scene.add(mesh);
+        const mesh = new THREE.Mesh(geometry, material);
+        const mesh1 = new THREE.Mesh(geometry1, material1);
+        // mesh.position.y = 0.1
+        scene.add(mesh);
+        scene.add(mesh1);
 
-    const gridHelper = new THREE.GridHelper(50, 50);
-    // gridHelper.position.y = 0;
-    scene.add(gridHelper);
+        const gridHelper = new THREE.GridHelper(50, 50);
+        // gridHelper.position.y = 0;
+        scene.add(gridHelper);
 
-    const mainFrameRenderer = new FrameRenderer(scene, camera, document.body);
-    rendererSystem.addRenderTarget(mainFrameRenderer);
+        const mainFrameRenderer = new FrameRenderer(scene, camera, document.body);
+        rendererSystem.addRenderTarget(mainFrameRenderer);
 
-    interactionSystem.enableInteraction(mainFrameRenderer);
+        interactionSystem.enableInteraction(mainFrameRenderer);
 
-    global.mainFrameRenderer = mainFrameRenderer;
-    global.rendererSystem = rendererSystem;
-    global.interactionSystem = interactionSystem;
+        global.mainFrameRenderer = mainFrameRenderer;
+        global.rendererSystem = rendererSystem;
+        global.interactionSystem = interactionSystem;
 
 
-    director.addEventListener(Director.EVENT_BEGIN_FRAME, (dt: number) => {
-        // let time = Date.now();
-        // mesh.rotation.x = time / 2000;
-        // mesh.rotation.y = time / 1000;
+        director.addEventListener(Director.EVENT_BEGIN_FRAME, (dt: number) => {
+            // let time = Date.now();
+            // mesh.rotation.x = time / 2000;
+            // mesh.rotation.y = time / 1000;
 
-        //test frustum
-        let start = performance.now();
-        const frustum = CameraUtils.getFrustum(mainFrameRenderer.camera, false);
-        console.log("intersect: ", frustum.intersectsBox(box), performance.now() - start);
+            //test frustum
+            let start = performance.now();
+            const frustum = CameraUtils.getFrustum(mainFrameRenderer.camera, false);
+            console.log("intersect: ", frustum.intersectsBox(box), performance.now() - start);
 
-        //test framestate
-        start = performance.now();
-        const frameState = new FrameState(mainFrameRenderer.camera as PerspectiveCamera, mainFrameRenderer.domElement);
-        console.log("create frameState: ", performance.now() - start);
-        frameState.endFrame();
+            //test framestate
+            start = performance.now();
+            const frameState = new FrameState(mainFrameRenderer.camera as PerspectiveCamera, mainFrameRenderer.domElement);
+            console.log("create frameState: ", performance.now() - start);
+            frameState.endFrame();
+        });
     });
+
 });
 
 
