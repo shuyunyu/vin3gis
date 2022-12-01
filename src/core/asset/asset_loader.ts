@@ -21,6 +21,7 @@ export class AssetLoader {
                 taskType: params.taskType || SystemDefines.RequestTaskeType.IMAGE,
                 imageTask: true,
                 params: params.params,
+                priority: params.priority,
                 onComplete: (result: RequestTaskResult) => {
                     if (result.status === RequestTaskStatus.SUCCESS) {
                         result.image.onload = () => {
@@ -29,6 +30,38 @@ export class AssetLoader {
                         }
                     } else {
                         reject("load image failed.");
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * 请求图片资源
+     * @param params 
+     */
+    public static requestImage (params: AssetDefines.LoadAssetParams) {
+        return new Promise<{ image?: HTMLImageElement, result: RequestTaskResult }>((resolve, reject) => {
+            requestSystem.request({
+                url: params.url,
+                taskType: params.taskType || SystemDefines.RequestTaskeType.IMAGE,
+                imageTask: true,
+                params: params.params,
+                priority: params.priority,
+                onComplete: (result: RequestTaskResult) => {
+                    if (result.status === RequestTaskStatus.SUCCESS) {
+                        result.image.onload = () => {
+                            result.image.onload = null;
+                            resolve({
+                                image: result.image,
+                                result: result
+                            });
+                        }
+                    } else {
+                        resolve({
+                            image: null,
+                            result: result
+                        });
                     }
                 }
             });

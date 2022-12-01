@@ -2,7 +2,7 @@ import { Frustum } from "three";
 import { GenericEvent } from "../../../core/event/generic_event";
 import { IntersectUtils } from "../../../core/utils/intersect_utils";
 import { Utils } from "../../../core/utils/utils";
-import { IScheduleRequestTask } from "../../../core/xhr/scheduler/@types/request";
+import { IScheduleRequestTask, RequestTaskStatus } from "../../../core/xhr/scheduler/@types/request";
 import { Rectangle } from "../geometry/rectangle";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { QuadtreeTileQueue } from "../scene/quad_tree_tile_queue";
@@ -89,7 +89,7 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
      * @param priority 
      * @param onComplete 
      */
-    public requestTileImageAsset (x: number, y: number, level: number, priority: number, onComplete: Function): IScheduleRequestTask | undefined {
+    public requestTileImageAsset (x: number, y: number, level: number, priority: number, onComplete: (img: HTMLImageElement, state: RequestTaskStatus) => void): IScheduleRequestTask | undefined {
         throw new Error('Method not implemented.');
     }
 

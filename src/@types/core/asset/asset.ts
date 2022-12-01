@@ -9,6 +9,7 @@ export namespace AssetDefines {
         url: string;
         taskType?: SystemDefines.RequestTaskeType,
         params?: any;
+        priority?: number;
     }
 
 }
