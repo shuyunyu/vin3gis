@@ -1,7 +1,11 @@
 import { Vector3 } from "three";
 import { math } from "../../../core/math/math";
+import { Utils } from "../../../core/utils/utils";
 import { ICartesian3Like } from "../../@types/core/gis";
 import { Cartesian3 } from "../cartesian/cartesian3";
+import { IImageryTileProvider } from "../provider/imagery_tile_provider";
+import { FrameState } from "../scene/frame_state";
+import { QuadtreeTile } from "../scene/quad_tree_tile";
 
 export class Transform {
     //每一个threejs单位 代表实际的多少米
@@ -74,6 +78,44 @@ export class Transform {
         let result = this.earthCar3ToWorldCar3(cartesian3, out);
         result.multiplyScalar(1 / metersPerUnit);
         return result;
+    }
+
+    /**
+     * 计算摄像机到瓦片的距离
+     * @param quadtreeTile 
+     */
+    public static computeCameraDinstanceToTile (quadtreeTile: QuadtreeTile, frameState: FrameState) {
+        if (!Utils.defined(quadtreeTile.distanceToCamera)) {
+            quadtreeTile.updateDistanceToCamera(frameState);
+        }
+        return quadtreeTile.distanceToCamera!;
+    }
+
+    /**
+     * 计算空间误差
+     * @param imageryTileProvider 
+     * @param tile 
+     * @param frameState 
+     * @returns 
+     */
+    public static computeSpaceError (imageryTileProvider: IImageryTileProvider, tile: QuadtreeTile, frameState: FrameState) {
+        //当前等级下 1像素多少米
+        let maxGeometricError = imageryTileProvider.getLevelMaximumGeometricError(tile.level);
+        let seeDenominator = frameState.sseDenominator;
+        let height = frameState.domEle.clientHeight;
+        let L = maxGeometricError * (height / seeDenominator);
+        let tileDistance = this.computeCameraDinstanceToTile(tile, frameState);
+        return L / tileDistance;
+    }
+
+
+    /**
+     * 验证瓦片的精度是否符合要求
+     */
+    public static validateSpaceError (tile: QuadtreeTile, imageryTileProvider: IImageryTileProvider, frameState: FrameState) {
+        let error = this.computeSpaceError(imageryTileProvider, tile, frameState);
+        // return error < (sys.isMobile ? 3 : );
+        return error < 2;
     }
 
 }

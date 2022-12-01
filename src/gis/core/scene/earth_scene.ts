@@ -6,6 +6,7 @@ import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { FrameState } from "./frame_state";
+import { GlobeSurfaceTileManager } from "./globe_surface_tile_manager";
 import { QuadtreePrimitive } from "./quad_tree_primitive";
 
 export class EarthScene {
