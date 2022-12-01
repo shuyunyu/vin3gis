@@ -1,3 +1,8 @@
+import { PerspectiveCamera } from "three";
+import { FrameRenderer } from "../../../core/renderer/frame_renderer";
+import { ViewPort } from "../../core/misc/view_port";
+import { IImageryTileProvider } from "../../core/provider/imagery_tile_provider";
+
 export interface ICartesian2Like {
     x: number;
     y: number;
@@ -24,4 +29,36 @@ export enum QuadtreeTileLoadState {
     LOADING,
     DONE,
     FAILED
+}
+
+/**
+ * 坐标类型
+ */
+export enum CoordinateType {
+    WGS84,
+    GCJ02,
+    BD09
+}
+
+export type MapViewerOptions = {
+    //坐标方案
+    coordinateOType?: CoordinateType;
+    //渲染对象
+    renderer: FrameRenderer;
+    //瓦片提供者
+    imageryTileProivder: IImageryTileProvider;
+    //是否允许双击放大地图
+    dblClickZoom?: boolean;
+    //是否允许平移地图
+    enablePan?: boolean;
+    //是否允许缩放
+    enableZoom?: boolean;
+    //是否允许倾斜
+    enablePitch?: boolean;
+    //是否允许旋转
+    enableRotate?: boolean;
+    //初始视角
+    homeViewPort: ViewPort;
+    //瓦片缓存数量 默认100
+    tileCacheSize?: number;
 }
