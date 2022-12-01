@@ -170,7 +170,7 @@ export class GlobeSurfaceTile {
             if (tileImagery.node) {
                 tileImagery.node.recycle();
             }
-            tileImagery.node = TileNode.create(provider, this._tile, texture);
+            tileImagery.node = TileNode.create(provider, this._tile, texture, tileImagery.imageryCoordinateRectangle);
             tileImagery.node.render();
         } else {
             tileImagery.recyleNodeResource();

@@ -56,7 +56,7 @@ export class TileNode {
      * @param texture 瓦片贴图
      * @returns 
      */
-    public static create (provider: IImageryTileProvider, tile: QuadtreeTile, texture: Texture) {
+    public static create (provider: IImageryTileProvider, tile: QuadtreeTile, texture: Texture, imageryRectangle: Rectangle) {
         const mesh = this.createTileMesh(tile, texture);
         return new TileNode(provider, mesh);
     }
