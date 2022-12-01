@@ -105,7 +105,7 @@ AssetLoader.loadRasterTileTexture({ url: "https://t0.tianditu.gov.cn/cva_w/wmts?
         const mapViewer = new MapViewer({
             renderer: mainFrameRenderer,
             imageryTileProivder: new AMapImageryTileProvider({
-                //style: 'street',
+                style: 'street',
                 key: '1d109683f4d84198e37a38c442d68311'
             }),
             homeViewPort: homeViewPort

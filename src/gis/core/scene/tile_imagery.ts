@@ -141,7 +141,9 @@ export class TileImagery {
     }
 
     private createTextureWithImagery (imagery: Imagery) {
-        return TextureUtils.createTextureByImage(imagery.imageAsset);
+        //可能没有图片资源
+        //请求被abort
+        return imagery.imageAsset ? TextureUtils.createTextureByImage(imagery.imageAsset) : undefined;
     }
 
     /**

@@ -42,7 +42,7 @@ export class TileNode {
         if (this._recycled) return;
         this._provider.tileNodeContainer.removeTileNode(this);
         const mtl = this._mesh.material as MeshBasicMaterial;
-        mtl && mtl.dispose();
+        mtl.dispose();
         //贴图不销毁 
         //贴图可能在多个node中使用
         this._mesh = null;
@@ -69,16 +69,8 @@ export class TileNode {
         const tileNativeRectangle = tile.nativeRectangle;
         const center = tileNativeRectangle.center;
         const plane = new PlaneGeometry(tileNativeRectangle.width, tileNativeRectangle.height);
-        let mesh: Mesh;
-        //如果贴图请求被abort
-        //或者缩放等级之外没有瓦片
-        //则有可能创建的texture没有image
-        if (texture.image) {
-            const mtl = new MeshBasicMaterial({ map: texture, transparent: true, side: DoubleSide });
-            mesh = new Mesh(plane, mtl);
-        } else {
-            mesh = new Mesh();
-        }
+        const mtl = new MeshBasicMaterial({ map: texture, transparent: true, side: DoubleSide });
+        const mesh = new Mesh(plane, mtl);
         mesh.rotateX(-math.PI_OVER_TWO);
         Transform.earthCar3ToWorldVec3(center, mesh.position);
         return mesh;
