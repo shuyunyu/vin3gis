@@ -179,7 +179,7 @@ export class QuadtreeTile {
     }
 
     get southwestChild () {
-        if (this._southwestChild !== undefined) {
+        if (this._southwestChild) {
             return this._southwestChild;
         }
         this._southwestChild = new QuadtreeTile(this.tilingScheme, this.x * 2, this.y * 2 + 1, this.level + 1, this);
@@ -187,7 +187,7 @@ export class QuadtreeTile {
     }
 
     get southeastChild () {
-        if (this._souteastChild !== undefined) {
+        if (this._souteastChild) {
             return this._souteastChild;
         }
         this._souteastChild = new QuadtreeTile(this.tilingScheme, this.x * 2 + 1, this.y * 2 + 1, this.level + 1, this);
@@ -195,7 +195,7 @@ export class QuadtreeTile {
     }
 
     get northwestChild () {
-        if (this._northwestChild !== undefined) {
+        if (this._northwestChild) {
             return this._northwestChild;
         }
         this._northwestChild = new QuadtreeTile(this.tilingScheme, this.x * 2, this.y * 2, this.level + 1, this);
@@ -203,7 +203,7 @@ export class QuadtreeTile {
     }
 
     get northeastChild () {
-        if (this._northeastChild !== undefined) {
+        if (this._northeastChild) {
             return this._northeastChild;
         }
         this._northeastChild = new QuadtreeTile(this.tilingScheme, this.x * 2 + 1, this.y * 2, this.level + 1, this);
