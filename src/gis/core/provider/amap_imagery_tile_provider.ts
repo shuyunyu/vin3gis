@@ -5,9 +5,9 @@ export class AMapImageryTileProvider extends UrlTemplateImageryProvider {
     //地图风格  Aerial:影像地图 street:街道地图 note:注记地图
     private _style: string = '';
 
-    protected _minimumLevel: number = 3;
+    public minimumLevel: number = 3;
 
-    protected _maximumLevel: number = 18;
+    public maximumLevel: number = 18;
 
     public get style () {
         return this._style;

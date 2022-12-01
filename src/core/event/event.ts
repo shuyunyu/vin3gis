@@ -128,7 +128,7 @@ export class Event {
      * @param args 
      */
     public invoke (event: EventType, ...args: any) {
-        this.dispatchEvent.call(this, arguments);
+        this.dispatchEvent.apply(this, arguments);
     }
 
     /**
@@ -138,7 +138,7 @@ export class Event {
      * @param args 
      */
     public emit (event: EventType, ...args: any) {
-        this.dispatchEvent.call(this, args);
+        this.dispatchEvent.apply(this, arguments);
     }
 
 }

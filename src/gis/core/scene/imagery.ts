@@ -96,7 +96,7 @@ export class Imagery {
                     this._imageAsset = imageAsset;
                     this._state = ImageryState.LOADED;
                 } else if (state === RequestTaskStatus.ABORT) {
-                    this._state = ImageryState.FAILED;
+                    this._state = ImageryState.LOADED;
                 }
                 this._requestTask = undefined;
             });

@@ -1,4 +1,4 @@
-import { Utils } from "../../../core/Utils/Utils";
+import { Utils } from "../../../core/utils/utils";
 import { QuadtreeTile } from "./quad_tree_tile";
 
 export class TileReplacementQueue {

@@ -165,13 +165,12 @@ export class GlobeSurfaceTile {
         let texture = tileImagery.createTexture();
         //缩放等级之外没有贴图
         if (Utils.defined(texture)) {
-            let imageryRectangle = tileImagery.imageryCoordinateRectangle;
             // let node = TileFactory.renderImageryToTileNode(provider, texture!, imageryRectangle, this._tile.nativeRectangle, this._tile.id, tileImagery.node, tileImagery.texture);
             // tileImagery.node = node;
             if (tileImagery.node) {
                 tileImagery.node.recycle();
             }
-            tileImagery.node = TileNode.create(provider, this._tile, texture, imageryRectangle);
+            tileImagery.node = TileNode.create(provider, this._tile, texture);
             tileImagery.node.render();
         } else {
             tileImagery.recyleNodeResource();

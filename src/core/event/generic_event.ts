@@ -47,12 +47,12 @@ export class GenericEvent<T> extends Event {
 
     //@ts-ignore
     public invoke (arg: T): void {
-        super.invoke(this._eventType, arg);
+        this.dispatchEvent(arg);
     }
 
     //@ts-ignore
     public emit (arg: T): void {
-        super.emit(this._eventType, arg);
+        this.dispatchEvent(arg);
     }
 
 }

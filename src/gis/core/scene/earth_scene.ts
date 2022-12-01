@@ -34,8 +34,9 @@ export class EarthScene {
         this.imageryProviders.add(imageryTileProvider);
         this._quadtreePrimitive = new QuadtreePrimitive(this.imageryProviders.get(0)!, tileCacheSize);
         this.tilingScheme = this._quadtreePrimitive.tileProvider.tilingScheme;
-        this.camera = new EarthCamera(this._renderer);
+        this.camera = new EarthCamera(this._renderer, this.tilingScheme);
         this._globleSurfaceManager = new GlobeSurfaceTileManager(this._quadtreePrimitive, this);
+        this.ready = true;
     }
 
 
@@ -74,7 +75,7 @@ export class EarthScene {
     public postRender (delay: number) {
         if (!this.ready) return;
         let frameState = new FrameState(this._renderer.camera as PerspectiveCamera, this._renderer.domElement);
-        this._globleSurfaceManager?.render(delay, frameState);
+        this._globleSurfaceManager.render(delay, frameState);
         this.camera.postRender(delay, frameState);
         frameState.endFrame();
     }

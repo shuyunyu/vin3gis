@@ -10,9 +10,9 @@ export class TdtImageryTileProvider extends UrlTemplateImageryProvider {
     //地图密钥
     private _key: string = '';
 
-    protected _minimumLevel: number = 3;
+    public minimumLevel: number = 3;
 
-    protected _maximumLevel: number = 18;
+    public maximumLevel: number = 18;
 
     public get style () {
         return this._style;

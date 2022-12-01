@@ -15,6 +15,11 @@ import { VecConstants } from './core/constants/vec_constants';
 import { DoubleSide, Object3D, PerspectiveCamera, Vector3 } from 'three';
 import { FrameState } from './gis/core/scene/frame_state';
 import { math } from './core/math/math';
+import { ViewPort } from './gis/core/misc/view_port';
+import { Cartographic } from './gis/core/cartographic';
+import { Orientation } from './gis/core/misc/orientation';
+import { MapViewer } from './gis/core/viewer/map_viewer';
+import { TdtImageryTileProvider } from './gis/core/provider/tdt_imagery_tile_provider';
 
 const div1 = document.getElementById('output-div-1');
 const div2 = document.getElementById('output-div-2');
@@ -58,8 +63,8 @@ AssetLoader.loadRasterTileTexture({ url: "https://t0.tianditu.gov.cn/cva_w/wmts?
         o2.add(mesh1);
 
         // mesh.position.y = 0.1
-        scene.add(o1);
-        scene.add(o2);
+        // scene.add(o1);
+        // scene.add(o2);
 
 
         const gridHelper = new THREE.GridHelper(50, 50);
@@ -82,16 +87,33 @@ AssetLoader.loadRasterTileTexture({ url: "https://t0.tianditu.gov.cn/cva_w/wmts?
             // mesh.rotation.y = time / 1000;
 
             //test frustum
-            let start = performance.now();
-            const frustum = CameraUtils.getFrustum(mainFrameRenderer.camera, false);
-            console.log("intersect: ", frustum.intersectsBox(box), performance.now() - start);
+            // let start = performance.now();
+            // const frustum = CameraUtils.getFrustum(mainFrameRenderer.camera, false);
+            // console.log("intersect: ", frustum.intersectsBox(box), performance.now() - start);
 
-            //test framestate
-            start = performance.now();
-            const frameState = new FrameState(mainFrameRenderer.camera as PerspectiveCamera, mainFrameRenderer.domElement);
-            console.log("create frameState: ", performance.now() - start);
-            frameState.endFrame();
+            // //test framestate
+            // start = performance.now();
+            // const frameState = new FrameState(mainFrameRenderer.camera as PerspectiveCamera, mainFrameRenderer.domElement);
+            // console.log("create frameState: ", performance.now() - start);
+            // frameState.endFrame();
         });
+
+        const initCameraPosition = new Vector3(0, 0, 16500000);
+        const initCameraOrientation = new Vector3(0, -90, 0);
+        const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), new Orientation(initCameraOrientation.x, initCameraOrientation.y, initCameraOrientation.z));
+        const mapViewer = new MapViewer({
+            renderer: mainFrameRenderer,
+            imageryTileProivder: new TdtImageryTileProvider({
+                //style: 'street',
+                key: '1d109683f4d84198e37a38c442d68311'
+            }),
+            homeViewPort: homeViewPort
+        });
+
+        director.addEventListener(Director.EVENT_DRAW_FRAME, (dt: number) => {
+            mapViewer.renderFrame(dt);
+        });
+
     });
 
 });
@@ -174,3 +196,9 @@ globalThis.testRequest = () => {
 //     }
 //     console.log(`从对象池创建${count}个,耗时[${performance.now() - start}] ms.`);
 // }
+
+
+
+
+
+

@@ -3,9 +3,13 @@ import { math } from "../../../core/math/math";
 import { Utils } from "../../../core/utils/utils";
 import { ICartesian3Like } from "../../@types/core/gis";
 import { Cartesian3 } from "../cartesian/cartesian3";
+import { Cartographic } from "../cartographic";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { FrameState } from "../scene/frame_state";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
+import { ITilingScheme } from "../tilingscheme/tiling_scheme";
+
+const scratchCartesian3 = new Cartesian3();
 
 export class Transform {
     //每一个threejs单位 代表实际的多少米
@@ -73,11 +77,57 @@ export class Transform {
      * @param cartesian3 
      * @returns 
      */
-    public static geoCart3ToWorldVec3 (cartesian3: Cartesian3, out?: Cartesian3) {
+    public static geoCart3ToWorldCar3 (cartesian3: Cartesian3, out?: Cartesian3) {
         let metersPerUnit = this.getMetersPerUnit();
         let result = this.earthCar3ToWorldCar3(cartesian3, out);
         result.multiplyScalar(1 / metersPerUnit);
         return result;
+    }
+
+    /**
+     * 将地理空间坐标转换为threejs中的坐标
+     * vec3 / 缩放值
+     * @param cartesian3 
+     * @returns 
+     */
+    public static geoCart3ToWorldVec3 (cartesian3: Cartesian3, out?: Vector3) {
+        let metersPerUnit = this.getMetersPerUnit();
+        let result = this.earthCar3ToWorldVec3(cartesian3, out);
+        result.multiplyScalar(1 / metersPerUnit);
+        return result;
+    }
+
+    /**
+     * 将地理空间经纬度高度坐标转换为threejs中的坐标
+     * @param cartographic 
+     * @param tilingScheme 
+     * @returns 
+     */
+    public static cartographicToWorldCar3 (cartographic: Cartographic, tilingScheme: ITilingScheme, out?: Cartesian3) {
+        let cartesian3 = tilingScheme.projection.project(cartographic);
+        return this.geoCart3ToWorldCar3(cartesian3, out);
+    }
+
+    /**
+     * 将地理空间经纬度高度坐标转换为threejs中的坐标
+     * @param cartographic 
+     * @param tilingScheme 
+     * @returns 
+     */
+    public static cartographicToWorldVec3 (cartographic: Cartographic, tilingScheme: ITilingScheme, out?: Vector3) {
+        let cartesian3 = tilingScheme.projection.project(cartographic);
+        return this.geoCart3ToWorldVec3(cartesian3, out);
+    }
+
+    /**
+     * 将creator中的坐标转换为世界空间下的cartographic
+     * @param worldVec3 
+     * @param tilingScheme 
+     * @returns 
+     */
+    public static worldCar3ToCartographic (worldVec3: ICartesian3Like, tilingScheme: ITilingScheme, out?: Cartographic) {
+        let cartesian3 = this.worldCar3ToEarthVec3(worldVec3, scratchCartesian3);
+        return tilingScheme.projection.unproject(cartesian3, out);
     }
 
     /**
