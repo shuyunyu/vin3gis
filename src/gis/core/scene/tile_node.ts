@@ -1,4 +1,5 @@
 import { DoubleSide, Mesh, MeshBasicMaterial, PlaneGeometry, Texture } from "three";
+import { math } from "../../../core/math/math";
 import { Rectangle } from "../geometry/rectangle";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { Transform } from "../transform/transform";
@@ -78,6 +79,7 @@ export class TileNode {
         } else {
             mesh = new Mesh();
         }
+        mesh.rotateX(-math.PI_OVER_TWO);
         Transform.earthCar3ToWorldVec3(center, mesh.position);
         return mesh;
     }

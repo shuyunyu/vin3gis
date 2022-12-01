@@ -20,6 +20,7 @@ import { Cartographic } from './gis/core/cartographic';
 import { Orientation } from './gis/core/misc/orientation';
 import { MapViewer } from './gis/core/viewer/map_viewer';
 import { TdtImageryTileProvider } from './gis/core/provider/tdt_imagery_tile_provider';
+import { AMapImageryTileProvider } from './gis/core/provider/amap_imagery_tile_provider';
 
 const div1 = document.getElementById('output-div-1');
 const div2 = document.getElementById('output-div-2');
@@ -31,7 +32,7 @@ DebugTools.showStatsPanel();
 
 // init
 
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 1000);
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.00001, 100000000000);
 // const camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 1, 1000);
 camera.position.z = 1;
 
@@ -103,7 +104,7 @@ AssetLoader.loadRasterTileTexture({ url: "https://t0.tianditu.gov.cn/cva_w/wmts?
         const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), new Orientation(initCameraOrientation.x, initCameraOrientation.y, initCameraOrientation.z));
         const mapViewer = new MapViewer({
             renderer: mainFrameRenderer,
-            imageryTileProivder: new TdtImageryTileProvider({
+            imageryTileProivder: new AMapImageryTileProvider({
                 //style: 'street',
                 key: '1d109683f4d84198e37a38c442d68311'
             }),
