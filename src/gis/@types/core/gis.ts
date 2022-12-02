@@ -1,4 +1,3 @@
-import { PerspectiveCamera } from "three";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { ViewPort } from "../../core/misc/view_port";
 import { IImageryTileProvider } from "../../core/provider/imagery_tile_provider";
@@ -61,4 +60,15 @@ export type MapViewerOptions = {
     homeViewPort: ViewPort;
     //瓦片缓存数量 默认100
     tileCacheSize?: number;
+}
+
+export namespace MeshDefines {
+
+    export type TileMeshAttribute = {
+        vertices: Float32Array,
+        indices: number[],
+        uvs: Float32Array,
+        normals: Float32Array
+    }
+
 }
