@@ -53,13 +53,24 @@ export class EarthCamera {
     }
 
     /**
-     * pick位置
+     * pick位置，返回和地图平面相交的vec3
      * @param location 
+     * @param out 
      */
-    public pickPosition (location: ICartesian2Like, out?: Cartographic) {
+    public pickVec3 (location: ICartesian2Like, out?: Vector3) {
+        out = out || new Vector3();
         const pickRay = this.getPickRay(location, tempRay);
         const distance = pickRay.distanceToPlane(Transform.MAP_PLANE);
-        const vec3 = RayUtils.computeHit(pickRay, distance, tempVec3);
+        RayUtils.computeHit(pickRay, distance, out);
+        return out;
+    }
+
+    /**
+     * pick位置,返回经纬度坐标
+     * @param location 
+     */
+    public pickCartographic (location: ICartesian2Like, out?: Cartographic) {
+        const vec3 = this.pickVec3(location, tempVec3);
         return Transform.worldCar3ToCartographic(vec3, this._tilingScheme, out);
     }
 

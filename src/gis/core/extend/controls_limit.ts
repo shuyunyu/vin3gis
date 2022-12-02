@@ -1,6 +1,8 @@
+import { Vector3 } from "three";
 import { SystemEventType } from "../../../@types/core/system/system";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { eventSystem } from "../../../core/system/event_system";
+import { interactionSystem } from "../../../core/system/interaction_system";
 import { EarthScene } from "../scene/earth_scene";
 
 /**
@@ -28,7 +30,9 @@ export class ControlsLimit {
     }
 
     private onMouseWheel (event: WheelEvent) {
-
+        //滚轮聚集的点
+        const focusVec3 = this._scene.camera.pickVec3({ x: event.clientX, y: event.clientY }, new Vector3());
+        interactionSystem.setControlsTarget(this._renderer, focusVec3);
     }
 
 }

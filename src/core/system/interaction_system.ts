@@ -1,3 +1,4 @@
+import { Vector3 } from "three";
 import { IOrbitControls } from "../../@types/core/controls/controls";
 import { SystemDefines } from "../../@types/core/system/system";
 import { MapControls, OrbitControls } from "../controls/orbit_controls";
@@ -87,6 +88,17 @@ export class InteractionSystem extends System {
             const rc = this._rendererControls.splice(index, 1)[0];
             rc.controls.dispose();
         }
+    }
+
+    public setControlsTarget (fTarget: FrameRenderer, target: Vector3) {
+        const rc = this.findControls(fTarget);
+        if (rc) {
+
+        }
+    }
+
+    private findControls (target: FrameRenderer) {
+        return this._rendererControls.find(rc => rc.renderer === target);
     }
 
     private findControlsIndex (target: FrameRenderer) {
