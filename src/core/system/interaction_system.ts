@@ -1,6 +1,6 @@
 import { IOrbitControls } from "../../@types/core/controls/controls";
 import { SystemDefines } from "../../@types/core/system/system";
-import { MapControls, OrbitControls } from "../controls/obrit_controls";
+import { MapControls, OrbitControls } from "../controls/orbit_controls";
 import { FrameRenderer } from "../renderer/frame_renderer";
 import { System } from "./system";
 
