@@ -96,9 +96,6 @@ export class RequestTask {
         this.priority = options.priority ?? RequestTaskPriority.LOW;
         this._imageTask = options.imageTask ?? false;
         this._options = Object.assign({}, options);
-        if (this._imageTask) {
-            this._options.responseType = XHRResponseType.ARRAYBUFFER;
-        }
         //@ts-ignore
         this._url = XHRRequest.getRequestUrl(options);
         this._server = RequestServer.getServer(this._url);
@@ -108,44 +105,75 @@ export class RequestTask {
         });
     }
 
+    /**
+     * 执行图片请求
+     */
+    private executeImageTask () {
+        const img = new Image();
+
+        if (global.location.protocol !== 'file:') {
+            img.crossOrigin = 'anonymous';
+        }
+
+        const _this = this;
+
+        function loadCallback () {
+            img.removeEventListener('load', loadCallback);
+            img.removeEventListener('error', errorCallback);
+            if (_this._isValid) {
+                _this._options.onComplete({
+                    image: img,
+                    status: RequestTaskStatus.SUCCESS,
+                    taskType: _this._taskType
+                });
+                _this.onTaskComplete();
+            } else {
+                //abrot
+                _this._options.onComplete({
+                    status: RequestTaskStatus.ABORT,
+                    taskType: _this._taskType
+                });
+                //abrot 的完成回调 在abort()调用时进行
+                _this.onTaskComplete(false);
+            }
+        }
+
+        function errorCallback () {
+            img.removeEventListener('load', loadCallback);
+            img.removeEventListener('error', errorCallback);
+            _this._options.onComplete({
+                status: RequestTaskStatus.ERROR,
+                taskType: _this._taskType
+            });
+            _this.onTaskComplete();
+        }
+
+        img.addEventListener('load', loadCallback);
+        img.addEventListener('error', errorCallback);
+        img.src = this._url;
+    }
 
     /**
-     * 执行此任务
+     * 执行一般请求
      */
-    public execute () {
+    private executeNormalTask () {
         XHRRequest.create(this._options).then((response: XHRResponse) => {
             if (!response.abort) {
-                if (!this.imageTask) {
-                    this._options.onComplete({
-                        response: response,
-                        status: RequestTaskStatus.SUCCESS,
-                        taskType: this.taskType
-                    });
-                } else {
-                    const image = RequestUtil.createImageFromResponse(response);
-                    this._options.onComplete({
-                        image: image,
-                        status: RequestTaskStatus.SUCCESS,
-                        taskType: this.taskType
-                    });
-                }
+                this._options.onComplete({
+                    response: response,
+                    status: RequestTaskStatus.SUCCESS,
+                    taskType: this.taskType
+                });
                 this.onTaskComplete();
             } else {
                 if (RequestTask.DEBUG) {
                     console.log(`[${RequestTask.name}] [abort]: `, response.config.url);
                 }
-                if (this.imageTask) {
-                    this._options.onComplete({
-                        status: RequestTaskStatus.ABORT,
-                        taskType: this.taskType
-                    });
-                } else {
-                    this._options.onComplete({
-                        response: response,
-                        status: RequestTaskStatus.ABORT,
-                        taskType: this.taskType
-                    });
-                }
+                this._options.onComplete({
+                    response: response,
+                    status: RequestTaskStatus.ABORT,
+                    taskType: this.taskType
+                });
                 this.onTaskComplete();
             }
         }).catch(err => {
@@ -157,6 +185,17 @@ export class RequestTask {
             });
             this.onTaskComplete();
         });
+    }
+
+    /**
+     * 执行此任务
+     */
+    public execute () {
+        if (this._imageTask) {
+            this.executeImageTask();
+        } else {
+            this.executeNormalTask();
+        }
         return this;
     }
 
@@ -164,7 +203,12 @@ export class RequestTask {
      * 终止任务
      */
     public abort () {
+        if (!this._isValid) return;
         this._isValid = false;
+        if (this._imageTask) {
+            //如果是图片请求 立即回调 以减少请求次数限制
+            RequestTask.onTaskComplete && RequestTask.onTaskComplete(this);
+        }
         if (this._cancelFunc) {
             this._cancelFunc();
             this._cancelFunc = null;
@@ -174,8 +218,8 @@ export class RequestTask {
     /**
      * 请求任务完成
      */
-    private onTaskComplete () {
-        RequestTask.onTaskComplete && RequestTask.onTaskComplete(this);
+    private onTaskComplete (callOnComplete: boolean = true) {
+        if (callOnComplete) RequestTask.onTaskComplete && RequestTask.onTaskComplete(this);
         this.recycle();
     }
 

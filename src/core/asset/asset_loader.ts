@@ -24,10 +24,7 @@ export class AssetLoader {
                 priority: params.priority,
                 onComplete: (result: RequestTaskResult) => {
                     if (result.status === RequestTaskStatus.SUCCESS) {
-                        result.image.onload = () => {
-                            result.image.onload = null;
-                            resolve(result.image);
-                        }
+                        resolve(result.image);
                     } else {
                         reject("load image failed.");
                     }
@@ -50,13 +47,10 @@ export class AssetLoader {
                 priority: params.priority,
                 onComplete: (result: RequestTaskResult) => {
                     if (result.status === RequestTaskStatus.SUCCESS) {
-                        result.image.onload = () => {
-                            result.image.onload = null;
-                            resolve({
-                                image: result.image,
-                                result: result
-                            });
-                        }
+                        resolve({
+                            image: result.image,
+                            result: result
+                        });
                     } else {
                         resolve({
                             image: null,
