@@ -1,7 +1,6 @@
-import { XHRCancelToken, XHRRequest, XHRResponse, XHRResponseType } from "../xhr_request";
+import { XHRCancelToken, XHRRequest, XHRResponse } from "../xhr_request";
 import { RequestTaskOptions, RequestTaskPriority, RequestTaskStatus, RequestTaskType } from "./@types/request";
 import { RequestServer } from "./request_server";
-import { RequestUtil } from "./request_util";
 
 /**
  * 单个请求任务
