@@ -123,8 +123,8 @@ export class TileNode {
         let height = textureRectangle.height;
         let xmin = (tileRectangle.west - textureRectangle.west) / width;
         let xmax = (tileRectangle.east - textureRectangle.west) / width;
-        let ymin = (textureRectangle.north - tileRectangle.north) / height;
-        let ymax = (textureRectangle.north - tileRectangle.south) / height;
+        let ymin = (tileRectangle.south - textureRectangle.south) / height;
+        let ymax = (tileRectangle.north - textureRectangle.south) / height;
         return new Float32Array([xmin, ymin, xmin, ymax, xmax, ymax, xmax, ymin]);
     }
 
