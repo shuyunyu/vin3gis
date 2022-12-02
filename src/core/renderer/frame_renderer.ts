@@ -1,6 +1,5 @@
 import * as THREE from "three"
 import { OrthographicCamera, PerspectiveCamera, Renderer, Scene, WebGLRendererParameters } from "three";
-import { Partial, RTS } from "../../@types/global/global";
 
 /**
  * 帧渲染器
@@ -58,29 +57,6 @@ export class FrameRenderer {
             this._camera.updateProjectionMatrix();
         } else if (this._camera instanceof THREE.OrthographicCamera) {
 
-        }
-    }
-
-    /**
-     * 更新相机的rts
-     * @param rts 
-     */
-    updateCameraRTS (rts: Partial<RTS>) {
-        let needUpdate = false;
-        if (rts.position) {
-            this._camera.position.copy(rts.position);
-            needUpdate = true;
-        }
-        if (rts.rotation) {
-            this._camera.quaternion.copy(rts.rotation);
-            needUpdate = true;
-        }
-        if (rts.scale) {
-            needUpdate = true;
-            this._camera.scale.copy(rts.scale);
-        }
-        if (needUpdate) {
-            this._camera.updateMatrix();
         }
     }
 

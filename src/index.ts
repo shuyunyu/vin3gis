@@ -32,7 +32,7 @@ DebugTools.showStatsPanel();
 
 // init
 
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.00001, 100000000000);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.00001, 100000000000);
 // const camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 1, 1000);
 camera.position.z = 1;
 
@@ -99,9 +99,9 @@ AssetLoader.loadRasterTileTexture({ url: "https://t0.tianditu.gov.cn/cva_w/wmts?
             // frameState.endFrame();
         });
 
-        const initCameraPosition = new Vector3(0, 0, 16500000);
+        const initCameraPosition = new Vector3(118.156, 24.118, 1650000);
         const initCameraOrientation = new Vector3(0, -90, 0);
-        const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), new Orientation(initCameraOrientation.x, initCameraOrientation.y, initCameraOrientation.z));
+        const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), Orientation.fromDegreeEulerAngles(initCameraOrientation));
         const mapViewer = new MapViewer({
             renderer: mainFrameRenderer,
             imageryTileProivder: new AMapImageryTileProvider({
@@ -110,7 +110,6 @@ AssetLoader.loadRasterTileTexture({ url: "https://t0.tianditu.gov.cn/cva_w/wmts?
             }),
             homeViewPort: homeViewPort
         });
-
         director.addEventListener(Director.EVENT_DRAW_FRAME, (dt: number) => {
             mapViewer.renderFrame(dt);
         });

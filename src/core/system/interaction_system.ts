@@ -1,6 +1,7 @@
 import { Vector3 } from "three";
 import { IOrbitControls } from "../../@types/core/controls/controls";
 import { SystemDefines } from "../../@types/core/system/system";
+import { Partial, RTS } from "../../@types/global/global";
 import { MapControls, OrbitControls } from "../controls/orbit_controls";
 import { FrameRenderer } from "../renderer/frame_renderer";
 import { System } from "./system";
@@ -45,7 +46,7 @@ export class InteractionSystem extends System {
      * @param target 
      */
     public enableInteraction (target: FrameRenderer, interactionConfig?: SystemDefines.InteractionConfig) {
-        const index = this.findControlsIndex(target)
+        const index = this.findControlsIndex(target);
         if (index === -1) {
             interactionConfig = interactionConfig ?? this._config;
             let controls: IOrbitControls;
@@ -94,6 +95,34 @@ export class InteractionSystem extends System {
         const rc = this.findControls(fTarget);
         if (rc) {
 
+        }
+    }
+
+    /**
+     * 更新相机的rts
+     * @param rts 
+     */
+    public updateCameraRTS (target: FrameRenderer, rts: Partial<RTS>) {
+        let needUpdate = false;
+        if (rts.position) {
+            target.camera.position.copy(rts.position);
+            needUpdate = true;
+        }
+        if (rts.rotation) {
+            target.camera.quaternion.copy(rts.rotation);
+            needUpdate = true;
+        }
+        if (rts.scale) {
+            needUpdate = true;
+            target.camera.scale.copy(rts.scale);
+        }
+        if (needUpdate) {
+            target.camera.updateMatrix();
+            const c = this.findControls(target);
+            if (c) {
+                //update controls
+                c.controls.saveState();
+            }
         }
     }
 

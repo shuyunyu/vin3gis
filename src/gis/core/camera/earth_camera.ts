@@ -1,5 +1,6 @@
 import { Euler, Quaternion, Ray, Vector3 } from "three";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
+import { interactionSystem } from "../../../core/system/interaction_system";
 import { CameraUtils } from "../../../core/utils/camera_utils";
 import { RayUtils } from "../../../core/utils/ray_utils";
 import { ICartesian2Like } from "../../@types/core/gis";
@@ -40,7 +41,7 @@ export class EarthCamera {
         let orientation = viewPort.orientation;
         const position = Transform.cartographicToWorldVec3(destination, this._tilingScheme);
         const rotation = new Quaternion().setFromEuler(new Euler(orientation.pitch, orientation.yaw, orientation.roll));
-        this._renderer.updateCameraRTS({ position, rotation });
+        interactionSystem.updateCameraRTS(this._renderer, { position, rotation });
     }
 
     /**
