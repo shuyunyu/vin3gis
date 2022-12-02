@@ -1,4 +1,5 @@
-import { Vector3 } from "three";
+import { Plane, Vector3 } from "three";
+import { VecConstants } from "../../../core/constants/vec_constants";
 import { math } from "../../../core/math/math";
 import { Utils } from "../../../core/utils/utils";
 import { ICartesian3Like } from "../../@types/core/gis";
@@ -15,6 +16,9 @@ export class Transform {
     //每一个threejs单位 代表实际的多少米
     //100 => 1 threejs单位 表示实际的1米
     public static THREEJS_UNIT_PER_METERS: number = 100;
+
+    //定义地图平面
+    public static readonly MAP_PLANE = new Plane(VecConstants.UNIT_Y_VEC3);
 
     /**
      * 获取 每单位 threejs距离 代表的实际地理距离
@@ -120,7 +124,7 @@ export class Transform {
     }
 
     /**
-     * 将creator中的坐标转换为世界空间下的cartographic
+     * 将threejs中的坐标转换为世界空间下的cartographic
      * @param worldVec3 
      * @param tilingScheme 
      * @returns 

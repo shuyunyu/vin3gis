@@ -1,4 +1,5 @@
 import { Camera, Frustum, Matrix4, OrthographicCamera, PerspectiveCamera, Ray, Vector2 } from "three";
+import { ICartesian2Like } from "../../gis/@types/core/gis";
 
 const mat4_1 = new Matrix4();
 
@@ -26,7 +27,7 @@ export class CameraUtils {
      * @param sp 
      * @param camera 
      */
-    public static screenPointToRay (coords: Vector2, camera: Camera, out?: Ray) {
+    public static screenPointToRay (coords: ICartesian2Like, camera: Camera, out?: Ray) {
         let ray = out || new Ray();
         if (camera instanceof PerspectiveCamera) {
 

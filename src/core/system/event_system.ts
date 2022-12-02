@@ -31,6 +31,7 @@ export class EventSystem extends System {
 
     /**
      * 根据渲染目标获取输入对象
+     * @exapmle eventSystem.getInput(target).on....
      * @param rendererTarget 
      * @returns 
      */
