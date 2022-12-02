@@ -1,4 +1,5 @@
 import { SystemDefines } from "../../@types/core/system/system";
+import { GenericEvent } from "../event/generic_event";
 import { FrameRenderer } from "../renderer/frame_renderer";
 import { System } from "./system";
 
@@ -16,6 +17,12 @@ export class RendererSystem extends System {
     }
 
     private _renderers: FrameRenderer[] = [];
+
+    //添加渲染对象时 触发的事件
+    public readonly rendererTargetAddEvent = new GenericEvent<FrameRenderer>;
+
+    //移除渲染对象时 触发的事件
+    public readonly rendererTargetRemoveEvent = new GenericEvent<FrameRenderer>;
 
     private constructor () {
         super();
@@ -38,6 +45,7 @@ export class RendererSystem extends System {
         if (this._renderers.indexOf(target) === -1) {
             this._renderers.push(target);
             target.updateRenderSize();
+            this.rendererTargetAddEvent.emit(target);
         }
     }
 
@@ -49,6 +57,7 @@ export class RendererSystem extends System {
         const index = this._renderers.indexOf(target);
         if (index > -1) {
             this._renderers.splice(index, 1)[0].destroy();
+            this.rendererTargetRemoveEvent.emit(target);
         }
     }
 

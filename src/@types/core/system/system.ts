@@ -1,5 +1,23 @@
 import { ControlsProperty } from "../controls/controls"
 
+//系统事件类型
+export enum SystemEventType {
+    MOUSE_DOWN = "mousedown",
+    MOUSE_MOVE = "mousemove",
+    MOUSE_UP = "mouseup",
+    MOUSE_WHEEL = "mousewheel",
+
+    TOUCH_START = "touchstart",
+    TOUCH_MOVE = "touchmove",
+    TOUCH_END = "touchend",
+    TOUCH_CANCEL = "touchcancel",
+
+    KEY_DOWN = "keydown",
+    KEY_UP = "keyup",
+    KEY_PRESS = "keypress"
+}
+
+
 export namespace SystemDefines {
 
     //系统优先级
@@ -8,7 +26,8 @@ export namespace SystemDefines {
         MEDIUM = 100,
         HIGH = 200,
         INTERACTION = 190,
-        REQUEST = 150
+        REQUEST = 150,
+        EVENT_SYSTEM = 195
     }
 
     //请求任务类型
@@ -32,5 +51,19 @@ export namespace SystemDefines {
         type: InteractionType,
         prop: ControlsProperty
     }
+
+    export type InputEventListenerParams<T> =
+        T extends SystemEventType.MOUSE_DOWN ? MouseEvent :
+        T extends SystemEventType.MOUSE_UP ? MouseEvent :
+        T extends SystemEventType.MOUSE_MOVE ? MouseEvent :
+        T extends SystemEventType.MOUSE_WHEEL ? WheelEvent :
+        T extends SystemEventType.TOUCH_START ? TouchEvent :
+        T extends SystemEventType.TOUCH_END ? TouchEvent :
+        T extends SystemEventType.TOUCH_MOVE ? TouchEvent :
+        T extends SystemEventType.TOUCH_CANCEL ? TouchEvent :
+        T extends SystemEventType.KEY_DOWN ? KeyboardEvent :
+        T extends SystemEventType.KEY_UP ? KeyboardEvent :
+        T extends SystemEventType.KEY_PRESS ? KeyboardEvent :
+        never
 
 }
