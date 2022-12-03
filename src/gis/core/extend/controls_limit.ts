@@ -30,7 +30,7 @@ export class ControlsLimit {
     }
 
     private onMouseWheel (event: WheelEvent) {
-        //滚轮聚集的点
+        //滚轮聚焦的点
         const focusVec3 = this._scene.camera.pickVec3({ x: event.clientX, y: event.clientY }, new Vector3());
         interactionSystem.setControlsTarget(this._renderer, focusVec3);
     }

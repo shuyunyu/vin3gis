@@ -3,6 +3,7 @@ import { IOrbitControls } from "../../@types/core/controls/controls";
 import { SystemDefines } from "../../@types/core/system/system";
 import { Partial, RTS } from "../../@types/global/global";
 import { MapControls, OrbitControls } from "../controls/orbit_controls";
+import { math } from "../math/math";
 import { FrameRenderer } from "../renderer/frame_renderer";
 import { System } from "./system";
 
@@ -26,7 +27,8 @@ export class InteractionSystem extends System {
             enableDamping: true,
             mouseButtons: {
                 MIDDLE: undefined
-            }
+            },
+            maxPolarAngle: math.toRadians(89.8)
         }
     }
 
@@ -91,10 +93,16 @@ export class InteractionSystem extends System {
         }
     }
 
+    /**
+     * 设置控制器的目标
+     * @param fTarget 
+     * @param target 
+     */
     public setControlsTarget (fTarget: FrameRenderer, target: Vector3) {
         const rc = this.findControls(fTarget);
         if (rc) {
-
+            // rc.controls.target = target;
+            // rc.controls.saveState();
         }
     }
 
@@ -122,6 +130,7 @@ export class InteractionSystem extends System {
             if (c) {
                 //update controls
                 c.controls.saveState();
+                c.controls.update();
             }
         }
     }

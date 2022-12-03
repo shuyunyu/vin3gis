@@ -1,4 +1,4 @@
-import { MOUSE } from "three";
+import { MOUSE, Vector3 } from "three";
 import { DeepPartial } from "../../global/global";
 
 export interface IControlsProperty {
@@ -8,6 +8,9 @@ export interface IControlsProperty {
     enablePan: boolean;
     enableRotate: boolean;
     enableZoom: boolean;
+    target: Vector3;
+    target0: Vector3;
+    maxPolarAngle: number;
     mouseButtons: { [key in 'LEFT' | 'MIDDLE' | 'RIGHT']: MOUSE.PAN | MOUSE.ROTATE | MOUSE.DOLLY | undefined }
 }
 

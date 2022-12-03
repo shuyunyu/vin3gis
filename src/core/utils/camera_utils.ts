@@ -24,7 +24,7 @@ export class CameraUtils {
 
     /**
      * 将屏幕坐标点转换为穿过该点的射线
-     * @param sp 
+     * @param sp NDC coord
      * @param camera 
      */
     public static screenPointToRay (coords: ICartesian2Like, camera: Camera, out?: Ray) {
