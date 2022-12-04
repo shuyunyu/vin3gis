@@ -42,8 +42,8 @@ export enum CoordinateType {
 export type MapViewerOptions = {
     //坐标方案
     coordinateOType?: CoordinateType;
-    //渲染对象
-    renderer: FrameRenderer;
+    //地图渲染的html元素或者元素的id
+    target: string | HTMLElement;
     //瓦片提供者
     imageryTileProivder: IImageryTileProvider;
     //是否允许双击放大地图

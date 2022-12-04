@@ -6,7 +6,11 @@ import { requestSystem } from "./system/request_system";
 
 export class Engine {
 
+    private static _inited = false;
+
     public static init () {
+        if (this._inited) return;
+        this._inited = true;
         director.registerSystem(rendererSystem);
         director.registerSystem(eventSystem);
         director.registerSystem(interactionSystem);

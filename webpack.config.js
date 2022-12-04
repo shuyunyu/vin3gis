@@ -5,15 +5,18 @@ const CopyPlugin = require('copy-webpack-plugin');
 const fs = require('fs');
 const path = require('path');
 
+const version = "_0.0.1";
+
 module.exports = {
     mode: 'development',
     entry: {
-        "ThreeTools": "./src/index.ts"
+        "Vin3Engine": "./src/index.ts",
+        "Vin3GIS": "./src/gis/index.ts"
     },
     output: {
         path: __dirname + '/dist',
-        filename: '[name].js',
-        library: "ThreeTools"
+        filename: '[name]' + version + '.js',
+        library: '[name]'
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js']

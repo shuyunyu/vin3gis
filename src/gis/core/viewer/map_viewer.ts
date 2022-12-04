@@ -1,4 +1,9 @@
+import { PerspectiveCamera, Scene } from "three";
+import { Director, director } from "../../../core/director";
+import { Engine } from "../../../core/engine";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
+import { interactionSystem } from "../../../core/system/interaction_system";
+import { rendererSystem } from "../../../core/system/renderer_system";
 import { Utils } from "../../../core/utils/utils";
 import { MapViewerOptions } from "../../@types/core/gis";
 import { ControlsLimit } from "../extend/controls_limit";
@@ -80,7 +85,8 @@ export class MapViewer {
     }
 
     constructor (viewerOptions: MapViewerOptions) {
-        this.renderer = viewerOptions.renderer;
+        Engine.init();
+        this.renderer = this.createRenderer(viewerOptions.target);
         this._imageryTileProvider = viewerOptions.imageryTileProivder;
         this.scene = new EarthScene(this.renderer, this.imageryTileProivder, Utils.defaultValue(viewerOptions.tileCacheSize, 100));
         this._enableDblclickZoom = Utils.defaultValue(viewerOptions.dblClickZoom, true);
@@ -90,6 +96,23 @@ export class MapViewer {
         this._enableRotate = Utils.defaultValue(viewerOptions.enableRotate, true);
         this.scene.camera.setViewPort(viewerOptions.homeViewPort);
         new ControlsLimit(this.renderer, this.scene).limit();
+
+        director.addEventListener(Director.EVENT_DRAW_FRAME, this.renderFrame, this);
+
+    }
+
+    /**
+     * 创建渲染对象
+     * @param target 
+     */
+    private createRenderer (target: string | HTMLElement) {
+        const ele = typeof target === 'string' ? document.getElementById(target) : target;
+        const scene = new Scene();
+        const camera = new PerspectiveCamera(45, ele.clientWidth / ele.clientHeight, 0.00001, 100000000000);
+        const renderer = new FrameRenderer(scene, camera, target as HTMLElement);
+        rendererSystem.addRenderTarget(renderer)
+        interactionSystem.enableInteraction(renderer);
+        return renderer;
     }
 
     /**
