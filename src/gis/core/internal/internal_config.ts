@@ -5,6 +5,9 @@ import { math } from "../../../core/math/math";
  */
 export class InternalConfig {
 
+    //标识是否开启debug模式
+    public static DEBUG = true;
+
     /**
      * 相机的最大倾角
      */
