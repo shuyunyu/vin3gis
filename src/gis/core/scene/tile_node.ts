@@ -1,6 +1,7 @@
-import { BufferAttribute, BufferGeometry, DoubleSide, Mesh, MeshBasicMaterial, Texture } from "three";
+import { BufferAttribute, BufferGeometry, Mesh, MeshBasicMaterial, Texture } from "three";
 import { MeshDefines } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
+import { tileMaterialPool } from "../pool/tile_material_pool";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { Transform } from "../transform/transform";
 import { QuadtreeTile } from "./quad_tree_tile";
@@ -42,7 +43,7 @@ export class TileNode {
         if (this._recycled) return;
         this._provider.tileNodeContainer.removeTileNode(this);
         const mtl = this._mesh.material as MeshBasicMaterial;
-        mtl.dispose();
+        if (mtl) tileMaterialPool.recycle(mtl);
         this._mesh.geometry.dispose();
         //贴图不销毁 
         //贴图可能在多个node中使用
@@ -77,7 +78,7 @@ export class TileNode {
         plane.setIndex(meshAttr.indices);
         plane.setAttribute('normal', new BufferAttribute(meshAttr.normals, 3));
         plane.setAttribute('uv', new BufferAttribute(meshAttr.uvs, 2));
-        const mtl = new MeshBasicMaterial({ map: texture, transparent: true, side: DoubleSide });
+        const mtl = tileMaterialPool.create(texture);
         const mesh = new Mesh(plane, mtl);
         Transform.earthCar3ToWorldVec3(center, mesh.position);
         return mesh;

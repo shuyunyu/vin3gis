@@ -19,6 +19,11 @@ export class InternalConfig {
     public static MIN_PITCH = -math.PI_OVER_TWO;
 
     /**
+     * 瓦片mtl texture缓存尺寸
+     */
+    public static TILE_TEXTURE_MTL_CACHE_SIZE = 200;
+
+    /**
      * 校验相机的pitch是否有效
      * @param pitch 
      * @returns 

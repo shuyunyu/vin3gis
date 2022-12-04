@@ -49,6 +49,8 @@ export class BasePool<T, P> implements IPool<T, P> {
         this.onRecycle(o);
         if (this._list.length < this.maxPoolSize) {
             this._list.push(o);
+        } else {
+            this.onAbandon(o);
         }
     }
 
@@ -76,6 +78,14 @@ export class BasePool<T, P> implements IPool<T, P> {
      * @param o 
      */
     protected onRecycle (o: T) {
+
+    }
+
+    /**
+     * 丢弃对象，不进池子
+     * @param o 
+     */
+    protected onAbandon (o: T) {
 
     }
 

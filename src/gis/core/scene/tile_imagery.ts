@@ -1,8 +1,8 @@
 import { Texture } from "three";
-import { TextureUtils } from "../../../core/utils/texture_utils";
 import { Utils } from "../../../core/utils/utils";
 import { imageryCache } from "../cache/imagery_cache";
 import { Rectangle } from "../geometry/rectangle";
+import { tileTexturePool } from "../pool/tile_texture_pool";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { Imagery, ImageryState } from "./imagery";
 import { QuadtreeTile } from "./quad_tree_tile";
@@ -143,7 +143,7 @@ export class TileImagery {
     private createTextureWithImagery (imagery: Imagery) {
         //可能没有图片资源
         //请求被abort
-        return imagery.imageAsset ? TextureUtils.createTextureByImage(imagery.imageAsset) : undefined;
+        return imagery.imageAsset ? tileTexturePool.create(imagery.imageAsset) : undefined;
     }
 
     /**
@@ -182,7 +182,7 @@ export class TileImagery {
      */
     public releaseTextureResource () {
         if (Utils.defined(this._texture)) {
-            this._texture.dispose();
+            tileTexturePool.recycle(this._texture);
         }
         this._imageryCoordinateRectangle = undefined;
         this._texture = undefined;
