@@ -100,7 +100,7 @@ AssetLoader.loadRasterTileTexture({ url: "https://t0.tianditu.gov.cn/cva_w/wmts?
         });
 
         const initCameraPosition = new Vector3(118.156, 24.118, 1650000);
-        const initCameraOrientation = new Vector3(0, -90, 0);
+        const initCameraOrientation = new Vector3(0, -78, 0);
         const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), Orientation.fromDegreeEulerAngles(initCameraOrientation));
         const mapViewer = new MapViewer({
             renderer: mainFrameRenderer,

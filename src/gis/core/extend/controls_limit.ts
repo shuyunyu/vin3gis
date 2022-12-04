@@ -26,13 +26,16 @@ export class ControlsLimit {
     }
 
     private onMouseDown (event: MouseEvent) {
-
+        interactionSystem.updateControlsTarget(this._renderer);
+        //开启相机的lookAt
+        interactionSystem.updateControlsProps(this._renderer, { shouldLookAt: true });
     }
 
     private onMouseWheel (event: WheelEvent) {
+        //禁用相机的lookAt 使其能够沿着当前鼠标位置的中心点缩放
+        interactionSystem.updateControlsProps(this._renderer, { shouldLookAt: false });
         //滚轮聚焦的点
-        const focusVec3 = this._scene.camera.pickVec3({ x: event.clientX, y: event.clientY }, new Vector3());
-        interactionSystem.setControlsTarget(this._renderer, focusVec3);
+        interactionSystem.updateControlsTarget(this._renderer, { x: event.clientX, y: event.clientY });
     }
 
 }

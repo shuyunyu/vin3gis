@@ -1,5 +1,6 @@
 import { Camera, Frustum, Matrix4, OrthographicCamera, PerspectiveCamera, Ray, Vector2 } from "three";
 import { ICartesian2Like } from "../../gis/@types/core/gis";
+import { VecConstants } from "../constants/vec_constants";
 
 const mat4_1 = new Matrix4();
 
@@ -43,6 +44,15 @@ export class CameraUtils {
             console.error('CameraUtils: Unsupported camera type: ' + camera.type);
         }
         return ray;
+    }
+
+    /**
+     * 将屏幕中心点转为穿过该点的射线
+     * @param camera 
+     * @param out 
+     */
+    public static screenCenterToRay (camera: Camera, out?: Ray) {
+        return this.screenPointToRay(VecConstants.ZERO_VEC2, camera, out);
     }
 
 }

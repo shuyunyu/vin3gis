@@ -10,6 +10,8 @@ export interface IControlsProperty {
     enableZoom: boolean;
     target: Vector3;
     target0: Vector3;
+    shouldLookAt: boolean;
+    minPolarAngle: number;
     maxPolarAngle: number;
     mouseButtons: { [key in 'LEFT' | 'MIDDLE' | 'RIGHT']: MOUSE.PAN | MOUSE.ROTATE | MOUSE.DOLLY | undefined }
 }

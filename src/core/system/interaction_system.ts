@@ -1,11 +1,19 @@
-import { Vector3 } from "three";
-import { IOrbitControls } from "../../@types/core/controls/controls";
+import { Plane, Ray, Vector3 } from "three";
+import { ControlsProperty, IOrbitControls } from "../../@types/core/controls/controls";
 import { SystemDefines } from "../../@types/core/system/system";
 import { Partial, RTS } from "../../@types/global/global";
+import { ICartesian2Like } from "../../gis/@types/core/gis";
+import { Cartesian2 } from "../../gis/core/cartesian/cartesian2";
+import { VecConstants } from "../constants/vec_constants";
 import { MapControls, OrbitControls } from "../controls/orbit_controls";
 import { math } from "../math/math";
 import { FrameRenderer } from "../renderer/frame_renderer";
+import { CameraUtils } from "../utils/camera_utils";
+import { DeviceCoordUtils } from "../utils/device_coord_util";
 import { System } from "./system";
+
+const tempRay = new Ray();
+const tempCar2 = new Cartesian2();
 
 /**
  * 交互系统
@@ -28,9 +36,13 @@ export class InteractionSystem extends System {
             mouseButtons: {
                 MIDDLE: undefined
             },
+            minPolarAngle: math.toRadians(0),
             maxPolarAngle: math.toRadians(89.8)
         }
     }
+
+    //y(xz)平面
+    private _planeY = new Plane(VecConstants.UNIT_Y_VEC3);
 
     private _rendererControls: { renderer: FrameRenderer, controls: IOrbitControls }[] = [];
 
@@ -60,22 +72,13 @@ export class InteractionSystem extends System {
                 controls = new MapControls(target.camera, target.interactionElement) as IOrbitControls;
             }
 
+            this._rendererControls.push({ renderer: target, controls: controls });
+
             //set controls's prop
             if (interactionConfig.prop) {
-                for (let key in interactionConfig.prop) {
-                    const val = interactionConfig.prop[key];
-                    //if prop val is object like mouseButtons
-                    if (typeof val === "object") {
-                        for (let k in val) {
-                            controls[key][k] = val[k];
-                        }
-                    } else {
-                        controls[key] = val;
-                    }
-                }
+                this.updateControlsProps(target, interactionConfig.prop);
             }
 
-            this._rendererControls.push({ renderer: target, controls: controls });
         } else {
             this._rendererControls[index].controls.enabled = true;
         }
@@ -90,19 +93,6 @@ export class InteractionSystem extends System {
         if (index > -1) {
             const rc = this._rendererControls.splice(index, 1)[0];
             rc.controls.dispose();
-        }
-    }
-
-    /**
-     * 设置控制器的目标
-     * @param fTarget 
-     * @param target 
-     */
-    public setControlsTarget (fTarget: FrameRenderer, target: Vector3) {
-        const rc = this.findControls(fTarget);
-        if (rc) {
-            // rc.controls.target = target;
-            // rc.controls.saveState();
         }
     }
 
@@ -125,20 +115,61 @@ export class InteractionSystem extends System {
             target.camera.scale.copy(rts.scale);
         }
         if (needUpdate) {
-            target.camera.updateMatrix();
-            const c = this.findControls(target);
-            if (c) {
-                //update controls
-                c.controls.saveState();
-                c.controls.update();
+            target.camera.matrixWorldNeedsUpdate = true;
+            target.camera.updateMatrixWorld();
+            this.updateControlsTarget(target);
+        }
+    }
+
+    /**
+     * 更新controls的目标点
+     * @param target 
+     */
+    public updateControlsTarget (target: FrameRenderer, screenCoord?: ICartesian2Like) {
+        const c = this.findControls(target);
+        if (c) {
+            const ray = screenCoord ? CameraUtils.screenPointToRay(DeviceCoordUtils.coordToNDCCoord(screenCoord, target.domElement, tempCar2), target.camera, tempRay) : CameraUtils.screenCenterToRay(target.camera, tempRay);
+            const intersectVec = ray.intersectPlane(this._planeY, new Vector3());
+            c.controls.target = intersectVec;
+            c.controls.saveState();
+        }
+    }
+
+    /**
+     * 更新控制器的属性
+     * @param target 
+     * @param props 
+     */
+    public updateControlsProps (target: FrameRenderer, prop: ControlsProperty) {
+        const c = this.findControls(target);
+        if (!c) return;
+        for (let key in prop) {
+            const val = prop[key];
+            //if prop val is object like mouseButtons
+            if (typeof val === "object") {
+                for (let k in val) {
+                    c.controls[key][k] = val[k];
+                }
+            } else {
+                c.controls[key] = val;
             }
         }
     }
 
+    /**
+     * 查找controls
+     * @param target 
+     * @returns 
+     */
     private findControls (target: FrameRenderer) {
         return this._rendererControls.find(rc => rc.renderer === target);
     }
 
+    /**
+     * 查找controls的索引
+     * @param target 
+     * @returns 
+     */
     private findControlsIndex (target: FrameRenderer) {
         return this._rendererControls.findIndex(rc => rc.renderer === target);
     }

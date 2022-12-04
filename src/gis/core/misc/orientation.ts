@@ -1,5 +1,7 @@
 import { math } from "../../../core/math/math";
 import { ICartesian3Like } from "../../@types/core/gis";
+import { Log } from "../../log/log";
+import { InternalConfig } from "../internal/internal_config";
 
 /**
  * 方位角对象
@@ -21,7 +23,12 @@ export class Orientation {
      */
     constructor (yaw: number, pitch: number, roll: number) {
         this.yaw = yaw;
-        this.pitch = pitch;
+        if (!InternalConfig.checkCameraPitch(pitch)) {
+            Log.warn(Orientation, `pitch value must between ${InternalConfig.MIN_PITCH} and ${InternalConfig.MAX_PITCH}, current value is : ${pitch}`);
+            this.pitch = InternalConfig.clampCameraPitch(pitch);
+        } else {
+            this.pitch = pitch;
+        }
         this.roll = roll;
     }
 

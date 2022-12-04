@@ -33,6 +33,9 @@ class OrbitControls extends EventDispatcher {
         // Set to false to disable this control
         this.enabled = true;
 
+        //相机是否应该lookAt
+        this.shouldLookAt = true;
+
         // "target" sets the location of focus, where the object orbits around
         this.target = new Vector3();
 
@@ -247,7 +250,7 @@ class OrbitControls extends EventDispatcher {
 
                 position.copy(scope.target).add(offset);
 
-                scope.object.lookAt(scope.target);
+                if (scope.shouldLookAt) scope.object.lookAt(scope.target);
 
                 if (scope.enableDamping === true) {
 
