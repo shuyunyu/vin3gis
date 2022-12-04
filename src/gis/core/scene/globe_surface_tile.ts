@@ -23,12 +23,10 @@ export class GlobeSurfaceTile {
     public get eligibleForUnloading () {
         let shouleRemoveTile = true;
         for (const key in this._tileImageryRecord) {
-            if (Object.prototype.hasOwnProperty.call(this._tileImageryRecord, key)) {
-                const tileImagery = this._tileImageryRecord[key];
-                shouleRemoveTile = !Utils.defined(tileImagery.loadingImagery);
-                if (!shouleRemoveTile) {
-                    break;
-                }
+            const tileImagery = this._tileImageryRecord[key];
+            shouleRemoveTile = !tileImagery.loadingImagery;
+            if (!shouleRemoveTile) {
+                break;
             }
         }
         return shouleRemoveTile;
@@ -204,7 +202,7 @@ export class GlobeSurfaceTile {
                 tileImagery.releaseResource();
             }
         }
-        this._tileImageryRecord = {};
+        this._tileImageryRecord = Object.create(null);
         this.markToRerenderTileImagery();
     }
 

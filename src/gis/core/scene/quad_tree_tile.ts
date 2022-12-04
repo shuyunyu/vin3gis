@@ -61,6 +61,8 @@ export class QuadtreeTile {
 
     private _data?: GlobeSurfaceTile;
 
+    private _children: QuadtreeTile[];
+
     //瓦片 id
     public get id () {
         return this._id;
@@ -170,12 +172,15 @@ export class QuadtreeTile {
     }
 
     get children (): QuadtreeTile[] {
-        return [
-            this.northwestChild,
-            this.northeastChild,
-            this.southwestChild,
-            this.southeastChild
-        ]
+        if (!this._children) {
+            this._children = [
+                this.northwestChild,
+                this.northeastChild,
+                this.southwestChild,
+                this.southeastChild
+            ];
+        }
+        return this._children;
     }
 
     get southwestChild () {
@@ -321,6 +326,7 @@ export class QuadtreeTile {
         this._southwestChild = null;
         this._northwestChild = null;
         this._northeastChild = null;
+        this._children = null;
     }
 
 }

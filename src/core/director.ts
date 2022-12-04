@@ -29,8 +29,13 @@ export class Director extends Event {
 
     private _systems: System[] = [];
 
+    private _aniLoopFunc: () => void;
+
     private constructor () {
         super();
+        this._aniLoopFunc = () => {
+            this.step();
+        }
     }
 
     /**
@@ -39,7 +44,7 @@ export class Director extends Event {
     public init () {
         this._systems.forEach(sys => sys.init());
         this._startTime = performance.now();
-        requestAnimationFrame(() => this.step());
+        requestAnimationFrame(this._aniLoopFunc);
         this.dispatchEvent(Director.EVENT_INIT);
     }
 
@@ -48,7 +53,7 @@ export class Director extends Event {
      */
     private step () {
         this.tick(this.calcDeltaTime());
-        requestAnimationFrame(() => this.step());
+        requestAnimationFrame(this._aniLoopFunc);
     }
 
     /**

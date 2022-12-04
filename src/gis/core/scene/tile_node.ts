@@ -43,6 +43,7 @@ export class TileNode {
         this._provider.tileNodeContainer.removeTileNode(this);
         const mtl = this._mesh.material as MeshBasicMaterial;
         mtl.dispose();
+        this._mesh.geometry.dispose();
         //贴图不销毁 
         //贴图可能在多个node中使用
         this._mesh = null;
