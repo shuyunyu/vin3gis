@@ -1,6 +1,7 @@
 import { Utils } from "../../../core/utils/utils";
 import { IScheduleRequestTask, RequestTaskStatus } from "../../../core/xhr/scheduler/@types/request";
 import { Log } from "../../log/log";
+import { TileImageAssetProcessor } from "../asset/tile_image_asset_processor";
 import { imageryCache } from "../cache/imagery_cache";
 import { Rectangle } from "../geometry/rectangle";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
@@ -29,7 +30,9 @@ export class Imagery {
 
     private _state: ImageryState;
 
-    private _imageAsset?: HTMLImageElement | ImageBitmap;
+    private _imageAsset?: ImageBitmap;
+
+    private _tileImageAssetProcessor?: TileImageAssetProcessor;
 
     private _parent: Imagery | undefined;
 
@@ -87,13 +90,18 @@ export class Imagery {
     public processStateMachine () {
         if (this._state === ImageryState.UNLOAD) {
             this._state = ImageryState.LOADING;
-            this._requestTask = this._imageryTileProvider.requestTileImageAsset(this._x, this._y, this._level, this._priority, (imageAsset: HTMLImageElement | ImageBitmap, state: RequestTaskStatus) => {
+            this._requestTask = this._imageryTileProvider.requestTileImageAsset(this._x, this._y, this._level, this._priority, (image: HTMLImageElement | ImageBitmap, state: RequestTaskStatus) => {
                 if (state === RequestTaskStatus.ERROR) {
                     this._state = ImageryState.FAILED;
                     Log.error(Imagery, `request tile imagery asset failed: x:${this._x} y:${this._y} level:${this._level} provider:${this._imageryTileProvider.id}`);
                 } else if (state === RequestTaskStatus.SUCCESS) {
-                    this._imageAsset = imageAsset;
-                    this._state = ImageryState.LOADED;
+                    this._tileImageAssetProcessor = new TileImageAssetProcessor(image);
+                    this._tileImageAssetProcessor.process().then(imageAsset => {
+                        this._imageAsset = imageAsset;
+                        this._state = ImageryState.LOADED;
+                    }).catch(err => {
+                        this._state = ImageryState.FAILED;
+                    });
                 } else if (state === RequestTaskStatus.ABORT) {
                     this._state = ImageryState.FAILED;
                 }
@@ -119,9 +127,13 @@ export class Imagery {
                 }
             }
         }
-        if (Utils.defined(this._requestTask)) {
+        if (this._requestTask) {
             this._requestTask.abort();
             this._requestTask = undefined;
+        }
+        if (this._tileImageAssetProcessor) {
+            this._tileImageAssetProcessor.dispose();
+            this._tileImageAssetProcessor = null;
         }
         this._imageAsset = undefined;
         this._state = ImageryState.UNLOAD;

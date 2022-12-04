@@ -73,13 +73,3 @@ export namespace MeshDefines {
     }
 
 }
-
-/**
- * 瓦片图片资源
- */
-export type TileImageAsset = {
-    pixels: Uint8Array;
-    width: number;
-    height: number;
-    format: string;
-}

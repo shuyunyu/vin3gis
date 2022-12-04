@@ -6,7 +6,7 @@ import { BasePool } from "./pool";
 /**
  * 瓦片贴图池
  */
-class TileTexturePool extends BasePool<Texture, HTMLImageElement | ImageBitmap>{
+class TileTexturePool extends BasePool<Texture, ImageBitmap>{
 
 
     public constructor () {
@@ -14,11 +14,11 @@ class TileTexturePool extends BasePool<Texture, HTMLImageElement | ImageBitmap>{
     }
 
 
-    protected onConstructor (p?: HTMLImageElement | ImageBitmap): Texture {
+    protected onConstructor (p?: ImageBitmap): Texture {
         return TextureUtils.createTextureByImage(p);
     }
 
-    protected onUpdate (o: Texture, p?: HTMLImageElement | ImageBitmap): void {
+    protected onUpdate (o: Texture, p?: ImageBitmap): void {
         o.image = p;
         o.needsUpdate = true;
     }
