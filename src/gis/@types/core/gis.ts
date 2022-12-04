@@ -1,4 +1,3 @@
-import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { ViewPort } from "../../core/misc/view_port";
 import { IImageryTileProvider } from "../../core/provider/imagery_tile_provider";
 
@@ -34,12 +33,14 @@ export enum QuadtreeTileLoadState {
  * 坐标类型
  */
 export enum CoordinateType {
-    WGS84,
-    GCJ02,
-    BD09
+    WGS84 = "wgs84",
+    GCJ02 = "gcj02",
+    BD09 = "bd09"
 }
 
 export type MapViewerOptions = {
+    //没threejs单位距离代表实际的多少米
+    UNIT_PER_METERS?: number;
     //坐标方案
     coordinateOType?: CoordinateType;
     //地图渲染的html元素或者元素的id

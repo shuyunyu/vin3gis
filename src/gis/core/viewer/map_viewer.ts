@@ -9,6 +9,7 @@ import { MapViewerOptions } from "../../@types/core/gis";
 import { ControlsLimit } from "../extend/controls_limit";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { EarthScene } from "../scene/earth_scene";
+import { Transform } from "../transform/transform";
 
 export class MapViewer {
 
@@ -86,6 +87,7 @@ export class MapViewer {
 
     constructor (viewerOptions: MapViewerOptions) {
         Engine.init();
+        Transform.THREEJS_UNIT_PER_METERS = Utils.defaultValue(viewerOptions.UNIT_PER_METERS, 1000);
         this.renderer = this.createRenderer(viewerOptions.target);
         this._imageryTileProvider = viewerOptions.imageryTileProivder;
         this.scene = new EarthScene(this.renderer, this.imageryTileProivder, Utils.defaultValue(viewerOptions.tileCacheSize, 100));
