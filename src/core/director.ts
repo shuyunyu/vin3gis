@@ -1,4 +1,5 @@
 import { Event } from "./event/event";
+import { math } from "./math/math";
 import { System } from "./system/system";
 
 export class Director extends Event {
@@ -23,6 +24,12 @@ export class Director extends Event {
     //绘制一帧
     public static readonly EVENT_DRAW_FRAME = "director_draw_frame";
 
+    private _frameRate = 60;
+
+    private _frameTime = 0;
+
+    private _delayTime = 0;
+
     private _startTime: number;
 
     private _deltaTime: number;
@@ -33,6 +40,7 @@ export class Director extends Event {
 
     private constructor () {
         super();
+        this.setFrameRate(60);
         this._aniLoopFunc = () => {
             this.step();
         }
@@ -52,8 +60,24 @@ export class Director extends Event {
      * 单步调用
      */
     private step () {
-        this.tick(this.calcDeltaTime());
+        const dt = this.calcDeltaTime();
+        if (this._delayTime > 0.0) {
+            this._delayTime -= dt * 1000;
+        }
+        if (this._delayTime <= 0.0) {
+            this.tick(dt);
+            this._delayTime += this._frameTime;
+        }
         requestAnimationFrame(this._aniLoopFunc);
+    }
+
+    /**
+     * 设置帧率
+     * @param frameRate 
+     */
+    public setFrameRate (frameRate: number) {
+        this._frameRate = math.clamp(frameRate, 1, 60);
+        this._frameTime = 1000 / this._frameRate;
     }
 
     /**
