@@ -9,7 +9,6 @@ import { QuadtreeTile } from "./quad_tree_tile";
 export enum ImageryState {
     UNLOAD = 0,
     LOADING,
-    CREATING_TEXTURE,
     LOADED,
     FAILED
 }
@@ -88,7 +87,7 @@ export class Imagery {
     public processStateMachine () {
         if (this._state === ImageryState.UNLOAD) {
             this._state = ImageryState.LOADING;
-            this._requestTask = this._imageryTileProvider.requestTileImageAsset(this._x, this._y, this._level, this._priority, (imageAsset: HTMLImageElement, state: RequestTaskStatus) => {
+            this._requestTask = this._imageryTileProvider.requestTileImageAsset(this._x, this._y, this._level, this._priority, (imageAsset: HTMLImageElement | ImageBitmap, state: RequestTaskStatus) => {
                 if (state === RequestTaskStatus.ERROR) {
                     this._state = ImageryState.FAILED;
                     Log.error(Imagery, `request tile imagery asset failed: x:${this._x} y:${this._y} level:${this._level} provider:${this._imageryTileProvider.id}`);
