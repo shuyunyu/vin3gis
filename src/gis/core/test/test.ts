@@ -1,10 +1,13 @@
 import { BoxGeometry, Color, DataTexture, Mesh, MeshBasicMaterial } from "three";
 import { Director, director } from "../../../core/director";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
+import { TaskProcessor } from "../../../core/worker/task_processor";
+import { TransferTypedArrayTestScriptBase64 } from "../../../core/worker/transfer_typed_array_test";
 
 export class GISTest {
 
     public static run (render: FrameRenderer) {
+        this.testWorker();
         return;
         const width = 512;
         const height = 512;
@@ -57,6 +60,14 @@ export class GISTest {
             }
         }, this);
 
+    }
+
+    private static testWorker () {
+        const taskProcessor = new TaskProcessor<{ array: Int8Array }, { array: Int8Array }>(TransferTypedArrayTestScriptBase64);
+        const array = new Int8Array([1, 2, 3]);
+        taskProcessor.scheduleTask({ array: array }, [array.buffer]).then(res => {
+            console.log(res);
+        })
     }
 
 }
