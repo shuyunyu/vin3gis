@@ -56,8 +56,8 @@ export class QuadtreeTile {
     private _northwestChild?: QuadtreeTile;
     private _northeastChild?: QuadtreeTile;
 
-    private _replacementPrevious?: QuadtreeTile;
-    private _replacementNext?: QuadtreeTile;
+    public replacementPrevious?: QuadtreeTile;
+    public replacementNext?: QuadtreeTile;
 
     private _data?: GlobeSurfaceTile;
 
@@ -145,22 +145,6 @@ export class QuadtreeTile {
 
     public set data (val: GlobeSurfaceTile | undefined) {
         this._data = val;
-    }
-
-    public get replacementPrevious () {
-        return this._replacementPrevious;
-    }
-
-    public set replacementPrevious (val: QuadtreeTile | undefined) {
-        this._replacementPrevious = val;
-    }
-
-    public get replacementNext () {
-        return this._replacementNext;
-    }
-
-    public set replacementNext (val: QuadtreeTile | undefined) {
-        this._replacementNext = val;
     }
 
     public get renderable () {
