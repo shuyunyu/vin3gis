@@ -5,7 +5,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const fs = require('fs');
 const path = require('path');
 
-const version = "_0.0.1";
+const version = ".0.0.1";
 
 module.exports = {
     mode: 'development',
