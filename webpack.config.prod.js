@@ -5,12 +5,12 @@ const CopyPlugin = require('copy-webpack-plugin');
 const fs = require('fs');
 const path = require('path');
 
-const version = "_0.0.1";
+const version = ".0.0.1";
 
 module.exports = {
     mode: 'production',
     entry: {
-        // "Vin3Engine": "./src/index.ts",
+        "Vin3Engine": "./src/index.ts",
         "Vin3GIS": "./src/gis/index.ts"
     },
     output: {
@@ -18,13 +18,17 @@ module.exports = {
         filename: '[name]' + version + '.js',
         library: '[name]'
     },
+    //不打包THREE
+    externals: {
+        three: 'THREE'
+    },
     resolve: {
         extensions: ['.ts', '.tsx', '.js']
     },
     plugins: [
         new htmlwp({
             title: 'webgl',
-            template: 'index.html',
+            template: 'index-prod.html',
             scriptLoading: 'blocking'
         }),
         new UglifyJSPlugin({
@@ -40,6 +44,7 @@ module.exports = {
         new CopyPlugin({
             patterns: [
                 { from: "./public", to: "./" },
+                { from: './node_modules/three/build/three.min.js', to: "./" },
                 { from: "./test", to: "./test" }
             ]
         })

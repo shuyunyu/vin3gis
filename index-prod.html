@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= htmlWebpackPlugin.options.title %></title>
+  <style>
+    body,
+    html {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .output-div{
+      position: absolute;
+      z-index: -1;
+      width: 50%;
+      height: 100%;
+    }
+
+    #output-div-1{
+        left: 0;
+    }
+
+    #output-div-2{
+        right: 0;
+    }
+    
+  </style>
+
+</head>
+
+<body>
+    
+  <script src="./three.min.js"></script>
+  <script src="./test/test.js"></script>
+  
+</body>
+
+</html>

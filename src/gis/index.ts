@@ -1,8 +1,5 @@
 export const version = '0.0.1';
 
-import * as THREE from 'three'
-global.THREE = THREE;
-
 export * from "./core/cartographic";
 
 export * from "./core/cartesian/cartesian2";
