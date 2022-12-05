@@ -1,12 +1,16 @@
 import * as THREE from "three"
-import { OrthographicCamera, PerspectiveCamera, Renderer, Scene, WebGLRendererParameters } from "three";
+import { OrthographicCamera, PerspectiveCamera, Renderer, Scene, WebGLRenderer, WebGLRendererParameters } from "three";
 
 /**
  * 帧渲染器
  */
 export class FrameRenderer {
 
-    private _renderer: Renderer;
+    private _renderer: WebGLRenderer;
+
+    public get rendererInfo () {
+        return this._renderer.info;
+    }
 
     private _scene: Scene;
 
