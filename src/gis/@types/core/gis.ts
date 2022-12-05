@@ -73,3 +73,6 @@ export namespace MeshDefines {
     }
 
 }
+
+//图片请求结果
+export type ImageRequestResult = HTMLImageElement | ImageBitmap | Blob;

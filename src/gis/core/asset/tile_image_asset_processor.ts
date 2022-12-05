@@ -1,3 +1,6 @@
+import { ImageUtils } from "../../../core/utils/image_utils";
+import { ImageRequestResult } from "../../@types/core/gis";
+
 /**
  * 瓦片图片资源处理对象
  */
@@ -5,17 +8,16 @@ export class TileImageAssetProcessor {
 
     private _abort: boolean;
 
-    private _image: HTMLImageElement | ImageBitmap;
+    private _image: ImageRequestResult;
 
-    public constructor (image: HTMLImageElement | ImageBitmap) {
+    public constructor (image: ImageRequestResult) {
         this._image = image;
         this._abort = false;
     }
 
     public process () {
         return new Promise<ImageBitmap>((resolve, reject) => {
-            if (this._image instanceof ImageBitmap || true) {
-                //@ts-ignore
+            if (this._image instanceof ImageBitmap) {
                 resolve(this._image);
             } else {
                 //TODO do it in worker.

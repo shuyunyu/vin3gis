@@ -1,6 +1,7 @@
 import { Frustum } from "three";
 import { GenericEvent } from "../../../core/event/generic_event";
 import { IScheduleRequestTask, RequestTaskStatus } from "../../../core/xhr/scheduler/@types/request";
+import { ImageRequestResult } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { QuadtreeTileQueue } from "../scene/quad_tree_tile_queue";
@@ -44,7 +45,7 @@ export interface IImageryTileProvider {
     //验证瓦片的缩放等级是否在限制的缩放等级之内
     validateTileLevelIsInRange (level: number): boolean;
     //请求 图片资源
-    requestTileImageAsset (x: number, y: number, level: number, priority: number, onComplete: (img: HTMLImageElement | ImageBitmap, state: RequestTaskStatus) => void): IScheduleRequestTask | undefined;
+    requestTileImageAsset (x: number, y: number, level: number, priority: number, onComplete: (img: ImageRequestResult, state: RequestTaskStatus) => void): IScheduleRequestTask | undefined;
     //计算瓦片可见性
     computeTileVisibility (tile: QuadtreeTile, frustum: Frustum): boolean;
     //获取指定等级下的 最大几何误差

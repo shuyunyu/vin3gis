@@ -1,5 +1,6 @@
 import { Utils } from "../../../core/utils/utils";
 import { IScheduleRequestTask, RequestTaskStatus } from "../../../core/xhr/scheduler/@types/request";
+import { ImageRequestResult } from "../../@types/core/gis";
 import { Log } from "../../log/log";
 import { TileImageAssetProcessor } from "../asset/tile_image_asset_processor";
 import { imageryCache } from "../cache/imagery_cache";
@@ -90,7 +91,7 @@ export class Imagery {
     public processStateMachine () {
         if (this._state === ImageryState.UNLOAD) {
             this._state = ImageryState.LOADING;
-            this._requestTask = this._imageryTileProvider.requestTileImageAsset(this._x, this._y, this._level, this._priority, (image: HTMLImageElement | ImageBitmap, state: RequestTaskStatus) => {
+            this._requestTask = this._imageryTileProvider.requestTileImageAsset(this._x, this._y, this._level, this._priority, (image: ImageRequestResult, state: RequestTaskStatus) => {
                 if (state === RequestTaskStatus.ERROR) {
                     this._state = ImageryState.FAILED;
                     Log.error(Imagery, `request tile imagery asset failed: x:${this._x} y:${this._y} level:${this._level} provider:${this._imageryTileProvider.id}`);

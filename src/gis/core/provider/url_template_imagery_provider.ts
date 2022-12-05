@@ -2,6 +2,7 @@ import { SystemDefines } from "../../../@types/core/system/system";
 import { AssetLoader } from "../../../core/asset/asset_loader";
 import { Utils } from "../../../core/utils/utils";
 import { IScheduleRequestTask, RequestTaskStatus } from "../../../core/xhr/scheduler/@types/request";
+import { ImageRequestResult } from "../../@types/core/gis";
 import { BaseImageryTileProvider } from "./base_imagery_tile_provider";
 import { ImageryTileProviderOptions } from "./imagery_tile_provider_options";
 
@@ -40,11 +41,11 @@ export class UrlTemplateImageryProvider extends BaseImageryTileProvider {
     }
 
     //请求图片资源
-    public requestTileImageAsset (x: number, y: number, level: number, priority: number, onComplete: (img: HTMLImageElement, state: RequestTaskStatus) => void): IScheduleRequestTask | undefined {
+    public requestTileImageAsset (x: number, y: number, level: number, priority: number, onComplete: (img: ImageRequestResult, state: RequestTaskStatus) => void): IScheduleRequestTask | undefined {
         //满足缩放等级范围才去请求瓦片
         if (this.validateTileLevelIsInRange(level)) {
             let url = this.createTileImageryUrl(x, y, level);
-            AssetLoader.requestImage({
+            AssetLoader.requestImageBlob({
                 url: url,
                 priority: priority,
                 taskType: SystemDefines.RequestTaskeType.RASTER_TILE
