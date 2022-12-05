@@ -1,4 +1,5 @@
 import { ImageUtils } from "../../../core/utils/image_utils";
+import { imageDecoder } from "../../../core/worker/image_decoder";
 import { ImageRequestResult } from "../../@types/core/gis";
 
 /**
@@ -19,6 +20,10 @@ export class TileImageAssetProcessor {
         return new Promise<ImageBitmap>((resolve, reject) => {
             if (this._image instanceof ImageBitmap) {
                 resolve(this._image);
+            } else if (this._image instanceof Blob) {
+                imageDecoder.imageBolbToImageBitMap(this._image, { imageOrientation: 'flipY' }).then(imageBitMap => {
+                    if (!this._abort) resolve(imageBitMap);
+                });
             } else {
                 //TODO do it in worker.
                 createImageBitmap(this._image, { imageOrientation: 'flipY' }).then(imageBitmap => {

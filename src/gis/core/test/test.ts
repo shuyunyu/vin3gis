@@ -7,8 +7,19 @@ import { TransferTypedArrayTestScriptBase64 } from "../../../core/worker/transfe
 export class GISTest {
 
     public static run (render: FrameRenderer) {
-        this.testWorker();
-        return;
+        // this.testWorker();
+        // this.testDataTexture(render);
+    }
+
+    private static testWorker () {
+        const taskProcessor = new TaskProcessor<{ array: Int8Array }, { array: Int8Array }>(TransferTypedArrayTestScriptBase64);
+        const array = new Int8Array([1, 2, 3]);
+        taskProcessor.scheduleTask({ array: array }, [array.buffer]).then(res => {
+            console.log(res);
+        })
+    }
+
+    private static testDataTexture (render: FrameRenderer) {
         const width = 512;
         const height = 512;
 
@@ -59,15 +70,6 @@ export class GISTest {
 
             }
         }, this);
-
-    }
-
-    private static testWorker () {
-        const taskProcessor = new TaskProcessor<{ array: Int8Array }, { array: Int8Array }>(TransferTypedArrayTestScriptBase64);
-        const array = new Int8Array([1, 2, 3]);
-        taskProcessor.scheduleTask({ array: array }, [array.buffer]).then(res => {
-            console.log(res);
-        })
     }
 
 }
