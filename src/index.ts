@@ -34,6 +34,7 @@ export * from "./core/utils/device_coord_util";
 export * from "./core/utils/intersect_utils";
 export * from "./core/utils/ray_utils";
 export * from "./core/utils/texture_utils";
+export * from "./core/utils/image_utils";
 
 export * from "./core/xhr/xhr_request";
 export * from "./core/xhr/scheduler/request_scheduler";

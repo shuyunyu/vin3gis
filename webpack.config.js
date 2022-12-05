@@ -10,8 +10,8 @@ const version = "_0.0.1";
 module.exports = {
     mode: 'development',
     entry: {
-        "Vin3Engine": "./src/index.ts",
-        "Vin3GIS": "./src/gis/index.ts"
+        // "Vin3Engine": "./src/index.ts",
+        "Vin3GIS": "./src/gis/index.ts",
     },
     output: {
         path: __dirname + '/dist',
