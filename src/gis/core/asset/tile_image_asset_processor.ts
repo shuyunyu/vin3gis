@@ -21,7 +21,7 @@ export class TileImageAssetProcessor {
             if (this._image instanceof ImageBitmap) {
                 resolve(this._image);
             } else if (this._image instanceof Blob) {
-                imageDecoder.imageBolbToImageBitMap(this._image, { imageOrientation: 'flipY' }).then(imageBitMap => {
+                imageDecoder.imageBlobToImageBitMap(this._image, { imageOrientation: 'flipY' }).then(imageBitMap => {
                     if (!this._abort) resolve(imageBitMap);
                 });
             } else {

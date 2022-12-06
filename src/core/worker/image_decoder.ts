@@ -3,7 +3,7 @@ import { TaskProcessor } from "./task_processor";
 
 enum TaskType {
     BUFFER = "base64BufferToImageBitMap",
-    BLOG = "base64BlobToImageBitMap"
+    BLOB = "base64BlobToImageBitMap"
 }
 
 type InputParams = {
@@ -66,15 +66,33 @@ class ImageDecoder {
      * @param blob 
      * @returns 
      */
-    public imageBolbToImageBitMap (blob: Blob, option?: ImageBitmapOptions) {
+    public imageBlobToImageBitMap (blob: Blob, option?: ImageBitmapOptions) {
         this.init();
         return new Promise<ImageBitmap>((resolve, reject) => {
             this._taskProcessor.scheduleTask({
-                type: TaskType.BLOG,
+                type: TaskType.BLOB,
                 blobs: [blob],
                 options: [option]
             }, null).then(res => {
                 resolve(res[0]);
+            }).catch(reject);
+        });
+    }
+
+    /**
+     * 批量图片转ImageBitMap
+     * @param blobs 
+     * @param option 
+     */
+    public imageBlobToImageBitMapMulti (blobs: Blob[], options?: ImageBitmapOptions[]) {
+        this.init();
+        return new Promise<ImageBitmap[]>((resolve, reject) => {
+            this._taskProcessor.scheduleTask({
+                type: TaskType.BLOB,
+                blobs: blobs,
+                options: options
+            }, null).then(res => {
+                resolve(res)
             }).catch(reject);
         });
     }
