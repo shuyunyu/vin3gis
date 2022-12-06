@@ -1,5 +1,7 @@
 import * as THREE from "three"
-import { OrthographicCamera, PerspectiveCamera, Renderer, Scene, WebGLRenderer, WebGLRendererParameters } from "three";
+import { Mesh, Object3D, OrthographicCamera, PerspectiveCamera, Renderer, Scene, WebGLRenderer, WebGLRendererParameters } from "three";
+import { GeometryUtils } from "../utils/geometry_utils";
+import { Object3Utils } from "../utils/object3_utils";
 
 /**
  * 帧渲染器
@@ -33,6 +35,21 @@ export class FrameRenderer {
 
     public get interactionElement () {
         return this._renderer.domElement.parentElement;
+    }
+
+    /**
+     * 获取当前场景中几何体的占用的内存
+     */
+    public get geometryMemory () {
+        let total = 0;
+        Object3Utils.foreachObject3(this._scene, (o: Object3D) => {
+            if (o instanceof Mesh) {
+                if (o.geometry) {
+                    total += GeometryUtils.getGeometryByteLength(o.geometry);
+                }
+            }
+        });
+        return total;
     }
 
     private _destroyed: boolean = false;

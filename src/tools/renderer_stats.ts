@@ -1,4 +1,5 @@
 import { FrameRenderer } from "../core/renderer/frame_renderer";
+import { Utils } from "../core/utils/utils";
 
 /**
  * 渲染状态
@@ -17,8 +18,9 @@ export class RendererStats {
             "Triangle",
             "Line",
             "Point",
-            "Geometry(M)",
-            "Texture(M)"
+            "GeometryCount",
+            "GeometryMemory",
+            "TextureCount"
         ].forEach(item => this.createItemEle(item));
     }
 
@@ -33,13 +35,15 @@ export class RendererStats {
         const lines = info.render.lines;
         const points = info.render.points;
         const geometries = info.memory.geometries;
+        const geometryMemory = Utils.formatBytes(this.renderer.geometryMemory, 2);
         const textures = info.memory.textures;
         this._ele.children[0].children[1].innerHTML = "" + drawcall;
         this._ele.children[1].children[1].innerHTML = "" + triangles;
         this._ele.children[2].children[1].innerHTML = "" + lines;
         this._ele.children[3].children[1].innerHTML = "" + points;
         this._ele.children[4].children[1].innerHTML = "" + geometries;
-        this._ele.children[5].children[1].innerHTML = "" + textures;
+        this._ele.children[5].children[1].innerHTML = "" + geometryMemory;
+        this._ele.children[6].children[1].innerHTML = "" + textures;
     }
 
     public dispose () {
@@ -78,7 +82,7 @@ export class RendererStats {
         div.style.left = "10px";
         div.style.bottom = "10px";
         div.style.zIndex = "10000";
-        div.style.width = "220px";
+        div.style.width = "230px";
         div.style.minHeight = "25px";
         div.style.backgroundColor = "#333";
         div.style.opacity = "0.8";

@@ -121,6 +121,26 @@ export class Utils {
     }
 
     /**
+     * 格式化字节数
+     * @param bytes 
+     * @param decimals 
+     * @returns 
+     */
+    public static formatBytes (bytes: number, decimals: number = 1) {
+
+        if (bytes === 0) return '0 B';
+
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['B', 'KB', 'MB'];
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+
+    }
+
+    /**
      * 通过脚本字符串创建脚本的blob
      * @param scriptStr 
      */
