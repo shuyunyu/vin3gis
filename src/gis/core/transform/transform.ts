@@ -15,7 +15,7 @@ const scratchCartesian3 = new Cartesian3();
 export class Transform {
     //每一个threejs单位 代表实际的多少米
     //100 => 1 threejs单位 表示实际的1米
-    public static THREEJS_UNIT_PER_METERS: number = 1000;
+    public static THREEJS_UNIT_PER_METERS: number = 10000;
 
     //定义地图平面
     public static readonly MAP_PLANE = new Plane(VecConstants.UNIT_Y_VEC3);

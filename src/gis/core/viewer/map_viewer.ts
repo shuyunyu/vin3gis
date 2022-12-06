@@ -90,7 +90,7 @@ export class MapViewer {
     constructor (viewerOptions: MapViewerOptions) {
         Engine.DEBUG = InternalConfig.DEBUG;
         Engine.init();
-        Transform.THREEJS_UNIT_PER_METERS = Utils.defaultValue(viewerOptions.UNIT_PER_METERS, 1000);
+        Transform.THREEJS_UNIT_PER_METERS = Utils.defaultValue(viewerOptions.UNIT_PER_METERS, 10000);
         this.renderer = this.createRenderer(viewerOptions.target);
         this._imageryTileProvider = viewerOptions.imageryTileProivder;
         this.scene = new EarthScene(this.renderer, this.imageryTileProivder, Utils.defaultValue(viewerOptions.tileCacheSize, 100));
@@ -113,7 +113,7 @@ export class MapViewer {
     private createRenderer (target: string | HTMLElement) {
         const ele = typeof target === 'string' ? document.getElementById(target) : target;
         const scene = new Scene();
-        const camera = new PerspectiveCamera(45, ele.clientWidth / ele.clientHeight, 0.00001, 100000000000);
+        const camera = new PerspectiveCamera(45, ele.clientWidth / ele.clientHeight, 0.00001, Transform.THREEJS_UNIT_PER_METERS * 100);
         const renderer = new FrameRenderer(scene, camera, target as HTMLElement);
         rendererSystem.addRenderTarget(renderer)
         interactionSystem.enableInteraction(renderer);
