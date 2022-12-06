@@ -1,17 +1,33 @@
-import { BoxGeometry, Color, DataTexture, Mesh, MeshBasicMaterial } from "three";
+import { BoxGeometry, Color, DataTexture, DoubleSide, Mesh, MeshBasicMaterial, Texture } from "three";
 import { AssetLoader } from "../../../core/asset/asset_loader";
 import { Director, director } from "../../../core/director";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
+import { imageDecoder } from "../../../core/worker/image_decoder";
 import { imageMerger } from "../../../core/worker/image_merger";
 import { TaskProcessor } from "../../../core/worker/task_processor";
 import { TransferTypedArrayTestScriptBase64 } from "../../../core/worker/transfer_typed_array_test";
+import { TileGeometryFactory } from "../factory/tile_geometry_factory";
 
 export class GISTest {
 
     public static run (render: FrameRenderer) {
+        this.testTileGeometry(render);
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
+    }
+
+    private static testTileGeometry (render: FrameRenderer) {
+        const tileGeometry = TileGeometryFactory.createGeometry();
+        const url1 = "https://webrd02.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x=52&y=28&z=6";
+        AssetLoader.requestImageBlob({ url: url1 }).then(res => {
+            imageDecoder.imageBlobToImageBitMap(res.image).then(image => {
+                const texture = new Texture(image);
+                const mtl = new MeshBasicMaterial({ map: texture, transparent: true, side: DoubleSide });
+                const mesh = new Mesh(tileGeometry, mtl);
+                render.scene.add(mesh);
+            })
+        });
     }
 
     private static testWorker () {
