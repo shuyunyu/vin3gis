@@ -14,11 +14,7 @@ type InputParams = {
     options?: ImageBitmapOptions[];
 }
 
-type OutpuParams = {
-    id: string;
-    error?: any,
-    result: ImageBitmap[];
-}
+type OutpuParams = ImageBitmap[];
 
 /**
  * 图片解码器
