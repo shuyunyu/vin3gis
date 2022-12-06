@@ -21,7 +21,7 @@ export class InternalConfig {
     /**
      * 瓦片mtl texture缓存尺寸
      */
-    public static TILE_TEXTURE_MTL_CACHE_SIZE = 200;
+    public static TILE_TEXTURE_MTL_CACHE_SIZE = 100;
 
     /**
      * 校验相机的pitch是否有效
