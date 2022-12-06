@@ -47,16 +47,15 @@ export type MapViewerOptions = {
     target: string | HTMLElement;
     //瓦片提供者
     imageryTileProivder: IImageryTileProvider;
-    //是否允许双击放大地图
-    dblClickZoom?: boolean;
     //是否允许平移地图
     enablePan?: boolean;
+    panSpeed?: number;
     //是否允许缩放
     enableZoom?: boolean;
-    //是否允许倾斜
-    enablePitch?: boolean;
+    zoomSpeed?: number;
     //是否允许旋转
     enableRotate?: boolean;
+    rotateSpeed?: number;
     //初始视角
     homeViewPort: ViewPort;
     //瓦片缓存数量 默认100

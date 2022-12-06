@@ -11,7 +11,10 @@ window.onload = () => {
             // style: 'aerial',
             key: '1d109683f4d84198e37a38c442d68311'
         }),
-        homeViewPort: homeViewPort
+        homeViewPort: homeViewPort,
+        enablePan: true,
+        enableZoom: true,
+        enableRotate: true
     });
     // mapViewer.scene.imageryProviders.add(new Vin3GIS.AMapImageryTileProvider({
     //     style: 'note'

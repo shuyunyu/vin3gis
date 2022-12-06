@@ -22,31 +22,23 @@ export class MapViewer {
     //瓦片提供者
     private _imageryTileProvider: IImageryTileProvider;
 
-    //是否允许 双击放大地图
-    private _enableDblclickZoom: boolean;
-
     //是否允许 平移
     private _enablePan: boolean;
+
+    private _panSpeed: number;
 
     //是否允许 缩放
     private _enableZoom: boolean;
 
-    //是否允许 倾斜
-    private _enablePitch: boolean;
+    private _zoomSpeed: number;
 
     //是否允许旋转
     private _enableRotate: boolean;
 
+    private _rotateSpeed: number;
+
     public get imageryTileProivder () {
         return this._imageryTileProvider;
-    }
-
-    public get dblClickZoom () {
-        return this._enableDblclickZoom;
-    }
-
-    public set dblClickZoom (enable: boolean) {
-        this._enableDblclickZoom = enable;
     }
 
     public get enablePan () {
@@ -55,6 +47,16 @@ export class MapViewer {
 
     public set enablePan (enable: boolean) {
         this._enablePan = enable;
+        interactionSystem.updateControlsProps(this.renderer, { enablePan: enable });
+    }
+
+    public get panSpeed () {
+        return this._panSpeed;
+    }
+
+    public set panSpeed (val: number) {
+        this._panSpeed = val;
+        interactionSystem.updateControlsProps(this.renderer, { panSpeed: val });
     }
 
     public get enableZoom () {
@@ -63,14 +65,16 @@ export class MapViewer {
 
     public set enableZoom (enable: boolean) {
         this._enableZoom = enable;
+        interactionSystem.updateControlsProps(this.renderer, { enableZoom: enable });
     }
 
-    public get enablePitch () {
-        return this._enablePitch;
+    public get zoomSpeed () {
+        return this._zoomSpeed;
     }
 
-    public set enablePitch (enable: boolean) {
-        this._enablePitch = enable;
+    public set zoomSpeed (val: number) {
+        this._zoomSpeed = val;
+        interactionSystem.updateControlsProps(this.renderer, { zoomSpeed: val });
     }
 
     public get enableRotate () {
@@ -79,6 +83,16 @@ export class MapViewer {
 
     public set enableRotate (enable: boolean) {
         this._enableRotate = enable;
+        interactionSystem.updateControlsProps(this.renderer, { enableRotate: enable });
+    }
+
+    public get rotateSpeed () {
+        return this._rotateSpeed;
+    }
+
+    public set rotateSpeed (val: number) {
+        this._rotateSpeed = val;
+        interactionSystem.updateControlsProps(this.renderer, { rotateSpeed: val });
     }
 
     public set imageryTileProivder (provider: IImageryTileProvider) {
@@ -94,11 +108,12 @@ export class MapViewer {
         this.renderer = this.createRenderer(viewerOptions.target);
         this._imageryTileProvider = viewerOptions.imageryTileProivder;
         this.scene = new EarthScene(this.renderer, this.imageryTileProivder, Utils.defaultValue(viewerOptions.tileCacheSize, 100));
-        this._enableDblclickZoom = Utils.defaultValue(viewerOptions.dblClickZoom, true);
-        this._enablePan = Utils.defaultValue(viewerOptions.enablePan, true);
-        this._enableZoom = Utils.defaultValue(viewerOptions.enableZoom, true);
-        this._enablePitch = Utils.defaultValue(viewerOptions.enablePitch, true);
-        this._enableRotate = Utils.defaultValue(viewerOptions.enableRotate, true);
+        this.enablePan = Utils.defaultValue(viewerOptions.enablePan, true);
+        this.panSpeed = Utils.defaultValue(viewerOptions.panSpeed, 1.2);
+        this.enableZoom = Utils.defaultValue(viewerOptions.enableZoom, true);
+        this.zoomSpeed = Utils.defaultValue(viewerOptions.zoomSpeed, 2.0);
+        this.enableRotate = Utils.defaultValue(viewerOptions.enableRotate, true);
+        this.rotateSpeed = Utils.defaultValue(viewerOptions.rotateSpeed, 1.0);
         this.scene.camera.setViewPort(viewerOptions.homeViewPort);
         new ControlsLimit(this.renderer, this.scene).limit();
 
