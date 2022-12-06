@@ -12,21 +12,39 @@ export class RendererStats {
     public constructor (renderer: FrameRenderer) {
         this.renderer = renderer;
         this.createEle();
-        ["DrawCalls"].forEach(item => this.createItemEle(item));
+        [
+            "DrawCall",
+            "Triangle",
+            "Line",
+            "Point",
+            "Geometry(M)",
+            "Texture(M)"
+        ].forEach(item => this.createItemEle(item));
     }
 
     public begine () {
 
     }
 
-    public end () {
-        const drawcall = this.renderer.rendererInfo.render.calls;
+    public end (dt: number) {
+        const info = this.renderer.renderer.info;
+        const drawcall = info.render.calls;
+        const triangles = info.render.triangles;
+        const lines = info.render.lines;
+        const points = info.render.points;
+        const geometries = info.memory.geometries;
+        const textures = info.memory.textures;
         this._ele.children[0].children[1].innerHTML = "" + drawcall;
+        this._ele.children[1].children[1].innerHTML = "" + triangles;
+        this._ele.children[2].children[1].innerHTML = "" + lines;
+        this._ele.children[3].children[1].innerHTML = "" + points;
+        this._ele.children[4].children[1].innerHTML = "" + geometries;
+        this._ele.children[5].children[1].innerHTML = "" + textures;
     }
 
     public dispose () {
         if (this._ele) {
-            this.renderer.domElement.removeChild(this._ele);
+            this.renderer.domElement.parentElement.removeChild(this._ele);
             this._ele = null;
         }
     }
@@ -36,8 +54,8 @@ export class RendererStats {
         div.style.color = "#fff";
         div.style.fontSize = "15px";
         div.style.fontWeight = "500";
-        div.style.height = "30px";
-        div.style.lineHeight = "30px";
+        div.style.height = "25px";
+        div.style.lineHeight = "25px";
         div.style.marginLeft = "5px";
         this._ele.appendChild(div);
         const titleSpan = document.createElement('span');
@@ -60,12 +78,13 @@ export class RendererStats {
         div.style.left = "10px";
         div.style.bottom = "10px";
         div.style.zIndex = "10000";
-        div.style.width = "200px";
-        div.style.minHeight = "30px";
+        div.style.width = "220px";
+        div.style.minHeight = "25px";
         div.style.backgroundColor = "#333";
         div.style.opacity = "0.8";
         div.style.borderRadius = "5px";
         div.style.overflowY = "hidden";
+        div.style.userSelect = "none";
         this.renderer.domElement.parentElement.appendChild(this._ele);
     }
 

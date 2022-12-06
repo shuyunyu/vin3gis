@@ -8,8 +8,8 @@ export class FrameRenderer {
 
     private _renderer: WebGLRenderer;
 
-    public get rendererInfo () {
-        return this._renderer.info;
+    public get renderer () {
+        return this._renderer;
     }
 
     private _scene: Scene;

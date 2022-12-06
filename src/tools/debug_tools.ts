@@ -43,9 +43,9 @@ export class DebugTools {
         this.rendererStatsArr.forEach(rs => rs.begine());
     }
 
-    private static endFrame () {
+    private static endFrame (dt: number) {
         stats.end();
-        this.rendererStatsArr.forEach(rs => rs.end());
+        this.rendererStatsArr.forEach(rs => rs.end(dt));
     }
 
 }
