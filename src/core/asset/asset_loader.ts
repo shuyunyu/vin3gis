@@ -70,27 +70,33 @@ export class AssetLoader {
      */
     public static requestImageBlob (params: AssetDefines.LoadAssetParams) {
         return new Promise<{ image?: Blob, result: RequestTaskResult }>((resolve, reject) => {
-            requestSystem.request({
-                url: params.url,
-                taskType: params.taskType || SystemDefines.RequestTaskeType.IMAGE,
-                imageTask: false,
-                params: params.params,
-                priority: params.priority,
-                responseType: XHRResponseType.BLOB,
-                onComplete: (result: RequestTaskResult) => {
-                    if (result.status === RequestTaskStatus.SUCCESS) {
-                        resolve({
-                            image: result.response.data,
-                            result: result
-                        });
-                    } else {
-                        resolve({
-                            image: null,
-                            result: result
-                        });
-                    }
+            this.requestImageBlobAsync(params, (res) => {
+                resolve(res);
+            })
+        });
+    }
+
+    public static requestImageBlobAsync (params: AssetDefines.LoadAssetParams, cb: (res: { image?: Blob, result: RequestTaskResult }) => void) {
+        return requestSystem.request({
+            url: params.url,
+            taskType: params.taskType || SystemDefines.RequestTaskeType.IMAGE,
+            imageTask: false,
+            params: params.params,
+            priority: params.priority,
+            responseType: XHRResponseType.BLOB,
+            onComplete: (result: RequestTaskResult) => {
+                if (result.status === RequestTaskStatus.SUCCESS) {
+                    cb({
+                        image: result.response.data,
+                        result: result
+                    });
+                } else {
+                    cb({
+                        image: null,
+                        result: result
+                    });
                 }
-            });
+            }
         });
     }
 

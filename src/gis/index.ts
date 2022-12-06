@@ -23,6 +23,7 @@ export * from "./core/provider/base_imagery_tile_provider";
 export * from "./core/provider/url_template_imagery_provider";
 export * from "./core/provider/amap_imagery_tile_provider";
 export * from "./core/provider/tdt_imagery_tile_provider";
+export * from './core/provider/empty_imagery_tile_provider';
 
 export * from "./core/viewer/map_viewer";
 export * from "./core/camera/earth_camera";

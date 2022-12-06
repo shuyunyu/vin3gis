@@ -45,13 +45,13 @@ export class UrlTemplateImageryProvider extends BaseImageryTileProvider {
         //满足缩放等级范围才去请求瓦片
         if (this.validateTileLevelIsInRange(level)) {
             let url = this.createTileImageryUrl(x, y, level);
-            AssetLoader.requestImageBlob({
+            return AssetLoader.requestImageBlobAsync({
                 url: url,
                 priority: priority,
                 taskType: SystemDefines.RequestTaskeType.RASTER_TILE
-            }).then(res => {
+            }, (res) => {
                 onComplete(res.image, res.result.status);
-            });
+            })
         } else {
             //返回一个空的asset
             onComplete(null, RequestTaskStatus.ABORT);

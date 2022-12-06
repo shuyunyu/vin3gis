@@ -6,6 +6,7 @@ window.onload = () => {
     const homeViewPort = new Vin3GIS.ViewPort(Vin3GIS.Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), Vin3GIS.Orientation.fromDegreeEulerAngles(initCameraOrientation));
     const mapViewer = new Vin3GIS.MapViewer({
         target: document.body,
+        //EmptyImageryTileProvider
         imageryTileProivder: new Vin3GIS.AMapImageryTileProvider({
             style: 'street',
             // style: 'aerial',
