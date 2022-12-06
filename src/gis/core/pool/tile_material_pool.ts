@@ -1,4 +1,4 @@
-import { DoubleSide, MeshBasicMaterial, Texture } from "three";
+import { BackSide, MeshBasicMaterial, Texture } from "three";
 import { InternalConfig } from "../internal/internal_config";
 import { BasePool } from "./pool";
 
@@ -12,7 +12,7 @@ class TileMaterialPool extends BasePool<MeshBasicMaterial, Texture>{
     }
 
     protected onConstructor (p?: Texture): MeshBasicMaterial {
-        const mtl = new MeshBasicMaterial({ map: p, transparent: true, side: DoubleSide });
+        const mtl = new MeshBasicMaterial({ map: p, transparent: true, side: BackSide });
         mtl.needsUpdate = true;
         return mtl;
     }
