@@ -24,7 +24,8 @@ class TileTexturePool extends BasePool<Texture, ImageBitmap>{
     }
 
     protected onRecycle (o: Texture): void {
-
+        o.image = null;
+        o.needsUpdate = true;
     }
 
     protected onAbandon (o: Texture): void {
