@@ -1,4 +1,4 @@
-import { BoxGeometry, Color, DataTexture, DoubleSide, Mesh, MeshBasicMaterial, Texture } from "three";
+import { BackSide, BoxGeometry, Color, DataTexture, DoubleSide, FrontSide, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, Object3D, Quaternion, Texture, Vector3 } from "three";
 import { AssetLoader } from "../../../core/asset/asset_loader";
 import { Director, director } from "../../../core/director";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
@@ -11,23 +11,59 @@ import { TileGeometryFactory } from "../factory/tile_geometry_factory";
 export class GISTest {
 
     public static run (render: FrameRenderer) {
-        this.testTileGeometry(render);
+        // this.testTileGeometry(render);
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
     }
 
     private static testTileGeometry (render: FrameRenderer) {
-        const tileGeometry = TileGeometryFactory.createGeometry();
-        const url1 = "https://webrd02.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x=52&y=28&z=6";
-        AssetLoader.requestImageBlob({ url: url1 }).then(res => {
-            imageDecoder.imageBlobToImageBitMap(res.image).then(image => {
-                const texture = new Texture(image);
-                const mtl = new MeshBasicMaterial({ map: texture, transparent: true, side: DoubleSide });
-                const mesh = new Mesh(tileGeometry, mtl);
-                render.scene.add(mesh);
-            })
-        });
+        // const tileGeometry = TileGeometryFactory.createGeometry();
+        // const url1 = "https://webst04.is.autonavi.com/appmaptile?style=6&x=33&y=30&z=6";
+        // const url2 = "https://webst03.is.autonavi.com/appmaptile?x=33&y=32&z=6&lang=zh_cn&size=1&scale=1&style=8";
+        // const blobsPromiseArr = [url1, url2].map(url => AssetLoader.requestImageBlob({ url: url }));
+        // Promise.all(blobsPromiseArr).then(resArr => {
+        //     const blobs = resArr.map(res => res.image);
+        //     imageDecoder.imageBlobToImageBitMapMulti(blobs).then(images => {
+        //         const texture = new Texture(images[0]);
+        //         texture.needsUpdate = true;
+        //         const mtl = new MeshBasicMaterial({ map: texture, transparent: true, side: FrontSide });
+        //         mtl.needsUpdate = true;
+
+        //         const texture2 = new Texture(images[1]);
+        //         texture2.needsUpdate = true;
+        //         const mtl2 = new MeshBasicMaterial({ map: texture2, transparent: true, side: FrontSide });
+        //         mtl2.needsUpdate = true;
+
+        //         const mesh = new Mesh(tileGeometry, mtl);
+        //         mesh.position.y = 0;
+        //         mesh.scale.copy(new Vector3(100, 100, 100));
+
+        //         const mesh1 = new InstancedMesh(tileGeometry, mtl, 2);
+        //         mesh1.position.y = 0;
+        //         // mesh1.scale.copy(new Vector3(100, 100, 100));
+
+        //         const o = new Object3D();
+
+        //         const matrix2 = new Matrix4();
+        //         const pos0 = new Vector3(0, 0, 0);
+        //         matrix2.compose(pos0, new Quaternion(), new Vector3(100, 100, 100));
+
+        //         const matrix1 = new Matrix4();
+        //         const pos = new Vector3(200, 0, 0);
+        //         matrix1.compose(pos, new Quaternion(), new Vector3(100, 100, 100));
+
+        //         mesh1.setMatrixAt(0, matrix2);
+        //         mesh1.setMatrixAt(1, matrix1);
+        //         mesh1.instanceMatrix.needsUpdate = true;
+
+        //         // o.add(mesh);
+        //         o.add(mesh1);
+
+
+        //         render.scene.add(o);
+        //     })
+        // })
     }
 
     private static testWorker () {

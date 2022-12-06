@@ -24,10 +24,10 @@ export class TileGeometryFactory {
             0, 1, 0
         ]);
         const uvs = new Float32Array([
-            -1, -1,
-            -1, 1,
+            0, 0,
+            0, 1,
             1, 1,
-            1, -1
+            1, 0
         ]);
         geometry.setAttribute('position', new BufferAttribute(position, 3));
         geometry.setIndex(indexs);
