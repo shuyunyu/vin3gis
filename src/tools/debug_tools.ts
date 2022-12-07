@@ -23,6 +23,15 @@ export class DebugTools {
         director.addEventListener(Director.EVENT_END_FRAME, this.endFrame, this);
     }
 
+    /**
+     * 查找渲染状态监视器
+     * @param target 
+     * @returns 
+     */
+    public static getRendererStats (target: FrameRenderer) {
+        return this.rendererStatsArr.find(rs => rs.renderer === target);
+    }
+
     public static onRendererTargetAdd (target: FrameRenderer) {
         const rs = this.rendererStatsArr.find(r => r.renderer === target);
         if (!rs) {

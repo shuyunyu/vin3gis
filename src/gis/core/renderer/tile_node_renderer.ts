@@ -12,6 +12,11 @@ export class TileNodeRenderer {
 
     private _tileNodeRecord: Record<string, TileNode> = Object.create(null);
 
+    //当前渲染瓦片节点数量
+    public get renderTileNodeCount () {
+        return Object.keys(this._tileNodeRecord).length;
+    }
+
     public constructor () {
 
     }
@@ -27,6 +32,7 @@ export class TileNodeRenderer {
         const tileNode = this._tileNodeRecord[tileImagery.tile.id];
         if (tileNode) {
             tileNode.unrenderTileImagery();
+            delete this._tileNodeRecord[tileImagery.tile.id];
         }
     }
 

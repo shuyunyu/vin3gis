@@ -10,6 +10,11 @@ export class RendererStats {
 
     private _ele: HTMLElement;
 
+    //追加的项目
+    private _appendItems: string[];
+
+    private _appendItemEles: HTMLSpanElement[] = [];
+
     public constructor (renderer: FrameRenderer) {
         this.renderer = renderer;
         this.createEle();
@@ -22,6 +27,29 @@ export class RendererStats {
             "GeometryMemory",
             "TextureCount"
         ].forEach(item => this.createItemEle(item));
+    }
+
+    /**
+     * 最近要显示的状态项目
+     * @param items 
+     */
+    public appendStatsItems (items: string[]) {
+        this._appendItems = items;
+        this._appendItems.forEach(item => {
+            this._appendItemEles.push(this.createItemEle(item));
+        });
+    }
+
+    /**
+     * 设置追加的状态项的值
+     * @param item 
+     * @param val
+     */
+    public setStatsItemVal (item: string | number, val: string) {
+        const index = typeof item === "number" ? item : this._appendItems.indexOf(item);
+        if (index > -1) {
+            this._appendItemEles[index].innerHTML = val;
+        }
     }
 
     public begine () {
@@ -58,21 +86,23 @@ export class RendererStats {
         div.style.color = "#fff";
         div.style.fontSize = "15px";
         div.style.fontWeight = "500";
-        div.style.height = "25px";
-        div.style.lineHeight = "25px";
+        div.style.height = "20px";
+        div.style.lineHeight = "20px";
         div.style.marginLeft = "5px";
         this._ele.appendChild(div);
         const titleSpan = document.createElement('span');
         div.appendChild(titleSpan);
         titleSpan.innerText = title;
-        titleSpan.style.width = "50%";
+        titleSpan.style.width = "65%";
         titleSpan.style.display = "inline-block";
+        titleSpan.style.overflowX = "hidden";
         const valSpan = document.createElement('span');
         div.appendChild(valSpan);
-        valSpan.style.width = "calc(50% - 5px)";
+        valSpan.style.width = "calc(35% - 5px)";
         valSpan.style.display = "inline-block";
         valSpan.innerText = val;
         valSpan.style.textAlign = "right";
+        return valSpan;
     }
 
     private createEle () {
@@ -83,12 +113,14 @@ export class RendererStats {
         div.style.bottom = "10px";
         div.style.zIndex = "10000";
         div.style.width = "230px";
-        div.style.minHeight = "25px";
+        div.style.minHeight = "20px";
         div.style.backgroundColor = "#333";
         div.style.opacity = "0.8";
         div.style.borderRadius = "5px";
         div.style.overflowY = "hidden";
         div.style.userSelect = "none";
+        div.style.paddingTop = "5px";
+        div.style.paddingBottom = "5px";
         this.renderer.domElement.parentElement.appendChild(this._ele);
     }
 

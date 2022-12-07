@@ -45,6 +45,13 @@ export class GlobeSurfaceTileManager {
 
     private _loadQueueTimeSlice: number = 5;
 
+    //当前帧选中的瓦片数量
+    private _curFrameSelectTileCount: number;
+
+    public get curFrameSelectTIleCount () {
+        return this._curFrameSelectTileCount;
+    }
+
     constructor (quadtreePrimitive: QuadtreePrimitive, scene: EarthScene) {
         this._quadtreePrimitive = quadtreePrimitive;
         this._scene = scene;
@@ -281,7 +288,7 @@ export class GlobeSurfaceTileManager {
                 selectedToRenderdQueue.push(ancestor!);
             }
         }
-
+        this._curFrameSelectTileCount = selectedToRenderdQueue.length;
         for (let i = 0; i < selectedToRenderdQueue.length; i++) {
             let tile = selectedToRenderdQueue[i];
             tile.data!.addToTileImageryRenderQueue(imageryProvider);

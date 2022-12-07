@@ -5,7 +5,9 @@ import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { interactionSystem } from "../../../core/system/interaction_system";
 import { rendererSystem } from "../../../core/system/renderer_system";
 import { Utils } from "../../../core/utils/utils";
+import { DebugTools } from "../../../tools/debug_tools";
 import { MapViewerOptions } from "../../@types/core/gis";
+import { MapStatsMonitor } from "../../monitor/map_stats_monitor";
 import { ControlsLimit } from "../extend/controls_limit";
 import { InternalConfig } from "../internal/internal_config";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
@@ -18,6 +20,8 @@ export class MapViewer {
     public readonly renderer: FrameRenderer;
 
     public readonly scene: EarthScene;
+
+    private _mapStatsMonitor?: MapStatsMonitor;
 
     //瓦片提供者
     private _imageryTileProvider: IImageryTileProvider;
@@ -116,6 +120,10 @@ export class MapViewer {
         this.rotateSpeed = Utils.defaultValue(viewerOptions.rotateSpeed, 1.0);
         this.scene.camera.setViewPort(viewerOptions.homeViewPort);
         new ControlsLimit(this.renderer, this.scene).limit();
+        //start a monitor
+        if (DebugTools.getRendererStats(this.renderer)) {
+            this._mapStatsMonitor = new MapStatsMonitor(this.renderer, this.scene);
+        }
 
         director.addEventListener(Director.EVENT_DRAW_FRAME, this.renderFrame, this);
 
@@ -141,11 +149,12 @@ export class MapViewer {
      * 按帧渲染
      */
     renderFrame (delay: number) {
-        this.scene!.postRender(delay);
+        this.scene.postRender(delay);
+        if (this._mapStatsMonitor) this._mapStatsMonitor.update();
     }
 
     renderLateUpdate (delay: number) {
-        this.scene!.renderLateUpdate(delay);
+        this.scene.renderLateUpdate(delay);
     }
 
     destroy () {

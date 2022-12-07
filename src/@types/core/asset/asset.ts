@@ -10,6 +10,8 @@ export namespace AssetDefines {
         taskType?: SystemDefines.RequestTaskeType,
         params?: any;
         priority?: number;
+        throttle?: boolean;
+        throttleServer?: boolean;
     }
 
 }

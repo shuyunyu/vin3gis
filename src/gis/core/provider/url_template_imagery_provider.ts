@@ -48,7 +48,9 @@ export class UrlTemplateImageryProvider extends BaseImageryTileProvider {
             return AssetLoader.requestImageBlobAsync({
                 url: url,
                 priority: priority,
-                taskType: SystemDefines.RequestTaskeType.RASTER_TILE
+                taskType: SystemDefines.RequestTaskeType.RASTER_TILE,
+                throttle: true,
+                throttleServer: true
             }, (res) => {
                 onComplete(res.image, res.result.status);
             })

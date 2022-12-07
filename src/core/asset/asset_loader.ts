@@ -23,6 +23,8 @@ export class AssetLoader {
                 imageTask: true,
                 params: params.params,
                 priority: params.priority,
+                throttle: params.throttle,
+                throttleServer: params.throttleServer,
                 onComplete: (result: RequestTaskResult) => {
                     if (result.status === RequestTaskStatus.SUCCESS) {
                         resolve(result.image);
@@ -46,6 +48,8 @@ export class AssetLoader {
                 imageTask: true,
                 params: params.params,
                 priority: params.priority,
+                throttle: params.throttle,
+                throttleServer: params.throttleServer,
                 onComplete: (result: RequestTaskResult) => {
                     if (result.status === RequestTaskStatus.SUCCESS) {
                         resolve({
@@ -84,6 +88,8 @@ export class AssetLoader {
             params: params.params,
             priority: params.priority,
             responseType: XHRResponseType.BLOB,
+            throttle: params.throttle,
+            throttleServer: params.throttleServer,
             onComplete: (result: RequestTaskResult) => {
                 if (result.status === RequestTaskStatus.SUCCESS) {
                     cb({
