@@ -17,9 +17,23 @@ class TileMaterialPool extends BasePool<MeshBasicMaterial, Texture>{
         return mtl;
     }
 
+    protected onSelect (p?: Texture): MeshBasicMaterial {
+        //先看看原先有没有这个材质 有的话 直接拿出来用
+        const index = this._list.findIndex(mtl => mtl.map === p);
+        if (index > -1) {
+            const mtl = this._list.splice(index, 1)[0];
+            return mtl;
+        } else {
+            return super.onSelect(p);
+        }
+    }
+
     protected onUpdate (o: MeshBasicMaterial, p?: Texture): void {
-        o.map = p;
-        o.needsUpdate = true;
+        //如果当前复用的材质不是原来的材质 则需要更新一下
+        if (o.map !== p) {
+            o.map = p;
+            o.needsUpdate = true;
+        }
     }
 
     protected onRecycle (o: MeshBasicMaterial): void {

@@ -18,14 +18,27 @@ class TileTexturePool extends BasePool<Texture, ImageBitmap>{
         return TextureUtils.createTextureByImage(p);
     }
 
+    protected onSelect (p?: ImageBitmap): Texture {
+        //先看看原先有没有这个贴图 有的话 直接拿出来用
+        const index = this._list.findIndex(t => t.image === p);
+        if (index > -1) {
+            const t = this._list.splice(index, 1)[0];
+            return t;
+        } else {
+            return super.onSelect(p);
+        }
+    }
+
     protected onUpdate (o: Texture, p?: ImageBitmap): void {
-        o.image = p;
-        o.needsUpdate = true;
+        //如果当前复用的贴图不是原来的贴图 则需要更新一下
+        if (o.image !== p) {
+            o.image = p;
+            o.needsUpdate = true;
+        }
     }
 
     protected onRecycle (o: Texture): void {
-        o.image = null;
-        o.needsUpdate = true;
+
     }
 
     protected onAbandon (o: Texture): void {

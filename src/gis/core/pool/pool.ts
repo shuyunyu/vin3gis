@@ -15,7 +15,7 @@ export interface IPool<T, P> {
  */
 export class BasePool<T, P> implements IPool<T, P> {
 
-    private _list: T[] = [];
+    protected _list: T[] = [];
 
     public readonly type: Constructor<T>;
 
@@ -33,7 +33,7 @@ export class BasePool<T, P> implements IPool<T, P> {
      */
     public create (p?: P) {
         if (this._list.length) {
-            const t = this._list.shift();
+            const t = this.onSelect(p);
             this.onUpdate(t, p);
             return t;
         } else {
@@ -61,6 +61,16 @@ export class BasePool<T, P> implements IPool<T, P> {
      */
     protected onConstructor (p?: P): T {
         return null;
+    }
+
+    /**
+     * 通过参数从池中选择对象 
+     * 子类可以重写此方法来修改从池中获取对象的方法
+     * @param p 
+     * @returns 
+     */
+    protected onSelect (p?: P): T {
+        return this._list.shift();
     }
 
     /**
