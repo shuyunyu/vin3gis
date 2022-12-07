@@ -33,6 +33,9 @@ export class TileNode {
         parent.add(this._mesh);
     }
 
+    /**
+     * 取消渲染瓦片图片
+     */
     public unrenderTileImagery () {
         this.recycle();
     }

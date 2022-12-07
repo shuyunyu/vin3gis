@@ -1,5 +1,4 @@
 import { Object3D } from "three";
-import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { TileImagery } from "../scene/tile_imagery";
 import { TileNode } from "./tile_node";
 
