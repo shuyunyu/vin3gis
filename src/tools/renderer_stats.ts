@@ -45,10 +45,10 @@ export class RendererStats {
      * @param item 
      * @param val
      */
-    public setStatsItemVal (item: string | number, val: string) {
+    public setStatsItemVal (item: string | number, val: string | number) {
         const index = typeof item === "number" ? item : this._appendItems.indexOf(item);
         if (index > -1) {
-            this._appendItemEles[index].innerHTML = val;
+            this._appendItemEles[index].innerHTML = "" + val;
         }
     }
 
@@ -96,12 +96,14 @@ export class RendererStats {
         titleSpan.style.width = "65%";
         titleSpan.style.display = "inline-block";
         titleSpan.style.overflowX = "hidden";
+        titleSpan.style.verticalAlign = "top";
         const valSpan = document.createElement('span');
         div.appendChild(valSpan);
         valSpan.style.width = "calc(35% - 5px)";
         valSpan.style.display = "inline-block";
         valSpan.innerText = val;
         valSpan.style.textAlign = "right";
+        valSpan.style.verticalAlign = "top";
         return valSpan;
     }
 

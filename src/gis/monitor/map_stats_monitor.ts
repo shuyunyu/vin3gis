@@ -26,8 +26,8 @@ export class MapStatsMonitor {
     }
 
     public update () {
-        this._rendererStats.setStatsItemVal(0, "" + this._scene.globleSurfaceManager.curFrameSelectTIleCount);
-        this._rendererStats.setStatsItemVal(1, "" + this._scene.tileNodeRenderer.renderTileNodeCount);
+        this._rendererStats.setStatsItemVal(0, this._scene.globleSurfaceManager.curFrameSelectTIleCount);
+        this._rendererStats.setStatsItemVal(1, this._scene.tileNodeRenderer.renderTileNodeCount);
         const curRequestCount = RequestScheduler.curRequestCount;
         this._rendererStats.setStatsItemVal(2, "<span " + (curRequestCount > RequestScheduler.maxConcurrency ? "style='color:red;'" : "") + ">" + curRequestCount + "<span>");
     }
