@@ -18,8 +18,6 @@ export interface IImageryTileProvider {
     id: string;
     //瓦片格式 .png | .jpg
     format: string;
-    //是否以base64的方式加载瓦片
-    // isBase64: boolean;
     //是否可见
     visible: boolean;
     //最大缩放等级
@@ -32,8 +30,6 @@ export interface IImageryTileProvider {
     tileHeight: number;
     //标识 是否准备完毕
     ready: boolean;
-    //装备完成的Promise
-    // readyPromise: Promise<boolean>;
     //瓦片提供范围
     rectangle: Rectangle;
     //瓦片方案
@@ -50,6 +46,4 @@ export interface IImageryTileProvider {
     computeTileVisibility (tile: QuadtreeTile, frustum: Frustum): boolean;
     //获取指定等级下的 最大几何误差
     getLevelMaximumGeometricError (level: number): number;
-    //将瓦片渲染至creator的节点
-    // renderTileToNode (parent: Node): any;
 }

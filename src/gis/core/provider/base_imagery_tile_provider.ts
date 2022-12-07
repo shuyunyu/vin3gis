@@ -63,17 +63,18 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
 
 
     public constructor (imageryTileProviderOptions?: ImageryTileProviderOptions) {
+        imageryTileProviderOptions = imageryTileProviderOptions || {};
         this.id = Utils.createGuid();
-        this._visible = Utils.defaultValue(imageryTileProviderOptions?.visible, true);
+        this._visible = Utils.defaultValue(imageryTileProviderOptions.visible, true);
         this.tileNodeContainer = new TileNodeContainer();
         this.tileNodeContainer.object3d.visible = this._visible;
-        this.format = Utils.defaultValue(imageryTileProviderOptions?.format, '.png');
-        this.maximumLevel = Utils.defaultValue(imageryTileProviderOptions?.maximumLevel, 0);
-        this.minimumLevel = Utils.defaultValue(imageryTileProviderOptions?.minimumLevel, 0);
-        this.tileWidth = Utils.defaultValue(imageryTileProviderOptions?.tileWidth, 256);
-        this.tileHeight = Utils.defaultValue(imageryTileProviderOptions?.tileHeight, 256);
-        this.tilingScheme = Utils.defaultValue(imageryTileProviderOptions?.tilingScheme, new WebMercatorTilingScheme());
-        this.rectangle = Utils.defaultValue(imageryTileProviderOptions?.rectangle, this.tilingScheme.projection.rectangle);
+        this.format = Utils.defaultValue(imageryTileProviderOptions.format, '.png');
+        this.minimumLevel = Utils.defaultValue(imageryTileProviderOptions.minimumLevel, 3);
+        this.maximumLevel = Utils.defaultValue(imageryTileProviderOptions.maximumLevel, 21);
+        this.tileWidth = Utils.defaultValue(imageryTileProviderOptions.tileWidth, 256);
+        this.tileHeight = Utils.defaultValue(imageryTileProviderOptions.tileHeight, 256);
+        this.tilingScheme = Utils.defaultValue(imageryTileProviderOptions.tilingScheme, new WebMercatorTilingScheme());
+        this.rectangle = Utils.defaultValue(imageryTileProviderOptions.rectangle, this.tilingScheme.projection.rectangle);
         this.tileImageryRenderedQueue = new QuadtreeTileQueue();
         let width = this.tilingScheme.projection.rectangle.width;
         let tilesOfXAtZeroLevel = this.tilingScheme.getNumberOfXTilesAtLevel(0);
