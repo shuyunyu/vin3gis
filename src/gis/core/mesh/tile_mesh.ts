@@ -1,67 +1,15 @@
-import { BufferAttribute, BufferGeometry, Mesh, MeshBasicMaterial, Texture } from "three";
+import { BufferAttribute, BufferGeometry, Mesh, Texture } from "three";
 import { MeshDefines } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
 import { tileMaterialPool } from "../pool/tile_material_pool";
-import { IImageryTileProvider } from "../provider/imagery_tile_provider";
+import { tileTexturePool } from "../pool/tile_texture_pool";
+import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { Transform } from "../transform/transform";
-import { QuadtreeTile } from "./quad_tree_tile";
 
 /**
- * 定义瓦片节点
- * 管理单个瓦片的渲染
+ * 瓦片网格
  */
-export class TileNode {
-
-    private _provider: IImageryTileProvider;
-
-    private _mesh: Mesh;
-
-    public get mesh () {
-        return this._mesh;
-    }
-
-    private _recycled: boolean = false;
-
-    public constructor (provider: IImageryTileProvider, mesh: Mesh) {
-        this._provider = provider;
-        this._mesh = mesh;
-        this._recycled = false;
-    }
-
-    /**
-     * 渲染此瓦片节点
-     */
-    public render () {
-        if (this._recycled) return;
-        this._provider.tileNodeContainer.addTileNode(this);
-    }
-
-    /**
-     * 回收此瓦片节点 并释放资源
-     */
-    public recycle () {
-        if (this._recycled) return;
-        this._provider.tileNodeContainer.removeTileNode(this);
-        const mtl = this._mesh.material as MeshBasicMaterial;
-        if (mtl) tileMaterialPool.recycle(mtl);
-        this._mesh.geometry.dispose();
-        //贴图不销毁 
-        //贴图可能在多个node中使用
-        this._mesh = null;
-        this._provider = null;
-    }
-
-    /**
-     * 创建一个瓦片节点
-     * @param provider 
-     * @param tile 
-     * @param texture 瓦片贴图
-     * @returns 
-     */
-    public static create (provider: IImageryTileProvider, tile: QuadtreeTile, texture: Texture, imageryRectangle: Rectangle) {
-        const mesh = this.createTileMesh(tile, texture, imageryRectangle);
-        return new TileNode(provider, mesh);
-    }
+export class TileMesh {
 
     /**
      * 创建瓦片显示用的mesh
@@ -69,7 +17,8 @@ export class TileNode {
      * @param texture
      * @param imageryRectangle
      */
-    private static createTileMesh (tile: QuadtreeTile, texture: Texture, imageryRectangle: Rectangle) {
+    public static createTileMesh (tile: QuadtreeTile, imageryRectangle: Rectangle, imagery: ImageBitmap) {
+        const texture: Texture = tileTexturePool.create(imagery);
         const tileNativeRectangle = tile.nativeRectangle;
         const center = tileNativeRectangle.center;
         const plane = new BufferGeometry();

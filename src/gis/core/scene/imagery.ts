@@ -98,6 +98,8 @@ export class Imagery {
                 } else if (state === RequestTaskStatus.SUCCESS) {
                     this._tileImageAssetProcessor = new TileImageAssetProcessor(image);
                     this._tileImageAssetProcessor.process().then(imageAsset => {
+                        this._tileImageAssetProcessor.dispose();
+                        this._tileImageAssetProcessor = null;
                         this._imageAsset = imageAsset;
                         this._state = ImageryState.LOADED;
                     }).catch(err => {

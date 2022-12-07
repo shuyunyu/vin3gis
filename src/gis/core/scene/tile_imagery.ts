@@ -1,25 +1,20 @@
-import { Texture } from "three";
 import { Utils } from "../../../core/utils/utils";
 import { imageryCache } from "../cache/imagery_cache";
 import { Rectangle } from "../geometry/rectangle";
-import { tileTexturePool } from "../pool/tile_texture_pool";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { Imagery, ImageryState } from "./imagery";
 import { QuadtreeTile } from "./quad_tree_tile";
-import { TileNode } from "./tile_node";
 
 /**
  * 瓦片图片
  */
 export class TileImagery {
 
+    public readonly tile: QuadtreeTile;
+
+    public readonly imageryProvider: IImageryTileProvider;
+
     private _imagery: Imagery;
-
-    private _texture?: Texture;
-
-    private _node?: TileNode;
-
-    private _imageryProvider: IImageryTileProvider;
 
     private _loadingImagery: Imagery | undefined;
 
@@ -33,8 +28,11 @@ export class TileImagery {
 
     private _loaded: boolean;
 
-    public get imageryProvider () {
-        return this._imageryProvider;
+    private _textureImagery?: Imagery;
+
+    //当前瓦片对应的贴图图片
+    public get textureImagery () {
+        return this._textureImagery;
     }
 
     public get loaded () {
@@ -47,14 +45,6 @@ export class TileImagery {
 
     public get loadingImagery () {
         return this._loadingImagery;
-    }
-
-    public get node () {
-        return this._node;
-    }
-
-    public set node (val: TileNode | undefined) {
-        this._node = val;
     }
 
     public get imageryChanged () {
@@ -80,13 +70,10 @@ export class TileImagery {
         return this._priority;
     }
 
-    public get texture () {
-        return this._texture;
-    }
-
     constructor (tile: QuadtreeTile, provider: IImageryTileProvider) {
         this._imagery = imageryCache.getImagery(tile, provider);
-        this._imageryProvider = provider;
+        this.imageryProvider = provider;
+        this.tile = tile;
         this._imageryChanged = false;
         this._loaded = false;
         this._priority = tile.priority;
@@ -140,59 +127,35 @@ export class TileImagery {
         }
     }
 
-    private createTextureWithImagery (imagery: Imagery) {
-        //可能没有图片资源
-        //请求被abort
-        return imagery.imageAsset ? tileTexturePool.create(imagery.imageAsset) : undefined;
-    }
-
     /**
-     * 创建贴图
+     * 创建贴图图片
      */
-    public createTexture () {
-        //node回收之后 texture不可复用  所以需要先清除原来的texture
-        this.releaseTextureResource();
-        let texture: Texture;
+    public createTextureImagery () {
+        let textureImagery: Imagery;
         if (this.loaded) {
-            texture = this.createTextureWithImagery(this._imagery!);
-            this._imageryCoordinateRectangle = this._imagery.rectangle;
+            textureImagery = this._imagery;
         } else {
-            if (Utils.defined(this._loadingImagery) && this._loadingImagery!.state === ImageryState.LOADED) {
-                texture = this.createTextureWithImagery(this._loadingImagery!);
-                this._imageryCoordinateRectangle = this._loadingImagery!.rectangle;
+            if (this._loadingImagery && this._loadingImagery.state === ImageryState.LOADED) {
+                textureImagery = this._loadingImagery;
             }
         }
-        this._texture = texture;
-        return this._texture;
+        //可能没有图片资源
+        this._textureImagery = textureImagery && textureImagery.imageAsset ? textureImagery : null;
+        return this._textureImagery;
     }
 
     /**
-     * 回收节点资源
+     * 回收贴图图片节点资源
      */
-    public recyleNodeResource () {
-        if (Utils.defined(this._node)) {
-            this._node.recycle();
-            this._node = undefined;
-        }
-        this.releaseTextureResource();
-    }
-
-    /**
-     * 释放贴图资源
-     */
-    public releaseTextureResource () {
-        if (Utils.defined(this._texture)) {
-            tileTexturePool.recycle(this._texture);
-        }
-        this._imageryCoordinateRectangle = undefined;
-        this._texture = undefined;
+    public recyleTextureImageryResource () {
+        this._textureImagery = null;
     }
 
     /**
      * 释放资源
      */
     public releaseResource () {
-        this.recyleNodeResource();
+        this.recyleTextureImageryResource();
         if (Utils.defined(this._imagery)) {
             this._imagery.releaseResource();
         }

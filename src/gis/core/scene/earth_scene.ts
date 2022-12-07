@@ -4,6 +4,7 @@ import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { EarthCamera } from "../camera/earth_camera";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
+import { TileNodeRenderer } from "../renderer/tile_node_renderer";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { FrameState } from "./frame_state";
 import { GlobeSurfaceTileManager } from "./globe_surface_tile_manager";
@@ -27,8 +28,14 @@ export class EarthScene {
 
     public readonly lateUpdateEvent = new GenericEvent<number>;
 
+    //瓦片节点渲染器
+    public readonly tileNodeRenderer: TileNodeRenderer;
+
     constructor (renderer: FrameRenderer, imageryTileProvider: IImageryTileProvider, tileCacheSize: number) {
         this._renderer = renderer;
+        this.tileNodeRenderer = new TileNodeRenderer();
+        //将渲染根节点添加到场景中
+        this._renderer.scene.add(this.tileNodeRenderer.root);
         this.imageryProviders = new ImageryTileProviderCollection();
         this.initEventListeners();
         this.imageryProviders.add(imageryTileProvider);
@@ -63,12 +70,10 @@ export class EarthScene {
     private onImageryTileProvderAdded (provider: IImageryTileProvider) {
         //挂载瓦片节点
         // provider.renderTileToNode(ResourceCenter.tileRootNode);
-        this._renderer.scene.add(provider.tileNodeContainer.object3d);
     }
 
     private onImageryTileProviderRemoved (provider: IImageryTileProvider) {
         // provider.node.removeFromParent();
-        this._renderer.scene.remove(provider.tileNodeContainer.object3d);
     }
 
 

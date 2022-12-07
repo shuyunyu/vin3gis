@@ -123,7 +123,7 @@ export class GlobeSurfaceTileManager {
     private processSingleTileDownloadQueue (frameState: FrameState, endTime: number, queue: QuadtreeTile[], didSomeLoading: boolean) {
         for (let i = 0; i < queue.length; i++) {
             const quadtreeTile = queue[i];
-            GlobeSurfaceTile.initialize(quadtreeTile, this._scene.imageryProviders);
+            GlobeSurfaceTile.initialize(quadtreeTile, this._scene.imageryProviders, this._scene.tileNodeRenderer);
             quadtreeTile.priority = this.computeTileLoadPriority(quadtreeTile, frameState);
         }
         //保证 当前帧需要下载的瓦片优先级最高
@@ -146,7 +146,7 @@ export class GlobeSurfaceTileManager {
     private selectTilesToRender (frameState: FrameState) {
         let tile;
         while (Utils.defined(tile = this._traversalQueue.dequeue())) {
-            GlobeSurfaceTile.initialize(tile!, this._scene.imageryProviders);
+            GlobeSurfaceTile.initialize(tile!, this._scene.imageryProviders, this._scene.tileNodeRenderer);
             //摄像机到屏幕中心的距离 小于 摄像机到瓦片的距离  说明瓦片精度更高 可以直接渲染
             tile!.updateDistanceToCamera(frameState);
             if (Transform.validateSpaceError(tile!, this._quadtreePrimitive.tileProvider, frameState)) {
@@ -257,7 +257,7 @@ export class GlobeSurfaceTileManager {
                 const child = tile.children[i];
                 if (imageryProvider.computeTileVisibility(child, frameState.frustum)) {
                     if (child.level >= imageryProvider.minimumLevel) {
-                        GlobeSurfaceTile.initialize(child, this._scene.imageryProviders);
+                        GlobeSurfaceTile.initialize(child, this._scene.imageryProviders, this._scene.tileNodeRenderer);
                         child.data!.processStateMachine();
                         if (child.data!.hasTileImagery(imageryProvider)) {
                             selectedToRenderdQueue.push(child);

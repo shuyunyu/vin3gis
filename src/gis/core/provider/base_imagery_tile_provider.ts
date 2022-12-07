@@ -7,7 +7,6 @@ import { ImageRequestResult } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { QuadtreeTileQueue } from "../scene/quad_tree_tile_queue";
-import { TileNodeContainer } from "../scene/tile_node_container";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { WebMercatorTilingScheme } from "../tilingscheme/web_mercator_tiling_scheme";
 import { IImageryTileProvider } from "./imagery_tile_provider";
@@ -17,10 +16,6 @@ import { ImageryTileProviderOptions } from "./imagery_tile_provider_options";
  * 基础图片切片 提供者
  */
 export class BaseImageryTileProvider implements IImageryTileProvider {
-
-    //瓦片节点容器 
-    //需要将瓦片节点容器添加至场景中才能显示图层
-    public readonly tileNodeContainer: TileNodeContainer;
 
     //id
     public readonly id;
@@ -57,7 +52,6 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
     public set visible (visible: boolean) {
         if (this._visible === visible) return;
         this._visible = visible;
-        this.tileNodeContainer.object3d.visible = this._visible;
         this.visibilityChanged.invoke(this);
     }
 
@@ -66,8 +60,6 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
         imageryTileProviderOptions = imageryTileProviderOptions || {};
         this.id = Utils.createGuid();
         this._visible = Utils.defaultValue(imageryTileProviderOptions.visible, true);
-        this.tileNodeContainer = new TileNodeContainer();
-        this.tileNodeContainer.object3d.visible = this._visible;
         this.format = Utils.defaultValue(imageryTileProviderOptions.format, '.png');
         this.minimumLevel = Utils.defaultValue(imageryTileProviderOptions.minimumLevel, 3);
         this.maximumLevel = Utils.defaultValue(imageryTileProviderOptions.maximumLevel, 21);

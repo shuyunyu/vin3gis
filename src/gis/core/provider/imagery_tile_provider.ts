@@ -5,15 +5,12 @@ import { ImageRequestResult } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { QuadtreeTileQueue } from "../scene/quad_tree_tile_queue";
-import { TileNodeContainer } from "../scene/tile_node_container";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 
 /**
  * 定义 图片瓦片提供者接口
  */
 export interface IImageryTileProvider {
-    //该瓦片提供者使用的瓦片节点容器
-    tileNodeContainer: TileNodeContainer;
     //id
     id: string;
     //瓦片格式 .png | .jpg

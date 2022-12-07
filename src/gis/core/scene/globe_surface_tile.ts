@@ -2,15 +2,17 @@ import { Utils } from "../../../core/utils/utils";
 import { QuadtreeTileLoadState } from "../../@types/core/gis";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
+import { TileNodeRenderer } from "../renderer/tile_node_renderer";
 import { QuadtreeTile } from "./quad_tree_tile";
 import { TileImagery } from "./tile_imagery";
-import { TileNode } from "./tile_node";
 
 export class GlobeSurfaceTile {
 
     private _tile: QuadtreeTile
 
     private _imageryProviderCollection: ImageryTileProviderCollection;
+
+    private _tileNodeRenderer: TileNodeRenderer;
 
     private _tileImageryRecord: Record<string, TileImagery> = Object.create(null);
 
@@ -32,17 +34,18 @@ export class GlobeSurfaceTile {
         return shouleRemoveTile;
     }
 
-    constructor (tile: QuadtreeTile, imageryProviderCollection: ImageryTileProviderCollection) {
+    constructor (tile: QuadtreeTile, imageryProviderCollection: ImageryTileProviderCollection, tileNodeRenderer: TileNodeRenderer) {
         this._tile = tile;
         this._imageryProviderCollection = imageryProviderCollection;
+        this._tileNodeRenderer = tileNodeRenderer;
     }
 
     /**
      * 初始化
      */
-    public static initialize (tile: QuadtreeTile, imageryProviderCollectoin: ImageryTileProviderCollection) {
+    public static initialize (tile: QuadtreeTile, imageryProviderCollectoin: ImageryTileProviderCollection, tileNodeRenderer: TileNodeRenderer) {
         if (!Utils.defined(tile.data)) {
-            tile.data = new GlobeSurfaceTile(tile, imageryProviderCollectoin);
+            tile.data = new GlobeSurfaceTile(tile, imageryProviderCollectoin, tileNodeRenderer);
         }
         if (tile.state === QuadtreeTileLoadState.START) {
             tile.state = QuadtreeTileLoadState.LOADING;
@@ -64,7 +67,7 @@ export class GlobeSurfaceTile {
      * 状态处理
      */
     public processStateMachine () {
-        GlobeSurfaceTile.initialize(this._tile, this._imageryProviderCollection);
+        GlobeSurfaceTile.initialize(this._tile, this._imageryProviderCollection, this._tileNodeRenderer);
         this.processTerrain();
         this.processImagery();
     }
@@ -130,7 +133,7 @@ export class GlobeSurfaceTile {
                 if (provider.visible) {
                     let tImagery = this._tileImageryRecord[provider.id];
                     //如果最下层还未渲染 先渲染它 不必等到上层加载完成
-                    if (i === 0 && !Utils.defined(tImagery.node)) {
+                    if (i === 0 && !Utils.defined(tImagery.textureImagery)) {
                         this.renderTileImagery(provider);
                     }
                     allImageryDone = allImageryDone && Utils.defined(this._tileImageryProviderToRenderQueue[i]) && tImagery.loaded;
@@ -160,18 +163,13 @@ export class GlobeSurfaceTile {
             provider.tileImageryRenderedQueue.enqueue(this._tile);
         }
         let tileImagery = this._tileImageryRecord[provider.id];
-        let texture = tileImagery.createTexture();
-        //缩放等级之外没有贴图
-        if (Utils.defined(texture)) {
-            // let node = TileFactory.renderImageryToTileNode(provider, texture!, imageryRectangle, this._tile.nativeRectangle, this._tile.id, tileImagery.node, tileImagery.texture);
-            // tileImagery.node = node;
-            if (tileImagery.node) {
-                tileImagery.node.recycle();
-            }
-            tileImagery.node = TileNode.create(provider, this._tile, texture, tileImagery.imageryCoordinateRectangle);
-            tileImagery.node.render();
-        } else {
-            tileImagery.recyleNodeResource();
+        //移除原来的渲染
+        this.unrenderTileImagery(tileImagery);
+        let textureImagery = tileImagery.createTextureImagery();
+        //缩放等级之外没有贴图图片
+        if (Utils.defined(textureImagery)) {
+            //重新渲染瓦片图片
+            this._tileNodeRenderer.render(tileImagery);
         }
     }
 
@@ -180,7 +178,7 @@ export class GlobeSurfaceTile {
      */
     public recyleTileImagery (provider: IImageryTileProvider) {
         let tileImagery = this._tileImageryRecord[provider.id];
-        tileImagery.recyleNodeResource();
+        tileImagery.recyleTextureImageryResource();
         this.markToRerenderTileImagery();
     }
 
@@ -199,11 +197,31 @@ export class GlobeSurfaceTile {
         for (const key in this._tileImageryRecord) {
             if (Object.prototype.hasOwnProperty.call(this._tileImageryRecord, key)) {
                 const tileImagery = this._tileImageryRecord[key];
-                tileImagery.releaseResource();
+                this.releaseTileImageryResource(tileImagery);
             }
         }
         this._tileImageryRecord = Object.create(null);
         this.markToRerenderTileImagery();
+    }
+
+    /**
+     * 取消渲染瓦片
+     * @param tileImagery 
+     */
+    private unrenderTileImagery (tileImagery: TileImagery) {
+        if (tileImagery.textureImagery) {
+            this._tileNodeRenderer.unrender(tileImagery);
+        }
+        tileImagery.recyleTextureImageryResource();
+    }
+
+    /**
+     * 释放瓦片资源
+     * @param tileImagery 
+     */
+    private releaseTileImageryResource (tileImagery: TileImagery) {
+        this.unrenderTileImagery(tileImagery);
+        tileImagery.releaseResource();
     }
 
 }

@@ -7,7 +7,8 @@ window.onload = () => {
     const mapViewer = new Vin3GIS.MapViewer({
         target: document.body,
         //EmptyImageryTileProvider
-        imageryTileProivder: new Vin3GIS.EmptyImageryTileProvider({
+        //AMapImageryTileProvider
+        imageryTileProivder: new Vin3GIS.AMapImageryTileProvider({
             style: 'street',
             // style: 'aerial',
             key: '1d109683f4d84198e37a38c442d68311'
