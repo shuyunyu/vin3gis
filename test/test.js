@@ -8,11 +8,16 @@ window.onload = () => {
         target: document.body,
         //EmptyImageryTileProvider
         //AMapImageryTileProvider
+        //TdtImageryTileProvider
         imageryTileProivder: new Vin3GIS.AMapImageryTileProvider({
             style: 'street',
             // style: 'aerial',
             key: '1d109683f4d84198e37a38c442d68311'
         }),
+        // imageryTileProivder: new Vin3GIS.ArcGISImageryTileProvider({
+        //     url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
+        //     // token: '1d109683f4d84198e37a38c442d68311'
+        // }),
         homeViewPort: homeViewPort,
         enablePan: true,
         enableZoom: true,

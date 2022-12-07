@@ -22,8 +22,10 @@ export interface ImageryTileProviderOptions {
     url?: string;
     //subdomain
     subdomain?: string[];
-    //key or token
+    //key for tdt
     key?: string;
+    //token for arcgis
+    token?: string;
     //风格
     style?: string;
 }
