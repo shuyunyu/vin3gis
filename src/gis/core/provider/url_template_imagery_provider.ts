@@ -32,6 +32,10 @@ export class UrlTemplateImageryProvider extends BaseImageryTileProvider {
      * 创建瓦片图片地址
      */
     public createTileImageryUrl (x: number, y: number, level: number) {
+        if (this.tms) {
+            const maxY = this.tilingScheme.getNumberOfYTilesAtLevel(level);
+            y = maxY - y - 1;
+        }
         let url = this.url.replace('{x}', x.toString()).replace('{y}', y.toString()).replace('{z}', level.toString());
         if (this.subdomains.length) {
             let index = Math.floor(Math.random() * this.subdomains.length);
