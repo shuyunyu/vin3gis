@@ -1,4 +1,5 @@
 import { Utils } from "../../../core/utils/utils";
+import { ImageryTileProviderOptions } from "./imagery_tile_provider_options";
 import { UrlTemplateImageryProvider } from "./url_template_imagery_provider";
 
 export class AMapImageryTileProvider extends UrlTemplateImageryProvider {
@@ -13,7 +14,8 @@ export class AMapImageryTileProvider extends UrlTemplateImageryProvider {
         return this._style;
     }
 
-    constructor (options?: Record<string, any>) {
+    constructor (options?: ImageryTileProviderOptions) {
+        options = options || {};
         super(options);
         this._style = Utils.defaultValue(options?.style, 'Aerial');
         this._url = this.getUrlTemplate(this._style);

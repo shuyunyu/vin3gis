@@ -19,6 +19,8 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
 
     //id
     public readonly id;
+    //是否是tms类型瓦片地图 default fasle
+    public readonly tms;
 
     private _levelZeroMaximumGeometricError: number | undefined;
 
@@ -59,6 +61,7 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
     public constructor (imageryTileProviderOptions?: ImageryTileProviderOptions) {
         imageryTileProviderOptions = imageryTileProviderOptions || {};
         this.id = Utils.createGuid();
+        this.tms = Utils.defaultValue(imageryTileProviderOptions.tms, false);
         this._visible = Utils.defaultValue(imageryTileProviderOptions.visible, true);
         this.format = Utils.defaultValue(imageryTileProviderOptions.format, '.png');
         this.minimumLevel = Utils.defaultValue(imageryTileProviderOptions.minimumLevel, 3);

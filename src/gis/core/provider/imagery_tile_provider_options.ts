@@ -2,6 +2,8 @@ import { Rectangle } from "../geometry/rectangle";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 
 export interface ImageryTileProviderOptions {
+    //是否是tms类型瓦片地图 default fasle
+    tms?: boolean;
     //可见性
     visible?: boolean;
     //格式

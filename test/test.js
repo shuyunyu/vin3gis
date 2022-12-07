@@ -18,6 +18,9 @@ window.onload = () => {
         //     url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
         //     // token: '1d109683f4d84198e37a38c442d68311'
         // }),
+        // imageryTileProivder: new Vin3GIS.TencentImageryTileProvider({
+        //     style: 'normal',
+        // }),
         homeViewPort: homeViewPort,
         enablePan: true,
         enableZoom: true,
