@@ -11,7 +11,7 @@ export class TileNodeRenderer {
     //渲染器根节点
     public readonly root = new Object3D();
 
-    private _tileNodeList: TileNode[] = [];
+    private _tileNodeRecord: Record<string, TileNode> = Object.create(null);
 
     public constructor () {
 
@@ -20,25 +20,15 @@ export class TileNodeRenderer {
     public render (tileImagery: TileImagery) {
         this.unrender(tileImagery);
         let tileNode = new TileNode(tileImagery.tile.id);
-        this._tileNodeList.push(tileNode);
+        this._tileNodeRecord[tileImagery.tile.id] = tileNode;
         tileNode.renderTileImagery(tileImagery.tile, tileImagery.textureImagery.imageAsset, tileImagery.textureImagery.rectangle, this.root);
     }
 
     public unrender (tileImagery: TileImagery) {
-        const index = this.findTileNodeIndex(tileImagery.tile);
-        if (index > -1) {
-            const tileNode = this._tileNodeList.splice(index, 1)[0];
+        const tileNode = this._tileNodeRecord[tileImagery.tile.id];
+        if (tileNode) {
             tileNode.unrenderTileImagery();
         }
-    }
-
-    private findTileNodeIndex (tile: QuadtreeTile) {
-        return this._tileNodeList.findIndex(tn => tn.tileId === tile.id);
-    }
-
-    private findTileNode (tile: QuadtreeTile) {
-        const index = this.findTileNodeIndex(tile);
-        return index > -1 ? this._tileNodeList[index] : null;
     }
 
 }

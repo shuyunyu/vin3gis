@@ -178,7 +178,7 @@ export class GlobeSurfaceTile {
      */
     public recyleTileImagery (provider: IImageryTileProvider) {
         let tileImagery = this._tileImageryRecord[provider.id];
-        tileImagery.recyleTextureImageryResource();
+        this.unrenderTileImagery(tileImagery);
         this.markToRerenderTileImagery();
     }
 
@@ -195,10 +195,8 @@ export class GlobeSurfaceTile {
      */
     public releaseResource () {
         for (const key in this._tileImageryRecord) {
-            if (Object.prototype.hasOwnProperty.call(this._tileImageryRecord, key)) {
-                const tileImagery = this._tileImageryRecord[key];
-                this.releaseTileImageryResource(tileImagery);
-            }
+            const tileImagery = this._tileImageryRecord[key];
+            this.releaseTileImageryResource(tileImagery);
         }
         this._tileImageryRecord = Object.create(null);
         this.markToRerenderTileImagery();
@@ -209,9 +207,7 @@ export class GlobeSurfaceTile {
      * @param tileImagery 
      */
     private unrenderTileImagery (tileImagery: TileImagery) {
-        if (tileImagery.textureImagery) {
-            this._tileNodeRenderer.unrender(tileImagery);
-        }
+        if (tileImagery.textureImagery) this._tileNodeRenderer.unrender(tileImagery);
         tileImagery.recyleTextureImageryResource();
     }
 

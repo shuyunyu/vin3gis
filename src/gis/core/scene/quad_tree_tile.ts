@@ -297,8 +297,8 @@ export class QuadtreeTile {
      */
     freeResources () {
         this._state = QuadtreeTileLoadState.START;
-        if (Utils.defined(this._data)) {
-            this._data!.releaseResource();
+        if (this._data) {
+            this._data.releaseResource();
         }
         this._data = null;
         this._renderable = false;
