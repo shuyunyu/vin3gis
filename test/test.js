@@ -27,6 +27,7 @@ window.onload = () => {
         enableRotate: true,
         enableDamping: true,
         // dampingFactor: 0.1
+        // maxDistance: 16000000
     });
     // mapViewer.scene.imageryProviders.add(new Vin3GIS.AMapImageryTileProvider({
     //     style: 'note'

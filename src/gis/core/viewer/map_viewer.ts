@@ -47,6 +47,12 @@ export class MapViewer {
     //惯性系数
     private _dampingFactor: number;
 
+    //视角能推进的最小距离
+    private _minDistance: number;
+
+    //视角能推进的最大距离
+    private _maxDistance: number;
+
     public get imageryTileProivder () {
         return this._imageryTileProvider;
     }
@@ -123,6 +129,24 @@ export class MapViewer {
         interactionSystem.updateControlsProps(this.renderer, { dampingFactor: val });
     }
 
+    public get minDistance () {
+        return this._minDistance;
+    }
+
+    public set minDistance (val: number) {
+        this._minDistance = val;
+        interactionSystem.updateControlsProps(this.renderer, { minDistance: val });
+    }
+
+    public get maxDistance () {
+        return this._maxDistance;
+    }
+
+    public set maxDistance (val: number) {
+        this._maxDistance = val;
+        interactionSystem.updateControlsProps(this.renderer, { maxDistance: val });
+    }
+
     public set imageryTileProivder (provider: IImageryTileProvider) {
         let oldImageryTileProvider = this._imageryTileProvider;
         this._imageryTileProvider = provider;
@@ -144,6 +168,8 @@ export class MapViewer {
         this.rotateSpeed = Utils.defaultValue(viewerOptions.rotateSpeed, 1.0);
         this.dampingFactor = Utils.defaultValue(viewerOptions.dampingFactor, 0.05);
         this.enableDamping = Utils.defaultValue(viewerOptions.enableDamping, true);
+        this.minDistance = Utils.defaultValue(viewerOptions.minDistance, 0.0);
+        this.maxDistance = Utils.defaultValue(viewerOptions.maxDistance, Infinity) / Transform.THREEJS_UNIT_PER_METERS;
         this.scene.camera.setViewPort(viewerOptions.homeViewPort);
         new ControlsLimit(this.renderer, this.scene).limit();
         //start a monitor

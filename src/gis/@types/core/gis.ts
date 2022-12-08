@@ -60,6 +60,10 @@ export type MapViewerOptions = {
     enableDamping?: boolean;
     //惯性系数
     dampingFactor?: number;
+    //视角能推进的最小距离
+    minDistance?: number;
+    //视角能推进的最大距离
+    maxDistance?: number;
     //初始视角
     homeViewPort: ViewPort;
     //瓦片缓存数量 默认100
