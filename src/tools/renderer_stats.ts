@@ -48,8 +48,12 @@ export class RendererStats {
     public setStatsItemVal (item: string | number, val: string | number) {
         const index = typeof item === "number" ? item : this._appendItems.indexOf(item);
         if (index > -1) {
-            this._appendItemEles[index].innerHTML = "" + val;
+            this._appendItemEles[index].innerText = "" + val;
         }
+    }
+
+    private setInternalItemVal (index: number, val: number | string) {
+        (this._ele.children[index].children[1] as HTMLSpanElement).innerText = "" + val;
     }
 
     public begine () {
@@ -65,13 +69,13 @@ export class RendererStats {
         const geometries = info.memory.geometries;
         const geometryMemory = Utils.formatBytes(this.renderer.geometryMemory, 2);
         const textures = info.memory.textures;
-        this._ele.children[0].children[1].innerHTML = "" + drawcall;
-        this._ele.children[1].children[1].innerHTML = "" + triangles;
-        this._ele.children[2].children[1].innerHTML = "" + lines;
-        this._ele.children[3].children[1].innerHTML = "" + points;
-        this._ele.children[4].children[1].innerHTML = "" + geometries;
-        this._ele.children[5].children[1].innerHTML = "" + geometryMemory;
-        this._ele.children[6].children[1].innerHTML = "" + textures;
+        this.setInternalItemVal(0, drawcall);
+        this.setInternalItemVal(1, triangles);
+        this.setInternalItemVal(2, lines);
+        this.setInternalItemVal(3, points);
+        this.setInternalItemVal(4, geometries);
+        this.setInternalItemVal(5, geometryMemory);
+        this.setInternalItemVal(6, textures);
     }
 
     public dispose () {
