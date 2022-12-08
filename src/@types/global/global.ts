@@ -18,3 +18,19 @@ export type RTS = {
     position: Vector3;
     scale: Vector3;
 }
+
+export type PerspectiveCameraProps = {
+    near?: number;
+    far?: number;
+    fov?: number;
+    aspect?: number;
+}
+
+export type OrthographicCameraProps = {
+    left?: number;
+    right?: number;
+    top?: number;
+    bottom?: number;
+    near?: number;
+    far?: number;
+}

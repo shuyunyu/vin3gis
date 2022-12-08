@@ -58,6 +58,8 @@ export class MapViewer {
     //视角能推进的最大距离
     private _maxDistance: number;
 
+    private _fov: number;
+
     public get imageryTileProivder () {
         return this._imageryTileProvider;
     }
@@ -152,6 +154,15 @@ export class MapViewer {
         interactionSystem.updateControlsProps(this.renderer, { maxDistance: val });
     }
 
+    public get fov () {
+        return this._fov;
+    }
+
+    public set fov (val: number) {
+        this._fov = val;
+        this.renderer.updateCameraProps({ fov: val });
+    }
+
     public set imageryTileProivder (provider: IImageryTileProvider) {
         let oldImageryTileProvider = this._imageryTileProvider;
         this._imageryTileProvider = provider;
@@ -162,6 +173,7 @@ export class MapViewer {
         Engine.DEBUG = InternalConfig.DEBUG;
         Engine.init();
         Transform.THREEJS_UNIT_PER_METERS = Utils.defaultValue(viewerOptions.UNIT_PER_METERS, 10000);
+        this._fov = Utils.defaultValue(viewerOptions.fov, 30);
         this.renderer = this.createRenderer(viewerOptions.target);
         this._terrainProvider = new SimpleTerrainProvider();
         this._imageryTileProvider = viewerOptions.imageryTileProivder;
@@ -194,7 +206,7 @@ export class MapViewer {
     private createRenderer (target: string | HTMLElement) {
         const ele = typeof target === 'string' ? document.getElementById(target) : target;
         const scene = new Scene();
-        const camera = new PerspectiveCamera(45, ele.clientWidth / ele.clientHeight, 0.00001, Transform.THREEJS_UNIT_PER_METERS * 100);
+        const camera = new PerspectiveCamera(this._fov, ele.clientWidth / ele.clientHeight, 0.00001, Transform.THREEJS_UNIT_PER_METERS * 100);
         const renderer = new FrameRenderer(scene, camera, target as HTMLElement);
         rendererSystem.addRenderTarget(renderer)
         interactionSystem.enableInteraction(renderer);

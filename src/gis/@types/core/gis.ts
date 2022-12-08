@@ -68,6 +68,8 @@ export type MapViewerOptions = {
     homeViewPort: ViewPort;
     //瓦片缓存数量 默认100
     tileCacheSize?: number;
+    //相机的fov
+    fov?: number;
 }
 
 export namespace MeshDefines {

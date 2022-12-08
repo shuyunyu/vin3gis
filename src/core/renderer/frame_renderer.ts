@@ -1,7 +1,9 @@
 import * as THREE from "three"
-import { Mesh, Object3D, OrthographicCamera, PerspectiveCamera, Renderer, Scene, WebGLRenderer, WebGLRendererParameters } from "three";
+import { Mesh, Object3D, OrthographicCamera, PerspectiveCamera, Scene, WebGLRenderer, WebGLRendererParameters } from "three";
+import { OrthographicCameraProps, PerspectiveCameraProps } from "../../@types/global/global";
 import { GeometryUtils } from "../utils/geometry_utils";
 import { Object3Utils } from "../utils/object3_utils";
+import { Utils } from "../utils/utils";
 
 /**
  * 帧渲染器
@@ -70,14 +72,73 @@ export class FrameRenderer {
      * @param height 
      */
     public updateRenderSize () {
-        const width = this._target.clientWidth;
-        const height = this._target.clientHeight;
-        this._renderer.setSize(width, height);
         if (this._camera instanceof THREE.PerspectiveCamera) {
-            this._camera.aspect = width / height;
-            this._camera.updateProjectionMatrix();
+            const width = this._target.clientWidth;
+            const height = this._target.clientHeight;
+            this._renderer.setSize(width, height);
+            this.updateCameraProps({ aspect: width / height });
         } else if (this._camera instanceof THREE.OrthographicCamera) {
 
+        }
+    }
+
+    /**
+     * 更新相机的属性
+     * @param props 
+     */
+    public updateCameraProps (props: PerspectiveCameraProps | OrthographicCameraProps) {
+        if (this._camera instanceof THREE.PerspectiveCamera) {
+            const cprops = props as PerspectiveCameraProps;
+            let changed = false;
+            if (Utils.defined(cprops.near)) {
+                this._camera.near = cprops.near;
+                changed = true;
+            }
+            if (Utils.defined(cprops.far)) {
+                this._camera.far = cprops.far;
+                changed = true;
+            }
+            if (Utils.defined(cprops.aspect)) {
+                this._camera.aspect = cprops.aspect;
+                changed = true;
+            }
+            if (Utils.defined(cprops.fov)) {
+                this._camera.fov = cprops.fov;
+                changed = true;
+            }
+            if (changed) {
+                this._camera.updateProjectionMatrix();
+            }
+        } else if (this._camera instanceof THREE.OrthographicCamera) {
+            const cprops = props as OrthographicCameraProps;
+            let changed = false;
+            if (Utils.defined(cprops.near)) {
+                this._camera.near = cprops.near;
+                changed = true;
+            }
+            if (Utils.defined(cprops.far)) {
+                this._camera.far = cprops.far;
+                changed = true;
+            }
+            if (Utils.defined(cprops.left)) {
+                this._camera.left = cprops.left;
+                changed = true;
+            }
+            if (Utils.defined(cprops.right)) {
+                this._camera.right = cprops.right;
+                changed = true;
+            }
+            if (Utils.defined(cprops.bottom)) {
+                this._camera.bottom = cprops.bottom;
+                changed = true;
+            }
+            if (Utils.defined(cprops.top)) {
+                this._camera.top = cprops.top;
+                changed = true;
+            }
+            if (changed) {
+                this._camera.updateProjectionMatrix();
+            }
         }
     }
 
