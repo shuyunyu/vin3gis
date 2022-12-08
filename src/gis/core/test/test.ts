@@ -1,4 +1,4 @@
-import { BackSide, BoxGeometry, Color, DataTexture, DoubleSide, FrontSide, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, Object3D, Quaternion, Texture, Vector3 } from "three";
+import { BackSide, BoxGeometry, Color, DataTexture, DoubleSide, FrontSide, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, Object3D, Quaternion, ShaderMaterial, Texture, Vector3 } from "three";
 import { AssetLoader } from "../../../core/asset/asset_loader";
 import { Director, director } from "../../../core/director";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
@@ -7,13 +7,28 @@ import { imageMerger } from "../../../core/worker/image_merger";
 import { TaskProcessor } from "../../../core/worker/task_processor";
 import { TransferTypedArrayTestScriptBase64 } from "../../../core/worker/transfer_typed_array_test";
 
+import verShader from "../shader/tile.vt.glsl";
+import fsShader from "../shader/tile.fs.glsl";
+
 export class GISTest {
 
     public static run (render: FrameRenderer) {
+        this.testShader(render);
         // this.testTileGeometry(render);
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
+    }
+
+    private static testShader (render: FrameRenderer) {
+        const box = new Mesh(
+            new BoxGeometry(10, 10, 10),
+            new ShaderMaterial({
+                vertexShader: verShader,
+                fragmentShader: fsShader
+            })
+        );
+        render.scene.add(box);
     }
 
     private static testTileGeometry (render: FrameRenderer) {

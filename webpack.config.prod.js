@@ -50,14 +50,20 @@ module.exports = {
         })
     ],
     module: {
-        rules: [{
-            test: /\.tsx?$/,
-            use: 'ts-loader',
-            exclude: /node_modules/
-        }, {
-            test: /\.css$/, // 正则表达式，表示.css后缀的文件
-            use: ['style-loader', 'css-loader'] // 针对css文件使用的loader，注意有先后顺序，数组项越靠后越先执行
-        }]
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/
+            }, {
+                test: /\.css$/, // 正则表达式，表示.css后缀的文件
+                use: ['style-loader', 'css-loader'] // 针对css文件使用的loader，注意有先后顺序，数组项越靠后越先执行
+            },
+            {
+                test: /\.(glsl)$/,
+                loader: 'raw-loader'
+            }
+        ]
     },
     watch: false, // 监听修改自动打包
     devServer: {
