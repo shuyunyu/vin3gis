@@ -249,7 +249,7 @@ export class GlobeSurfaceTileManager {
      */
     private renderImageryTileProviderTiles (imageryProvider: IImageryTileProvider, toRenderQueue: QuadtreeTile[], frameState: FrameState) {
         let tileRenderedQueue = imageryProvider.tileImageryRenderedQueue;
-        let selectedToRenderdQueue = [].concat(toRenderQueue);
+        let selectedToRenderdQueue = [].concat(toRenderQueue) as QuadtreeTile[];
 
         let stack: QuadtreeTile[] = selectedToRenderdQueue.filter(tile => tile.level < imageryProvider.minimumLevel);
         //当小于最小缩放等级时  用最邻近的缩放等级替代
