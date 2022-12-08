@@ -24,7 +24,9 @@ window.onload = () => {
         homeViewPort: homeViewPort,
         enablePan: true,
         enableZoom: true,
-        enableRotate: true
+        enableRotate: true,
+        enableDamping: true,
+        // dampingFactor: 0.1
     });
     // mapViewer.scene.imageryProviders.add(new Vin3GIS.AMapImageryTileProvider({
     //     style: 'note'

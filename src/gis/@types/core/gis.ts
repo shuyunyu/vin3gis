@@ -56,6 +56,10 @@ export type MapViewerOptions = {
     //是否允许旋转
     enableRotate?: boolean;
     rotateSpeed?: number;
+    //是否允许惯性
+    enableDamping?: boolean;
+    //惯性系数
+    dampingFactor?: number;
     //初始视角
     homeViewPort: ViewPort;
     //瓦片缓存数量 默认100

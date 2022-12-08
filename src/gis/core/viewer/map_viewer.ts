@@ -41,6 +41,12 @@ export class MapViewer {
 
     private _rotateSpeed: number;
 
+    //是否允许惯性
+    private _enableDamping: boolean;
+
+    //惯性系数
+    private _dampingFactor: number;
+
     public get imageryTileProivder () {
         return this._imageryTileProvider;
     }
@@ -99,6 +105,24 @@ export class MapViewer {
         interactionSystem.updateControlsProps(this.renderer, { rotateSpeed: val });
     }
 
+    public get enableDamping () {
+        return this._enableDamping;
+    }
+
+    public set enableDamping (val: boolean) {
+        this._enableDamping = val;
+        interactionSystem.updateControlsProps(this.renderer, { enableDamping: val });
+    }
+
+    public get dampingFactor () {
+        return this._dampingFactor;
+    }
+
+    public set dampingFactor (val: number) {
+        this._dampingFactor = val;
+        interactionSystem.updateControlsProps(this.renderer, { dampingFactor: val });
+    }
+
     public set imageryTileProivder (provider: IImageryTileProvider) {
         let oldImageryTileProvider = this._imageryTileProvider;
         this._imageryTileProvider = provider;
@@ -118,6 +142,8 @@ export class MapViewer {
         this.zoomSpeed = Utils.defaultValue(viewerOptions.zoomSpeed, 2.0);
         this.enableRotate = Utils.defaultValue(viewerOptions.enableRotate, true);
         this.rotateSpeed = Utils.defaultValue(viewerOptions.rotateSpeed, 1.0);
+        this.dampingFactor = Utils.defaultValue(viewerOptions.dampingFactor, 0.05);
+        this.enableDamping = Utils.defaultValue(viewerOptions.enableDamping, true);
         this.scene.camera.setViewPort(viewerOptions.homeViewPort);
         new ControlsLimit(this.renderer, this.scene).limit();
         //start a monitor
