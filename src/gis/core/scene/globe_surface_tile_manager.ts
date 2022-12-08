@@ -33,10 +33,6 @@ export class GlobeSurfaceTileManager {
      */
     private _tileLoadQueueMedium: QuadtreeTile[] = [];
 
-    /**
-     * 低优先级的瓦片下载队列
-     */
-    private _tileLoadQueueLow: QuadtreeTile[] = [];
 
     /**
      * 需要渲染的瓦片队列
@@ -112,7 +108,7 @@ export class GlobeSurfaceTileManager {
      * @returns 
      */
     private processTileDownloadQueue (frameState: FrameState) {
-        if (this._tileLoadQueueHigh.length === 0 && this._tileLoadQueueMedium.length === 0 && this._tileLoadQueueLow.length === 0) {
+        if (this._tileLoadQueueHigh.length === 0 && this._tileLoadQueueMedium.length === 0) {
             return;
         }
         let endTime = this.getTimestamp() + this._loadQueueTimeSlice;
@@ -120,7 +116,6 @@ export class GlobeSurfaceTileManager {
         this.processSingleTileDownloadQueue(frameState, endTime, this._tileLoadQueueMedium, didSomeLoading);
         this._tileLoadQueueMedium.length = 0;
         this._tileLoadQueueHigh.length = 0;
-        this._tileLoadQueueLow.length = 0;
     }
 
     /**
@@ -144,7 +139,7 @@ export class GlobeSurfaceTileManager {
     }
 
     private getTimestamp () {
-        return Date.now();
+        return (performance || Date).now();
     }
 
     /**
