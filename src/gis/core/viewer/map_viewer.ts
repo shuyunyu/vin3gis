@@ -12,6 +12,8 @@ import { ControlsLimit } from "../extend/controls_limit";
 import { InternalConfig } from "../internal/internal_config";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { EarthScene } from "../scene/earth_scene";
+import { SimpleTerrainProvider } from "../terrain/simple_terrain_provider";
+import { ITerrainProvider } from "../terrain/terrain_provider";
 import { GISTest } from "../test/test";
 import { Transform } from "../transform/transform";
 
@@ -22,6 +24,9 @@ export class MapViewer {
     public readonly scene: EarthScene;
 
     private _mapStatsMonitor?: MapStatsMonitor;
+
+    //地形提供者
+    private _terrainProvider: ITerrainProvider;
 
     //瓦片提供者
     private _imageryTileProvider: IImageryTileProvider;
@@ -158,6 +163,7 @@ export class MapViewer {
         Engine.init();
         Transform.THREEJS_UNIT_PER_METERS = Utils.defaultValue(viewerOptions.UNIT_PER_METERS, 10000);
         this.renderer = this.createRenderer(viewerOptions.target);
+        this._terrainProvider = new SimpleTerrainProvider();
         this._imageryTileProvider = viewerOptions.imageryTileProivder;
         this.scene = new EarthScene(this.renderer, this.imageryTileProivder, Utils.defaultValue(viewerOptions.tileCacheSize, 100));
         this.enablePan = Utils.defaultValue(viewerOptions.enablePan, true);
