@@ -1,4 +1,4 @@
-import { BackSide, BoxGeometry, Color, DataTexture, DoubleSide, FrontSide, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, Object3D, Quaternion, ShaderMaterial, Texture, Vector3 } from "three";
+import { BackSide, BoxGeometry, Color, DataTexture, DoubleSide, FrontSide, ImageUtils, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, Object3D, PlaneGeometry, Quaternion, ShaderMaterial, Texture, TextureLoader, Vector3 } from "three";
 import { AssetLoader } from "../../../core/asset/asset_loader";
 import { Director, director } from "../../../core/director";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
@@ -9,11 +9,12 @@ import { TransferTypedArrayTestScriptBase64 } from "../../../core/worker/transfe
 
 import verShader from "../shader/tile.vt.glsl";
 import fsShader from "../shader/tile.fs.glsl";
+import { math } from "../../../core/math/math";
 
 export class GISTest {
 
     public static run (render: FrameRenderer) {
-        this.testShader(render);
+        // this.testShader(render);
         // this.testTileGeometry(render);
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
@@ -21,14 +22,21 @@ export class GISTest {
     }
 
     private static testShader (render: FrameRenderer) {
-        const box = new Mesh(
-            new BoxGeometry(10, 10, 10),
-            new ShaderMaterial({
-                vertexShader: verShader,
-                fragmentShader: fsShader
-            })
-        );
-        render.scene.add(box);
+        // const box = new Mesh(
+        //     new PlaneGeometry(10, 10).rotateX(-math.PI_OVER_TWO),
+        //     new ShaderMaterial({
+        //         uniforms: {
+        //             base_texture: {
+        //                 value: new TextureLoader().load("http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/13/3345/6862")
+        //             }
+        //         },
+        //         vertexShader: verShader,
+        //         fragmentShader: fsShader,
+        //         side: DoubleSide,
+        //         transparent: true
+        //     })
+        // );
+        // render.scene.add(box);
     }
 
     private static testTileGeometry (render: FrameRenderer) {
