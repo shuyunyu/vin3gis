@@ -130,8 +130,10 @@ export class InteractionSystem extends System {
         if (c) {
             const ray = screenCoord ? CameraUtils.screenPointToRay(DeviceCoordUtils.coordToNDCCoord(screenCoord, target.domElement, tempCar2), target.camera, tempRay) : CameraUtils.screenCenterToRay(target.camera, tempRay);
             const intersectVec = ray.intersectPlane(this._planeY, new Vector3());
-            c.controls.target = intersectVec;
-            c.controls.saveState();
+            if (intersectVec) {
+                c.controls.target = intersectVec;
+                c.controls.saveState();
+            }
         }
     }
 

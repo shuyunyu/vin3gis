@@ -6,7 +6,6 @@ import { imageDecoder } from "../../../core/worker/image_decoder";
 import { imageMerger } from "../../../core/worker/image_merger";
 import { TaskProcessor } from "../../../core/worker/task_processor";
 import { TransferTypedArrayTestScriptBase64 } from "../../../core/worker/transfer_typed_array_test";
-import { TileGeometryFactory } from "../factory/tile_geometry_factory";
 
 export class GISTest {
 
