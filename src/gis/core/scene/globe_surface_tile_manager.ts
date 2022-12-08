@@ -2,6 +2,7 @@ import { math } from "../../../core/math/math";
 import { Utils } from "../../../core/utils/utils";
 import { Cartesian3 } from "../cartesian/cartesian3";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
+import { ITerrainProvider } from "../terrain/terrain_provider";
 import { Transform } from "../transform/transform";
 import { EarthScene } from "./earth_scene";
 import { FrameState } from "./frame_state";
@@ -17,6 +18,8 @@ export class GlobeSurfaceTileManager {
     private _quadtreePrimitive: QuadtreePrimitive;
 
     private _scene: EarthScene;
+
+    private _terrainProvider: ITerrainProvider;
 
     /**
      * 需要进行遍历的四叉树的队列
@@ -48,8 +51,9 @@ export class GlobeSurfaceTileManager {
         return this._curFrameSelectTileCount;
     }
 
-    constructor (quadtreePrimitive: QuadtreePrimitive, scene: EarthScene) {
+    constructor (quadtreePrimitive: QuadtreePrimitive, terrainProvider: ITerrainProvider, scene: EarthScene) {
         this._quadtreePrimitive = quadtreePrimitive;
+        this._terrainProvider = terrainProvider;
         this._scene = scene;
         this._scene.imageryProviders.providerRemoved.addEventListener(this.onImageryProviderRemoved, this);
         this._scene.imageryProviders.providerShownOrHidden.addEventListener(this.onImageryProviderShownOrHidden, this);
@@ -125,7 +129,7 @@ export class GlobeSurfaceTileManager {
     private processSingleTileDownloadQueue (frameState: FrameState, endTime: number, queue: QuadtreeTile[], didSomeLoading: boolean) {
         for (let i = 0; i < queue.length; i++) {
             const quadtreeTile = queue[i];
-            GlobeSurfaceTile.initialize(quadtreeTile, this._scene.imageryProviders, this._scene.tileNodeRenderer);
+            GlobeSurfaceTile.initialize(quadtreeTile, this._terrainProvider, this._scene.imageryProviders, this._scene.tileNodeRenderer);
             quadtreeTile.priority = this.computeTileLoadPriority(quadtreeTile, frameState);
         }
         //保证 当前帧需要下载的瓦片优先级最高
@@ -148,7 +152,7 @@ export class GlobeSurfaceTileManager {
     private selectTilesToRender (frameState: FrameState) {
         let tile;
         while (Utils.defined(tile = this._traversalQueue.dequeue())) {
-            GlobeSurfaceTile.initialize(tile!, this._scene.imageryProviders, this._scene.tileNodeRenderer);
+            GlobeSurfaceTile.initialize(tile, this._terrainProvider, this._scene.imageryProviders, this._scene.tileNodeRenderer);
             //摄像机到屏幕中心的距离 小于 摄像机到瓦片的距离  说明瓦片精度更高 可以直接渲染
             tile!.updateDistanceToCamera(frameState);
             if (Transform.validateSpaceError(tile!, this._quadtreePrimitive.tileProvider, frameState)) {
@@ -259,7 +263,7 @@ export class GlobeSurfaceTileManager {
                 const child = tile.children[i];
                 if (imageryProvider.computeTileVisibility(child, frameState.frustum)) {
                     if (child.level >= imageryProvider.minimumLevel) {
-                        GlobeSurfaceTile.initialize(child, this._scene.imageryProviders, this._scene.tileNodeRenderer);
+                        GlobeSurfaceTile.initialize(child, this._terrainProvider, this._scene.imageryProviders, this._scene.tileNodeRenderer);
                         child.data!.processStateMachine();
                         if (child.data!.hasTileImagery(imageryProvider)) {
                             selectedToRenderdQueue.push(child);

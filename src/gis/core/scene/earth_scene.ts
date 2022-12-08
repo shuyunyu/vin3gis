@@ -5,6 +5,7 @@ import { EarthCamera } from "../camera/earth_camera";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
 import { TileNodeRenderer } from "../renderer/tile_node_renderer";
+import { ITerrainProvider } from "../terrain/terrain_provider";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { FrameState } from "./frame_state";
 import { GlobeSurfaceTileManager } from "./globe_surface_tile_manager";
@@ -31,7 +32,7 @@ export class EarthScene {
     //瓦片节点渲染器
     public readonly tileNodeRenderer: TileNodeRenderer;
 
-    constructor (renderer: FrameRenderer, imageryTileProvider: IImageryTileProvider, tileCacheSize: number) {
+    constructor (renderer: FrameRenderer, imageryTileProvider: IImageryTileProvider, terrainProvider: ITerrainProvider, tileCacheSize: number) {
         this._renderer = renderer;
         this.tileNodeRenderer = new TileNodeRenderer();
         //将渲染根节点添加到场景中
@@ -42,7 +43,7 @@ export class EarthScene {
         this._quadtreePrimitive = new QuadtreePrimitive(this.imageryProviders.get(0)!, tileCacheSize);
         this.tilingScheme = this._quadtreePrimitive.tileProvider.tilingScheme;
         this.camera = new EarthCamera(this._renderer, this.tilingScheme);
-        this.globleSurfaceManager = new GlobeSurfaceTileManager(this._quadtreePrimitive, this);
+        this.globleSurfaceManager = new GlobeSurfaceTileManager(this._quadtreePrimitive, terrainProvider, this);
         this.ready = true;
     }
 
