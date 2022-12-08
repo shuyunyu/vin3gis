@@ -223,12 +223,9 @@ export class GlobeSurfaceTileManager {
      */
     private renderTiles (frameState: FrameState) {
         if (this._tileRenderQueue.length == 0) return;
-        let imageryTileProviders = this._scene.imageryProviders.toArray();
-        for (let j = 0; j < imageryTileProviders.length; j++) {
-            const provider = imageryTileProviders[j];
-            if (!provider.visible) continue;
-            this.renderImageryTileProviderTiles(provider, this._tileRenderQueue, frameState);
-        }
+        this._scene.imageryProviders.foreach((provider: IImageryTileProvider, index: number) => {
+            if (provider.visible) this.renderImageryTileProviderTiles(provider, this._tileRenderQueue, frameState);
+        })
         this._tileRenderQueue.length = 0;
     }
 

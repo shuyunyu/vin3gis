@@ -2,6 +2,7 @@ import { Box3, Sphere } from "three";
 import { Utils } from "../../../core/utils/utils";
 import { QuadtreeTileLoadState } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
+import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { FrameState } from "./frame_state";
@@ -227,18 +228,16 @@ export class QuadtreeTile {
      * 判断是否需要加载数据
      */
     public needsLoading (imageryProviderCollection: ImageryTileProviderCollection) {
-        let imageryProviders = imageryProviderCollection.toArray();
         let targetCount = 0;
         let count = 0;
-        for (let i = 0; i < imageryProviders.length; i++) {
-            const provider = imageryProviders[i];
+        imageryProviderCollection.foreach((provider: IImageryTileProvider, i: number) => {
             if (provider.visible) {
                 targetCount++;
             }
-            if (Utils.defined(this.data) && this.data!.hasTileImagery(provider)) {
+            if (this.data && this.data.hasTileImagery(provider)) {
                 count++;
             }
-        }
+        });
         return count < targetCount;
     }
 
@@ -246,8 +245,8 @@ export class QuadtreeTile {
      * 判断瓦片是否可以渲染
      */
     public canRender (imageryProviderCollection: ImageryTileProviderCollection, considerAllProvider?: boolean) {
-        let imageryProviders = imageryProviderCollection.toArray();
-        if (imageryProviders.length === 0) {
+        const size = imageryProviderCollection.size;
+        if (size === 0) {
             return true;
         } else if (!Utils.defined(this.data)) {
             return false;
@@ -255,8 +254,7 @@ export class QuadtreeTile {
             if (considerAllProvider) {
                 let textureCount = 0;
                 let targetCount = 0;
-                for (let i = 0; i < imageryProviders.length; i++) {
-                    const provider = imageryProviders[i];
+                imageryProviderCollection.foreach((provider: IImageryTileProvider, i: number) => {
                     if (provider.visible) {
                         targetCount++;
                         //考虑 3-18 前三级是没有texture的
@@ -264,11 +262,11 @@ export class QuadtreeTile {
                             textureCount++;
                         }
                     }
-                }
+                });
                 return textureCount === targetCount;
             } else {
-                if (imageryProviders.length === 0) return true;
-                let baseImageryProvider = imageryProviders[0];
+                if (size === 0) return true;
+                let baseImageryProvider = imageryProviderCollection.get(0);
                 //此处 && this.level <= baseImageryProvider.maximumLevel 在没有地形数据的时候 不能让遍历持续到最大缩放等级之下  会导致超过等级的瓦片消息  最终是需要使用父级瓦片的贴图来贴超过等级的瓦片
                 return (this.data!.hasTileImagery(baseImageryProvider) || this.level < baseImageryProvider.minimumLevel) && this.level <= baseImageryProvider.maximumLevel;
             }

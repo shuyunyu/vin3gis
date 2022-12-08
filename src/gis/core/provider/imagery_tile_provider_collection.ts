@@ -16,6 +16,10 @@ export class ImageryTileProviderCollection {
     //图层显示或隐藏触发
     public readonly providerShownOrHidden = new GenericEvent<IImageryTileProvider>();
 
+    public get size () {
+        return this._collection.length;
+    }
+
     constructor (imageryTileProviders?: IImageryTileProvider[]) {
         if (Utils.defined(imageryTileProviders)) {
             for (let i = 0; i < imageryTileProviders!.length; i++) {
@@ -110,12 +114,11 @@ export class ImageryTileProviderCollection {
         }
     }
 
-    public size () {
-        return this._collection.length;
-    }
-
-    public toArray () {
-        return this._collection;
+    public foreach (callback: (item: IImageryTileProvider, index: number) => any) {
+        for (let i = 0; i < this._collection.length; i++) {
+            const res = callback(this._collection[i], i);
+            if (res === false) break;
+        }
     }
 
     private onProviderVisibilityChanged (provider: IImageryTileProvider) {

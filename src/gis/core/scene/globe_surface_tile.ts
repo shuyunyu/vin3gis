@@ -63,12 +63,10 @@ export class GlobeSurfaceTile {
 
     //准备新的瓦片数据
     private prepareNewTile () {
-        let providers = this._imageryProviderCollection.toArray();
-        for (let i = 0; i < providers.length; i++) {
-            const provider = providers[i];
+        this._imageryProviderCollection.foreach((provider: IImageryTileProvider, index: number) => {
             let tileImagery = new TileImagery(this._tile, provider);
             this._tileImageryRecord[provider.id] = tileImagery;
-        }
+        });
     }
 
     /**
@@ -95,9 +93,7 @@ export class GlobeSurfaceTile {
     //处理贴图
     private processImagery () {
         //状态处理
-        let providers = this._imageryProviderCollection.toArray();
-        for (let i = 0; i < providers.length; i++) {
-            const provider = providers[i];
+        this._imageryProviderCollection.foreach((provider: IImageryTileProvider, index: number) => {
             let tileImagery = this._tileImageryRecord[provider.id];
             if (!Utils.defined(tileImagery)) {
                 tileImagery = this._tileImageryRecord[provider.id] = new TileImagery(this._tile, provider);
@@ -105,9 +101,9 @@ export class GlobeSurfaceTile {
             tileImagery.priority = this._tile.priority;
             //最底下的图层使用loading图片加载
             if (provider.visible) {
-                tileImagery.processStateMachine(i !== 0);
+                tileImagery.processStateMachine(index !== 0);
             }
-        }
+        });
     }
 
     /**
@@ -138,10 +134,8 @@ export class GlobeSurfaceTile {
             if (this._tileImageryRendered) {
                 return;
             }
-            let providers = this._imageryProviderCollection.toArray();
             let allImageryDone = true;
-            for (let i = 0; i < providers.length; i++) {
-                const provider = providers[i];
+            this._imageryProviderCollection.foreach((provider: IImageryTileProvider, i: number) => {
                 if (provider.visible) {
                     let tImagery = this._tileImageryRecord[provider.id];
                     //如果最下层还未渲染 先渲染它 不必等到上层加载完成
@@ -150,10 +144,11 @@ export class GlobeSurfaceTile {
                     }
                     allImageryDone = allImageryDone && Utils.defined(this._tileImageryProviderToRenderQueue[i]) && tImagery.loaded;
                     if (!allImageryDone) {
-                        break;
+                        //break
+                        return false;
                     }
                 }
-            }
+            });
             //按图层顺序重置瓦片节点
             if (allImageryDone) {
                 //只调整上层瓦片
