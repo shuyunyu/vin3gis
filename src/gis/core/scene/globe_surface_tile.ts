@@ -1,5 +1,6 @@
 import { Utils } from "../../../core/utils/utils";
 import { QuadtreeTileLoadState } from "../../@types/core/gis";
+import { TileImageryProviderRenderManager } from "../manager/tile_imagery_provider_render_manager";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
 import { TileNodeRenderer } from "../renderer/tile_node_renderer";
@@ -14,6 +15,8 @@ export class GlobeSurfaceTile {
     private _terrainProvider: ITerrainProvider;
 
     private _imageryProviderCollection: ImageryTileProviderCollection;
+
+    private _tileImagerProviderRenderManager: TileImageryProviderRenderManager;
 
     private _tileNodeRenderer: TileNodeRenderer;
 
@@ -37,19 +40,20 @@ export class GlobeSurfaceTile {
         return shouleRemoveTile;
     }
 
-    constructor (tile: QuadtreeTile, terrainProvider: ITerrainProvider, imageryProviderCollection: ImageryTileProviderCollection, tileNodeRenderer: TileNodeRenderer) {
+    constructor (tile: QuadtreeTile, terrainProvider: ITerrainProvider, tileImagerProviderRenderManager: TileImageryProviderRenderManager, tileNodeRenderer: TileNodeRenderer) {
         this._tile = tile;
         this._terrainProvider = terrainProvider;
-        this._imageryProviderCollection = imageryProviderCollection;
+        this._tileImagerProviderRenderManager = tileImagerProviderRenderManager;
+        this._imageryProviderCollection = tileImagerProviderRenderManager.imageryProviders;
         this._tileNodeRenderer = tileNodeRenderer;
     }
 
     /**
      * 初始化
      */
-    public static initialize (tile: QuadtreeTile, terrainProvider: ITerrainProvider, imageryProviderCollectoin: ImageryTileProviderCollection, tileNodeRenderer: TileNodeRenderer) {
+    public static initialize (tile: QuadtreeTile, terrainProvider: ITerrainProvider, tileImagerProviderRenderManager: TileImageryProviderRenderManager, tileNodeRenderer: TileNodeRenderer) {
         if (!Utils.defined(tile.data)) {
-            tile.data = new GlobeSurfaceTile(tile, terrainProvider, imageryProviderCollectoin, tileNodeRenderer);
+            tile.data = new GlobeSurfaceTile(tile, terrainProvider, tileImagerProviderRenderManager, tileNodeRenderer);
         }
         if (tile.state === QuadtreeTileLoadState.START) {
             tile.state = QuadtreeTileLoadState.LOADING;
@@ -71,7 +75,7 @@ export class GlobeSurfaceTile {
      * 状态处理
      */
     public processStateMachine () {
-        GlobeSurfaceTile.initialize(this._tile, this._terrainProvider, this._imageryProviderCollection, this._tileNodeRenderer);
+        GlobeSurfaceTile.initialize(this._tile, this._terrainProvider, this._tileImagerProviderRenderManager, this._tileNodeRenderer);
         this.processTerrain();
         this.processImagery();
     }
@@ -167,8 +171,9 @@ export class GlobeSurfaceTile {
      * 渲染单个瓦片贴图
      */
     private renderTileImagery (provider: IImageryTileProvider) {
-        if (!provider.tileImageryRenderedQueue.contains(this._tile)) {
-            provider.tileImageryRenderedQueue.enqueue(this._tile);
+        const queue = this._tileImagerProviderRenderManager.getProviderRenderQueue(provider);
+        if (!queue.contains(this._tile)) {
+            queue.enqueue(this._tile);
         }
         let tileImagery = this._tileImageryRecord[provider.id];
         //移除原来的渲染

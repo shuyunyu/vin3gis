@@ -75,6 +75,13 @@ export class QuadtreeTileQueue {
         return this._queue.filter(tile => quadtreeTiles.indexOf(tile) === -1);
     }
 
+    public foreach (callback: (tile: QuadtreeTile, index: number) => boolean | any) {
+        for (let i = 0; i < this._queue.length; i++) {
+            const res = callback(this._queue[i], i);
+            if (res === false) break;
+        }
+    }
+
     public toArray (out?: QuadtreeTile[]): QuadtreeTile[] {
         if (Utils.defined(out)) {
             for (let i = 0; i < this._queue.length; i++) {

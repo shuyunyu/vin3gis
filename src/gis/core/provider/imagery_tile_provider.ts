@@ -4,7 +4,6 @@ import { IScheduleRequestTask, RequestTaskStatus } from "../../../core/xhr/sched
 import { ImageRequestResult } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
-import { QuadtreeTileQueue } from "../scene/quad_tree_tile_queue";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 
 /**
@@ -35,8 +34,6 @@ export interface IImageryTileProvider {
     tilingScheme: ITilingScheme;
     //visibilityChangedEvent
     visibilityChanged: GenericEvent<IImageryTileProvider>;
-    //保存上一帧渲染瓦片贴图的队列
-    tileImageryRenderedQueue: QuadtreeTileQueue;
     //验证瓦片的缩放等级是否在限制的缩放等级之内
     validateTileLevelIsInRange (level: number): boolean;
     //请求 图片资源

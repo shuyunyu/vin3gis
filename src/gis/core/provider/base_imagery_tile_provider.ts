@@ -6,7 +6,6 @@ import { IScheduleRequestTask, RequestTaskStatus } from "../../../core/xhr/sched
 import { ImageRequestResult } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
-import { QuadtreeTileQueue } from "../scene/quad_tree_tile_queue";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { WebMercatorTilingScheme } from "../tilingscheme/web_mercator_tiling_scheme";
 import { IImageryTileProvider } from "./imagery_tile_provider";
@@ -45,8 +44,6 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
 
     public readonly visibilityChanged = new GenericEvent<IImageryTileProvider>;
 
-    public readonly tileImageryRenderedQueue: QuadtreeTileQueue;
-
     public get visible () {
         return this._visible;
     }
@@ -70,7 +67,6 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
         this.tileHeight = Utils.defaultValue(imageryTileProviderOptions.tileHeight, 256);
         this.tilingScheme = Utils.defaultValue(imageryTileProviderOptions.tilingScheme, new WebMercatorTilingScheme());
         this.rectangle = Utils.defaultValue(imageryTileProviderOptions.rectangle, this.tilingScheme.projection.rectangle);
-        this.tileImageryRenderedQueue = new QuadtreeTileQueue();
         let width = this.tilingScheme.projection.rectangle.width;
         let tilesOfXAtZeroLevel = this.tilingScheme.getNumberOfXTilesAtLevel(0);
         this._levelZeroMaximumGeometricError = width / tilesOfXAtZeroLevel / this.tileWidth;
