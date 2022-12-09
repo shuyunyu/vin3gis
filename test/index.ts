@@ -47,7 +47,7 @@ window.onload = () => {
 class GISTest {
 
     public static run (render: FrameRenderer) {
-        // this.testShader(render);
+        this.testShader(render);
         // this.testTileGeometry(render);
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
@@ -65,12 +65,13 @@ class GISTest {
                     u_texture2: {
                         value: new TextureLoader().load("https://webst03.is.autonavi.com/appmaptile?x=33&y=30&z=6&lang=zh_cn&size=1&scale=1&style=8")
                     },
-                    u_overlay: { value: 1.0 }
+                    u_base: { value: 1.0 },
+                    u_overlay: { value: 1.0 },
                 },
                 vertexShader: verShader,
                 fragmentShader: fsShader,
                 side: FrontSide,
-                // transparent: true
+                transparent: true
             })
         );
         render.scene.add(box);
@@ -82,12 +83,16 @@ class GISTest {
                     u_texture1: {
                         value: new TextureLoader().load("https://webst04.is.autonavi.com/appmaptile?style=6&x=33&y=30&z=6")
                     },
-                    u_overlay: { value: 0.0 }
+                    u_texture2: {
+                        value: new TextureLoader().load("https://webst03.is.autonavi.com/appmaptile?x=33&y=30&z=6&lang=zh_cn&size=1&scale=1&style=8")
+                    },
+                    u_base: { value: 0.0 },
+                    u_overlay: { value: 1.0 }
                 },
                 vertexShader: verShader,
                 fragmentShader: fsShader,
                 side: FrontSide,
-                // transparent: true
+                transparent: true
             })
         );
         box1.position.x = 10;
