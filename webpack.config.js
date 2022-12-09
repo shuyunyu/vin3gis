@@ -19,6 +19,10 @@ module.exports = {
         filename: '[name]' + version + '.js',
         library: '[name]'
     },
+    //不打包THREE
+    externals: {
+        three: 'THREE'
+    },
     resolve: {
         extensions: ['.ts', '.tsx', '.js']
     },
