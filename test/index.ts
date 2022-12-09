@@ -1,11 +1,14 @@
-import { Vector3 } from "three";
-import { FrameRenderer } from "../src";
-import { AMapImageryTileProvider, Cartographic, MapViewer, Orientation, ViewPort } from "../src/gis";
+import { BoxGeometry, DoubleSide, FrontSide, Mesh, PlaneGeometry, ShaderMaterial, TextureLoader, Vector3 } from "three";
+import { FrameRenderer, math } from "../src";
+import { AMapImageryTileProvider, Cartographic, EmptyImageryTileProvider, MapViewer, Orientation, ViewPort } from "../src/gis";
+
+import verShader from "../src/gis/core/shader/tile.vt.glsl"
+import fsShader from "../src/gis/core/shader/tile.fs.glsl"
 
 window.onload = () => {
 
-    const initCameraPosition = new Vector3(118.156, 24.118, 1650000);
-    // const initCameraPosition = new Vector3(0, 0, 1650000);
+    // const initCameraPosition = new Vector3(118.156, 24.118, 1650000);
+    const initCameraPosition = new Vector3(0, 0, 1650000);
     const initCameraOrientation = new Vector3(0, -90, 0);
     const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), Orientation.fromDegreeEulerAngles(initCameraOrientation));
     const mapViewer = new MapViewer({
@@ -13,11 +16,12 @@ window.onload = () => {
         //EmptyImageryTileProvider
         //AMapImageryTileProvider
         //TdtImageryTileProvider
-        imageryTileProivder: new AMapImageryTileProvider({
-            style: 'street',
-            // style: 'aerial',
-            key: '1d109683f4d84198e37a38c442d68311'
-        }),
+        // imageryTileProivder: new AMapImageryTileProvider({
+        //     style: 'street',
+        //     // style: 'aerial',
+        //     key: '1d109683f4d84198e37a38c442d68311'
+        // }),
+        imageryTileProivder: new EmptyImageryTileProvider(),
         // imageryTileProivder: new ArcGISImageryTileProvider({
         //     url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
         //     // token: '1d109683f4d84198e37a38c442d68311'
@@ -43,7 +47,7 @@ window.onload = () => {
 class GISTest {
 
     public static run (render: FrameRenderer) {
-        // this.testShader(render);
+        this.testShader(render);
         // this.testTileGeometry(render);
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
@@ -51,21 +55,24 @@ class GISTest {
     }
 
     private static testShader (render: FrameRenderer) {
-        // const box = new Mesh(
-        //     new PlaneGeometry(10, 10).rotateX(-math.PI_OVER_TWO),
-        //     new ShaderMaterial({
-        //         uniforms: {
-        //             base_texture: {
-        //                 value: new TextureLoader().load("http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/13/3345/6862")
-        //             }
-        //         },
-        //         vertexShader: verShader,
-        //         fragmentShader: fsShader,
-        //         side: DoubleSide,
-        //         transparent: true
-        //     })
-        // );
-        // render.scene.add(box);
+        const box = new Mesh(
+            new BoxGeometry(10, 10, 10).rotateX(-math.PI_OVER_TWO),
+            new ShaderMaterial({
+                uniforms: {
+                    texture1: {
+                        value: new TextureLoader().load("https://webst04.is.autonavi.com/appmaptile?style=6&x=33&y=30&z=6")
+                    },
+                    texture2: {
+                        value: new TextureLoader().load("https://webst03.is.autonavi.com/appmaptile?x=33&y=32&z=6&lang=zh_cn&size=1&scale=1&style=8")
+                    }
+                },
+                vertexShader: verShader,
+                fragmentShader: fsShader,
+                side: FrontSide,
+                transparent: true
+            })
+        );
+        render.scene.add(box);
     }
 
     private static testTileGeometry (render: FrameRenderer) {
