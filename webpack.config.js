@@ -12,6 +12,7 @@ module.exports = {
     entry: {
         "Vin3Engine": "./src/index.ts",
         "Vin3GIS": "./src/gis/index.ts",
+        "TestCase": './test/index.ts'
     },
     output: {
         path: __dirname + '/dist',
@@ -39,13 +40,16 @@ module.exports = {
         }),
         new CopyPlugin({
             patterns: [
-                { from: "./public", to: "./" },
-                { from: "./test", to: "./test" }
+                { from: "./public", to: "./" }
             ]
         })
     ],
     module: {
         rules: [
+            {
+                test: /\.(glsl)$/,
+                loader: 'raw-loader'
+            },
             {
                 test: /\.tsx?$/,
                 use: 'ts-loader',
@@ -53,10 +57,6 @@ module.exports = {
             }, {
                 test: /\.css$/, // 正则表达式，表示.css后缀的文件
                 use: ['style-loader', 'css-loader'] // 针对css文件使用的loader，注意有先后顺序，数组项越靠后越先执行
-            },
-            {
-                test: /\.(glsl)$/,
-                loader: 'raw-loader'
             }
         ]
     },

@@ -1,17 +1,46 @@
-import { BackSide, BoxGeometry, Color, DataTexture, DoubleSide, FrontSide, ImageUtils, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, Object3D, PlaneGeometry, Quaternion, ShaderMaterial, Texture, TextureLoader, Vector3 } from "three";
-import { AssetLoader } from "../../../core/asset/asset_loader";
-import { Director, director } from "../../../core/director";
-import { FrameRenderer } from "../../../core/renderer/frame_renderer";
-import { imageDecoder } from "../../../core/worker/image_decoder";
-import { imageMerger } from "../../../core/worker/image_merger";
-import { TaskProcessor } from "../../../core/worker/task_processor";
-import { TransferTypedArrayTestScriptBase64 } from "../../../core/worker/transfer_typed_array_test";
+import { Vector3 } from "three";
+import { FrameRenderer } from "../src";
+import { AMapImageryTileProvider, Cartographic, MapViewer, Orientation, ViewPort } from "../src/gis";
 
-import verShader from "../shader/tile.vt.glsl";
-import fsShader from "../shader/tile.fs.glsl";
-import { math } from "../../../core/math/math";
+window.onload = () => {
 
-export class GISTest {
+    const initCameraPosition = new Vector3(118.156, 24.118, 1650000);
+    // const initCameraPosition = new Vector3(0, 0, 1650000);
+    const initCameraOrientation = new Vector3(0, -90, 0);
+    const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), Orientation.fromDegreeEulerAngles(initCameraOrientation));
+    const mapViewer = new MapViewer({
+        target: document.body,
+        //EmptyImageryTileProvider
+        //AMapImageryTileProvider
+        //TdtImageryTileProvider
+        imageryTileProivder: new AMapImageryTileProvider({
+            style: 'street',
+            // style: 'aerial',
+            key: '1d109683f4d84198e37a38c442d68311'
+        }),
+        // imageryTileProivder: new ArcGISImageryTileProvider({
+        //     url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
+        //     // token: '1d109683f4d84198e37a38c442d68311'
+        // }),
+        // imageryTileProivder: new TencentImageryTileProvider({
+        //     style: 'normal',
+        // }),
+        homeViewPort: homeViewPort,
+        enablePan: true,
+        enableZoom: true,
+        enableRotate: true,
+        enableDamping: true,
+        fov: 60
+        // dampingFactor: 0.1
+        // maxDistance: 16000000
+    });
+    // mapViewer.scene.imageryProviders.add(new AMapImageryTileProvider({
+    //     style: 'note'
+    // }));
+    GISTest.run(mapViewer.renderer);
+}
+
+class GISTest {
 
     public static run (render: FrameRenderer) {
         // this.testShader(render);

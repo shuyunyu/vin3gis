@@ -14,7 +14,6 @@ import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { EarthScene } from "../scene/earth_scene";
 import { SimpleTerrainProvider } from "../terrain/simple_terrain_provider";
 import { ITerrainProvider } from "../terrain/terrain_provider";
-import { GISTest } from "../test/test";
 import { Transform } from "../transform/transform";
 
 export class MapViewer {
@@ -210,8 +209,6 @@ export class MapViewer {
         const renderer = new FrameRenderer(scene, camera, target as HTMLElement);
         rendererSystem.addRenderTarget(renderer)
         interactionSystem.enableInteraction(renderer);
-        //run test code
-        GISTest.run(renderer);
         return renderer;
     }
 

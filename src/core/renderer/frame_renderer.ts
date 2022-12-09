@@ -1,4 +1,3 @@
-import * as THREE from "three"
 import { Mesh, Object3D, OrthographicCamera, PerspectiveCamera, Scene, WebGLRenderer, WebGLRendererParameters } from "three";
 import { OrthographicCameraProps, PerspectiveCameraProps } from "../../@types/global/global";
 import { GeometryUtils } from "../utils/geometry_utils";
@@ -57,7 +56,7 @@ export class FrameRenderer {
     private _destroyed: boolean = false;
 
     public constructor (scene: Scene, camera: PerspectiveCamera | OrthographicCamera, target: HTMLElement, rendererParams?: WebGLRendererParameters) {
-        this._renderer = new THREE.WebGLRenderer(Object.assign({ antialias: true }, rendererParams));
+        this._renderer = new WebGLRenderer(Object.assign({ antialias: true }, rendererParams));
         //@ts-ignore
         this._renderer.setPixelRatio(window.devicePixelRatio);
         this._scene = scene;
@@ -72,12 +71,12 @@ export class FrameRenderer {
      * @param height 
      */
     public updateRenderSize () {
-        if (this._camera instanceof THREE.PerspectiveCamera) {
+        if (this._camera instanceof PerspectiveCamera) {
             const width = this._target.clientWidth;
             const height = this._target.clientHeight;
             this._renderer.setSize(width, height);
             this.updateCameraProps({ aspect: width / height });
-        } else if (this._camera instanceof THREE.OrthographicCamera) {
+        } else if (this._camera instanceof OrthographicCamera) {
 
         }
     }
@@ -87,7 +86,7 @@ export class FrameRenderer {
      * @param props 
      */
     public updateCameraProps (props: PerspectiveCameraProps | OrthographicCameraProps) {
-        if (this._camera instanceof THREE.PerspectiveCamera) {
+        if (this._camera instanceof PerspectiveCamera) {
             const cprops = props as PerspectiveCameraProps;
             let changed = false;
             if (Utils.defined(cprops.near)) {
@@ -109,7 +108,7 @@ export class FrameRenderer {
             if (changed) {
                 this._camera.updateProjectionMatrix();
             }
-        } else if (this._camera instanceof THREE.OrthographicCamera) {
+        } else if (this._camera instanceof OrthographicCamera) {
             const cprops = props as OrthographicCameraProps;
             let changed = false;
             if (Utils.defined(cprops.near)) {
