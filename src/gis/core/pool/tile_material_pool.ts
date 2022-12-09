@@ -16,8 +16,11 @@ class TileMaterialPool extends BasePool<ShaderMaterial, Texture[]>{
     //上层贴图
     public readonly overlayTexture = "u_texture2";
 
-    //标识是否要叠加多层贴图
-    public readonly overlayFalg = "u_overlay";
+    //标识是否要叠加底层贴图
+    public readonly baseFlag = "u_base";
+
+    //标识是否要叠加上层贴图
+    public readonly overlayFlag = "u_overlay";
 
     public constructor () {
         super(ShaderMaterial, InternalConfig.TILE_TEXTURE_MTL_CACHE_SIZE);
@@ -38,12 +41,19 @@ class TileMaterialPool extends BasePool<ShaderMaterial, Texture[]>{
     }
 
     private setUniforms (uniforms: Record<string, any>, p?: Texture[]) {
-        uniforms[this.baseTexture] = { value: p[0] };
-        if (p.length > 1) {
-            uniforms[this.overlayTexture] = { value: p[1] };
-            uniforms[this.overlayFalg] = { value: 1.0 }
+        const baseTexture = p[0];
+        const overTexture = p[1];
+        if (baseTexture) {
+            uniforms[this.baseTexture] = { value: baseTexture };
+            uniforms[this.baseFlag] = { value: 1.0 };
         } else {
-            uniforms[this.overlayFalg] = { value: 0.0 };
+            uniforms[this.baseFlag] = { value: 0.0 };
+        }
+        if (overTexture) {
+            uniforms[this.overlayTexture] = { value: p[1] };
+            uniforms[this.overlayFlag] = { value: 1.0 };
+        } else {
+            uniforms[this.overlayFlag] = { value: 0.0 };
         }
     }
 

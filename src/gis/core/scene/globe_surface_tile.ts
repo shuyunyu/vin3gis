@@ -178,7 +178,7 @@ export class GlobeSurfaceTile {
         //缩放等级之外没有贴图图片
         if (Utils.defined(textureImagery)) {
             //重新渲染瓦片图片
-            this._tileNodeRenderer.render(tileImagery);
+            this._tileNodeRenderer.render(tileImagery.tile, tileImagery.textureImagery.rectangle, tileImagery);
         }
     }
 
@@ -216,7 +216,7 @@ export class GlobeSurfaceTile {
      * @param tileImagery 
      */
     private unrenderTileImagery (tileImagery: TileImagery) {
-        if (tileImagery.textureImagery) this._tileNodeRenderer.unrender(tileImagery);
+        if (tileImagery.textureImagery) this._tileNodeRenderer.unrender(tileImagery.tile);
         tileImagery.recyleTextureImageryResource();
     }
 

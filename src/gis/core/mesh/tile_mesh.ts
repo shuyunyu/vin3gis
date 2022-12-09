@@ -15,12 +15,15 @@ export class TileMesh {
      * 创建瓦片显示用的mesh
      * @param tile 
      * @param imageryRectangle 当前瓦片贴图的矩形范围
-     * @param imagery 当前瓦片的底层贴图
+     * @param baseImagery 当前瓦片的底层贴图
      * @param overlayImagery 当前瓦片的上层贴图
      * @returns 
      */
-    public static createTileMesh (tile: QuadtreeTile, imageryRectangle: Rectangle, imagery: ImageBitmap, overlayImagery?: ImageBitmap) {
-        const texture: Texture = tileTexturePool.create(imagery);
+    public static createTileMesh (tile: QuadtreeTile, imageryRectangle: Rectangle, baseImagery?: ImageBitmap, overlayImagery?: ImageBitmap) {
+        let baseTexture: Texture;
+        if (baseImagery) {
+            baseTexture = tileTexturePool.create(baseImagery);
+        }
         let overlayTexture: Texture;
         if (overlayImagery) {
             overlayTexture = tileTexturePool.create(overlayImagery);
@@ -33,7 +36,7 @@ export class TileMesh {
         plane.setIndex(meshAttr.indices);
         plane.setAttribute('normal', new BufferAttribute(meshAttr.normals, 3));
         plane.setAttribute('uv', new BufferAttribute(meshAttr.uvs, 2));
-        const mtl = tileMaterialPool.create(overlayTexture ? [texture, overlayTexture] : [texture]);
+        const mtl = tileMaterialPool.create([baseTexture, overlayTexture]);
         const mesh = new Mesh(plane, mtl);
         Transform.earthCar3ToWorldVec3(center, mesh.position);
         return mesh;

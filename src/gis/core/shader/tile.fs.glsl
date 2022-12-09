@@ -22,8 +22,10 @@ void main(){
         gl_FragColor=final_color;
     }else if(u_base==1.){
         gl_FragColor=texture2D(u_texture1,vUv);
-    }else {
+    }else if(u_overlay==1.){
         gl_FragColor=texture2D(u_texture2,vUv);
+    }else {
+        gl_FragColor=vec4(0.,0.,0.,0.);
     }
     
 }

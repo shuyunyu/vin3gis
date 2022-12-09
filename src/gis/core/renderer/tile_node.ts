@@ -18,11 +18,18 @@ export class TileNode {
         return this._mesh;
     }
 
-    //当前节点使用的瓦片贴图
-    private _imagery: ImageBitmap;
+    private _baseImagery: ImageBitmap;
 
-    public get imagery () {
-        return this._imagery;
+    //当前节点使用的底层瓦片贴图
+    public get baseImagery () {
+        return this._baseImagery;
+    }
+
+    private _overlayImagery: ImageBitmap;
+
+    //当前节点使用的上层瓦片贴图
+    public get overlayImagery () {
+        return this._overlayImagery;
     }
 
     public constructor (tileId: string) {
@@ -35,22 +42,11 @@ export class TileNode {
      * @param imagery 
      * @param imageryRectangle 
      */
-    public createTileMesh (tile: QuadtreeTile, imagery: ImageBitmap, imageryRectangle: Rectangle, overlayImagery?: ImageBitmap) {
+    public createTileMesh (tile: QuadtreeTile, imageryRectangle: Rectangle, imagery?: ImageBitmap, overlayImagery?: ImageBitmap) {
         this._mesh = TileMesh.createTileMesh(tile, imageryRectangle, imagery, overlayImagery);
-        this._imagery = imagery;
+        this._baseImagery = imagery;
+        this._overlayImagery = overlayImagery;
         return this._mesh;
-    }
-
-    /**
-     * 更新瓦片贴图渲染
-     * @param overlayImagery 上层贴图
-     */
-    public updateTileMesh (overlayImagery: ImageBitmap) {
-        const mtl = this._mesh.material as ShaderMaterial;
-        if (mtl) {
-            mtl.uniforms[tileMaterialPool.overlayTexture].value = overlayImagery;
-            mtl.needsUpdate = true;
-        }
     }
 
     /**
