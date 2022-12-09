@@ -4,6 +4,8 @@ export * from "./core/director";
 
 export * from "./core/engine";
 
+export * from "./core/sys/sys";
+
 export * from "./core/asset/asset_loader";
 export * from "./core/constants/vec_constants";
 
