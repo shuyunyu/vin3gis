@@ -67,6 +67,15 @@ export class TileImageryProviderRenderManager {
     }
 
     /**
+     * 判断提供者是否是最底层的提供者
+     * @param provider 
+     * @returns 
+     */
+    public isBaseImageryTileProvider (provider: IImageryTileProvider) {
+        return provider === this.baseImageryTileProvider;
+    }
+
+    /**
      * 获取provider的渲染队列
      * @param provider 
      * @returns 

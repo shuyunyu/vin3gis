@@ -225,6 +225,9 @@ export class GlobeSurfaceTileManager {
         if (this._tileRenderQueue.length == 0) return;
         this._scene.imageryProviders.foreach((provider: IImageryTileProvider, index: number) => {
             if (provider.visible) this.renderImageryTileProviderTiles(provider, this._tileRenderQueue, frameState);
+            else {
+                //TODO handle provider visible
+            }
         })
         this._tileRenderQueue.length = 0;
     }
@@ -244,11 +247,12 @@ export class GlobeSurfaceTileManager {
                 const child = tile.children[i];
                 if (imageryProvider.computeTileVisibility(child, frameState.frustum)) {
                     if (child.level >= imageryProvider.minimumLevel) {
-                        GlobeSurfaceTile.initialize(child, this._terrainProvider, this._scene.imageryProviderRenderManager, this._scene.tileNodeRenderer);
-                        child.data!.processStateMachine();
-                        if (child.data!.hasTileImagery(imageryProvider)) {
-                            selectedToRenderdQueue.push(child);
+                        //如果没有数据  说明此瓦片没有被加载
+                        if (!child.data) {
+                            GlobeSurfaceTile.initialize(child, this._terrainProvider, this._scene.imageryProviderRenderManager, this._scene.tileNodeRenderer);
                         }
+                        child.data!.processStateMachine();
+                        selectedToRenderdQueue.push(child);
                     } else {
                         stack.push(child);
                     }

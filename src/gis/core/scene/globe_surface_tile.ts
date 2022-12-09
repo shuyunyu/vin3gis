@@ -20,6 +20,7 @@ export class GlobeSurfaceTile {
 
     private _tileNodeRenderer: TileNodeRenderer;
 
+    //保存该瓦片对应的每个瓦片提供者的图片信息
     private _tileImageryRecord: Record<string, TileImagery> = Object.create(null);
 
     //等待渲染的 瓦片提供者
@@ -111,7 +112,7 @@ export class GlobeSurfaceTile {
      */
     public hasTileImagery (provider: IImageryTileProvider) {
         let tileImagery = this._tileImageryRecord[provider.id];
-        return Utils.defined(tileImagery) && tileImagery.hasImagery;
+        return tileImagery && tileImagery.hasImagery;
     }
 
     /**
