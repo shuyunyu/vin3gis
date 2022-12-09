@@ -44,7 +44,8 @@ module.exports = {
         new CopyPlugin({
             patterns: [
                 { from: "./public", to: "./" },
-                { from: './node_modules/three/build/three.min.js', to: "./" }
+                { from: './node_modules/three/build/three.min.js', to: "./" },
+                { from: "./test/prod.test.js", to: "./" },
             ]
         })
     ],
