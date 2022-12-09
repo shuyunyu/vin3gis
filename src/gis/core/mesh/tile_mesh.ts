@@ -27,7 +27,7 @@ export class TileMesh {
         plane.setIndex(meshAttr.indices);
         plane.setAttribute('normal', new BufferAttribute(meshAttr.normals, 3));
         plane.setAttribute('uv', new BufferAttribute(meshAttr.uvs, 2));
-        const mtl = tileMaterialPool.create(texture);
+        const mtl = tileMaterialPool.create([texture]);
         const mesh = new Mesh(plane, mtl);
         Transform.earthCar3ToWorldVec3(center, mesh.position);
         return mesh;

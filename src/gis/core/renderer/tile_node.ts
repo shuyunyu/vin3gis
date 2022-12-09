@@ -1,4 +1,4 @@
-import { Mesh, MeshBasicMaterial, Object3D, ShaderMaterial } from "three";
+import { Mesh, Object3D, ShaderMaterial, Texture } from "three";
 import { Rectangle } from "../geometry/rectangle";
 import { TileMesh } from "../mesh/tile_mesh";
 import { tileMaterialPool } from "../pool/tile_material_pool";
@@ -47,8 +47,12 @@ export class TileNode {
         if (!this._mesh) return;
         const mtl = this._mesh.material as ShaderMaterial;
         if (mtl) {
-            const texture = mtl.uniforms[tileMaterialPool.shaderBaseTextureName].value;
-            if (texture) tileTexturePool.recycle(texture);
+            for (const key in mtl.uniforms) {
+                const val = mtl.uniforms[key].value;
+                if (val instanceof Texture) {
+                    tileTexturePool.recycle(val);
+                }
+            }
             tileMaterialPool.recycle(mtl);
         }
         this._mesh.geometry.dispose();

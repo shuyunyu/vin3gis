@@ -7,8 +7,8 @@ import fsShader from "../src/gis/core/shader/tile.fs.glsl"
 
 window.onload = () => {
 
-    // const initCameraPosition = new Vector3(118.156, 24.118, 1650000);
-    const initCameraPosition = new Vector3(0, 0, 1650000);
+    const initCameraPosition = new Vector3(118.156, 24.118, 1650000);
+    // const initCameraPosition = new Vector3(0, 0, 165000);
     const initCameraOrientation = new Vector3(0, -90, 0);
     const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), Orientation.fromDegreeEulerAngles(initCameraOrientation));
     const mapViewer = new MapViewer({
@@ -16,12 +16,12 @@ window.onload = () => {
         //EmptyImageryTileProvider
         //AMapImageryTileProvider
         //TdtImageryTileProvider
-        // imageryTileProivder: new AMapImageryTileProvider({
-        //     style: 'street',
-        //     // style: 'aerial',
-        //     key: '1d109683f4d84198e37a38c442d68311'
-        // }),
-        imageryTileProivder: new EmptyImageryTileProvider(),
+        imageryTileProivder: new AMapImageryTileProvider({
+            style: 'street',
+            // style: 'aerial',
+            key: '1d109683f4d84198e37a38c442d68311'
+        }),
+        // imageryTileProivder: new EmptyImageryTileProvider(),
         // imageryTileProivder: new ArcGISImageryTileProvider({
         //     url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
         //     // token: '1d109683f4d84198e37a38c442d68311'
@@ -47,7 +47,7 @@ window.onload = () => {
 class GISTest {
 
     public static run (render: FrameRenderer) {
-        this.testShader(render);
+        // this.testShader(render);
         // this.testTileGeometry(render);
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
@@ -56,23 +56,42 @@ class GISTest {
 
     private static testShader (render: FrameRenderer) {
         const box = new Mesh(
-            new BoxGeometry(10, 10, 10).rotateX(-math.PI_OVER_TWO),
+            new PlaneGeometry(10, 10, 10).rotateX(-math.PI_OVER_TWO),
             new ShaderMaterial({
                 uniforms: {
-                    texture1: {
+                    u_texture1: {
                         value: new TextureLoader().load("https://webst04.is.autonavi.com/appmaptile?style=6&x=33&y=30&z=6")
                     },
-                    texture2: {
-                        value: new TextureLoader().load("https://webst03.is.autonavi.com/appmaptile?x=33&y=32&z=6&lang=zh_cn&size=1&scale=1&style=8")
-                    }
+                    u_texture2: {
+                        value: new TextureLoader().load("https://webst03.is.autonavi.com/appmaptile?x=33&y=30&z=6&lang=zh_cn&size=1&scale=1&style=8")
+                    },
+                    u_overlay: { value: 1.0 }
                 },
                 vertexShader: verShader,
                 fragmentShader: fsShader,
                 side: FrontSide,
-                transparent: true
+                // transparent: true
             })
         );
         render.scene.add(box);
+
+        const box1 = new Mesh(
+            new PlaneGeometry(10, 10, 10).rotateX(-math.PI_OVER_TWO),
+            new ShaderMaterial({
+                uniforms: {
+                    u_texture1: {
+                        value: new TextureLoader().load("https://webst04.is.autonavi.com/appmaptile?style=6&x=33&y=30&z=6")
+                    },
+                    u_overlay: { value: 0.0 }
+                },
+                vertexShader: verShader,
+                fragmentShader: fsShader,
+                side: FrontSide,
+                // transparent: true
+            })
+        );
+        box1.position.x = 10;
+        render.scene.add(box1);
     }
 
     private static testTileGeometry (render: FrameRenderer) {

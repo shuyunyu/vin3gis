@@ -8,18 +8,24 @@ import tileFsShader from "../shader/tile.fs.glsl";
 /**
  * 瓦片材质池
  */
-class TileMaterialPool extends BasePool<ShaderMaterial, Texture>{
+class TileMaterialPool extends BasePool<ShaderMaterial, Texture[]>{
 
-    //shader里面最底层的texture的名称
-    public readonly shaderBaseTextureName = "texture1";
+    //底层贴图
+    public readonly baseTexture = "u_texture1";
+
+    //上层贴图
+    public readonly overlayTexture = "u_texture2";
+
+    //标识是否要叠加多层贴图
+    public readonly overlayFalg = "u_overlay";
 
     public constructor () {
         super(ShaderMaterial, InternalConfig.TILE_TEXTURE_MTL_CACHE_SIZE);
     }
 
-    protected onConstructor (p?: Texture): ShaderMaterial {
+    protected onConstructor (p?: Texture[]): ShaderMaterial {
         const uniforms = Object.create(null);
-        uniforms[this.shaderBaseTextureName] = { value: p };
+        this.setUniforms(uniforms, p);
         const mtl = new ShaderMaterial({
             uniforms: uniforms,
             vertexShader: tileVtShader,
@@ -31,23 +37,19 @@ class TileMaterialPool extends BasePool<ShaderMaterial, Texture>{
         return mtl;
     }
 
-    protected onSelect (p?: Texture): ShaderMaterial {
-        //先看看原先有没有这个材质 有的话 直接拿出来用
-        const index = this._list.findIndex(mtl => mtl.uniforms[this.shaderBaseTextureName].value === p);
-        if (index > -1) {
-            const mtl = this._list.splice(index, 1)[0];
-            return mtl;
+    private setUniforms (uniforms: Record<string, any>, p?: Texture[]) {
+        uniforms[this.baseTexture] = { value: p[0] };
+        if (p.length > 1) {
+            uniforms[this.overlayTexture] = { value: p[1] };
+            uniforms[this.overlayFalg] = { value: 1.0 }
         } else {
-            return super.onSelect(p);
+            uniforms[this.overlayFalg] = { value: 0.0 };
         }
     }
 
-    protected onUpdate (o: ShaderMaterial, p?: Texture): void {
-        //如果当前复用的材质不是原来的材质 则需要更新一下
-        if (o.uniforms[this.shaderBaseTextureName].value !== p) {
-            o.uniforms[this.shaderBaseTextureName].value = p;
-            o.needsUpdate = true;
-        }
+    protected onUpdate (o: ShaderMaterial, p?: Texture[]): void {
+        this.setUniforms(o.uniforms, p);
+        o.needsUpdate = true;
     }
 
     protected onRecycle (o: ShaderMaterial): void {
