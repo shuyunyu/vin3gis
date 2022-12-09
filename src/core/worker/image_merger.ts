@@ -1,5 +1,5 @@
 import { imageDecoder } from "./image_decoder";
-import { ImageMergerWorkerScriptStr } from "./image_merger_worker";
+import ImageMergerWorkerScriptStr from "./image_merger_worker.worker";
 import { TaskProcessor } from "./task_processor";
 
 type InputParams = {

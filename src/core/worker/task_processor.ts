@@ -1,6 +1,6 @@
 import { GenericEvent } from "../event/generic_event";
 import { Utils } from "../utils/utils";
-import { TransferTypedArrayTestScriptBase64 } from "./transfer_typed_array_test";
+import TransferTypedArrayTestScript from "./transfer_typed_array_test.worker";
 
 let testing: boolean = false;
 let testAwiters: Record<string, Function>[] = [];
@@ -24,7 +24,7 @@ const canTransferArrayBuffer = function () {
             });
             if (!testing) {
                 testing = true;
-                createWorker(TransferTypedArrayTestScriptBase64).then((worker: Worker) => {
+                createWorker(TransferTypedArrayTestScript).then((worker: Worker) => {
                     let value = 99;
                     let array = new Int8Array([value]);
                     try {
@@ -60,14 +60,13 @@ const canTransferArrayBuffer = function () {
 
 /**
  * 创建worker
- * @param workerBase64str worker脚本的base64字符串
+ * @param workerScriptstr worker脚本的字符串
  * @param processor 
  * @returns 
  */
-const createWorker = <P, R> (workerBase64str: string, processor?: TaskProcessor<P, R>) => {
+const createWorker = <P, R> (workerScriptstr: string, processor?: TaskProcessor<P, R>) => {
     return new Promise<Worker>((resolve, reject) => {
-        const workerScriptSrt = Utils.base64Decode(workerBase64str);
-        const jsBlob = Utils.createScriptBlob(workerScriptSrt);
+        const jsBlob = Utils.createScriptBlob(workerScriptstr);
         let worker = new Worker(URL.createObjectURL(jsBlob));
         if (Utils.defined(processor)) {
             worker.onmessage = function (event) {
@@ -109,7 +108,7 @@ const completeTask = <P, R> (processor: TaskProcessor<P, R>, data: any) => {
  */
 export class TaskProcessor<P, R> {
 
-    private workerBase64str: string;
+    private workerScriptstr: string;
 
     private _maxmiumActiveTasks: number;
 
@@ -129,8 +128,8 @@ export class TaskProcessor<P, R> {
 
     public static canTransferArrayBuffer: boolean | undefined;
 
-    constructor (workerBase64str: string, maxmiumActiveTasks?: number) {
-        this.workerBase64str = workerBase64str;
+    constructor (workerScriptstr: string, maxmiumActiveTasks?: number) {
+        this.workerScriptstr = workerScriptstr;
         this._maxmiumActiveTasks = Utils.defaultValue(maxmiumActiveTasks, Number.POSITIVE_INFINITY);
     }
 
@@ -158,7 +157,7 @@ export class TaskProcessor<P, R> {
                 if (!this._creatingWorker) {
                     this._creatingWorker = true;
                     canTransferArrayBuffer().then(() => {
-                        createWorker(this.workerBase64str, this).then((w: Worker) => {
+                        createWorker(this.workerScriptstr, this).then((w: Worker) => {
                             this._worker = w;
                             this.callAwiters(undefined, this._worker);
                         }).catch((err: any) => {
