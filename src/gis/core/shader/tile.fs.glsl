@@ -4,13 +4,14 @@ uniform sampler2D u_texture2;
 uniform float u_base;
 uniform float u_overlay;
 
-varying vec2 vUv;
+varying vec2 v_base_uv;
+varying vec2 v_overlay_uv;
 
 void main(){
     
     if(u_base==1. && u_overlay==1.){
-         vec4 back_color=texture2D(u_texture1,vUv);
-         vec4 overlay_color=texture2D(u_texture2,vUv);
+         vec4 back_color=texture2D(u_texture1,v_base_uv);
+         vec4 overlay_color=texture2D(u_texture2,v_overlay_uv);
         
         back_color.rgb*=back_color.a;
         overlay_color.rgb*=overlay_color.a;
@@ -21,9 +22,9 @@ void main(){
         
         gl_FragColor=final_color;
     }else if(u_base==1.){
-        gl_FragColor=texture2D(u_texture1,vUv);
+        gl_FragColor=texture2D(u_texture1,v_base_uv);
     }else if(u_overlay==1.){
-        gl_FragColor=texture2D(u_texture2,vUv);
+        gl_FragColor=texture2D(u_texture2,v_overlay_uv);
     }else {
         gl_FragColor=vec4(0.,0.,0.,0.);
     }

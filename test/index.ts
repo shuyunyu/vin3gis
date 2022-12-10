@@ -1,4 +1,4 @@
-import { BoxGeometry, DoubleSide, FrontSide, Mesh, PlaneGeometry, ShaderMaterial, TextureLoader, Vector3 } from "three";
+import { BoxGeometry, BufferAttribute, DoubleSide, FrontSide, Mesh, PlaneGeometry, ShaderMaterial, TextureLoader, Vector3 } from "three";
 import { FrameRenderer, math } from "../src";
 import { AMapImageryTileProvider, Cartographic, EmptyImageryTileProvider, MapViewer, Orientation, ViewPort } from "../src/gis";
 
@@ -47,16 +47,20 @@ window.onload = () => {
 class GISTest {
 
     public static run (render: FrameRenderer) {
-        this.testShader(render);
+        // this.testShader(render);
         // this.testTileGeometry(render);
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
     }
 
+
     private static testShader (render: FrameRenderer) {
+        const geo0 = new PlaneGeometry(10, 10).rotateX(-math.PI_OVER_TWO);
+        // geo0.setAttribute('uv', new BufferAttribute(new Float32Array([0, 0, 0, 1, 1, 1, 1, 0]), 2));
+        geo0.setAttribute('a_overlay_uv', new BufferAttribute(new Float32Array([0, 0, 0, 1, 1, 1, 1, 0]), 2));
         const box = new Mesh(
-            new PlaneGeometry(10, 10, 10).rotateX(-math.PI_OVER_TWO),
+            geo0,
             new ShaderMaterial({
                 uniforms: {
                     u_texture1: {
@@ -76,8 +80,10 @@ class GISTest {
         );
         render.scene.add(box);
 
-        const box1 = new Mesh(
-            new PlaneGeometry(10, 10, 10).rotateX(-math.PI_OVER_TWO),
+        const geo1 = new PlaneGeometry(10, 10).rotateX(-math.PI_OVER_TWO);
+        // geo1.setAttribute('uv', new BufferAttribute(new Float32Array([0, 0, 0, 1, 1, 1, 1, 0]), 2));
+        geo1.setAttribute('a_overlay_uv', new BufferAttribute(new Float32Array([0, 0, 0, 1, 1, 1, 1, 0]), 2));
+        const box1 = new Mesh(geo1,
             new ShaderMaterial({
                 uniforms: {
                     u_texture1: {
@@ -87,7 +93,7 @@ class GISTest {
                         value: new TextureLoader().load("https://webst03.is.autonavi.com/appmaptile?x=33&y=30&z=6&lang=zh_cn&size=1&scale=1&style=8")
                     },
                     u_base: { value: 0.0 },
-                    u_overlay: { value: 1.0 }
+                    u_overlay: { value: 1.0 },
                 },
                 vertexShader: verShader,
                 fragmentShader: fsShader,
