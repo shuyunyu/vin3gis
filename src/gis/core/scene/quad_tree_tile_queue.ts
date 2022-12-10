@@ -1,4 +1,3 @@
-import { Utils } from "../../../core/utils/utils";
 import { QuadtreeTile } from "./quad_tree_tile";
 
 export class QuadtreeTileQueue {
@@ -51,7 +50,7 @@ export class QuadtreeTileQueue {
     /**
      * 清除所有
      */
-    public clearAll () {
+    public clear () {
         while (this._queue.length) {
             this._queue.pop();
         }
@@ -75,6 +74,23 @@ export class QuadtreeTileQueue {
         return this._queue.filter(tile => quadtreeTiles.indexOf(tile) === -1);
     }
 
+    /**
+     * 复制指定队列
+     * @param queue 
+     */
+    public copy (queue: QuadtreeTileQueue | QuadtreeTile[]) {
+        this._queue.length = 0;
+        if (queue instanceof QuadtreeTileQueue) {
+            queue.foreach((tile: QuadtreeTile, i: number) => this._queue[i] = tile);
+        } else {
+            this._queue.push(...queue);
+        }
+    }
+
+    /**
+     * 遍历
+     * @param callback 
+     */
     public foreach (callback: (tile: QuadtreeTile, index: number) => boolean | any) {
         for (let i = 0; i < this._queue.length; i++) {
             const res = callback(this._queue[i], i);
@@ -82,17 +98,6 @@ export class QuadtreeTileQueue {
         }
     }
 
-    public toArray (out?: QuadtreeTile[]): QuadtreeTile[] {
-        if (Utils.defined(out)) {
-            for (let i = 0; i < this._queue.length; i++) {
-                const tile = this._queue[i];
-                out!.push(tile);
-            }
-            return out!;
-        } else {
-            return this._queue;
-        }
 
-    }
 
 }

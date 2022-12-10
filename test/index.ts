@@ -7,7 +7,7 @@ import fsShader from "../src/gis/core/shader/tile.fs.glsl"
 
 window.onload = () => {
 
-    const initCameraPosition = new Vector3(118.156, 24.118, 16500000);
+    const initCameraPosition = new Vector3(118.256, 24.418, 165000);
     // const initCameraPosition = new Vector3(0, 0, 165000);
     const initCameraOrientation = new Vector3(0, -90, 0);
     const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), Orientation.fromDegreeEulerAngles(initCameraOrientation));

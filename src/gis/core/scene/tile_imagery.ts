@@ -40,7 +40,8 @@ export class TileImagery {
     }
 
     public get hasImagery () {
-        return this.loaded || (this._loadingImagery && this._loadingImagery.state === ImageryState.LOADED);
+        // return this.loaded || (this._loadingImagery && this._loadingImagery.state === ImageryState.LOADED);
+        return this.loaded;
     }
 
     public get loadingImagery () {

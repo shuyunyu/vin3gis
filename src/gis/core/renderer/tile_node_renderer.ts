@@ -25,11 +25,11 @@ export class TileNodeRenderer {
      * @param baseImagery 底层瓦片贴图
      * @param overlayImagery 上层瓦片贴图
      */
-    public render (tile: QuadtreeTile, baseImagery?: Imagery, overlayImager?: Imagery) {
+    public render (tile: QuadtreeTile, baseImagery?: Imagery, overlayImagery?: Imagery) {
         this.unrender(tile);
         let tileNode = new TileNode(tile.id);
         this._tileNodeRecord[tile.id] = tileNode;
-        const mesh = tileNode.createTileMesh(tile, baseImagery, overlayImager);
+        const mesh = tileNode.createTileMesh(tile, baseImagery, overlayImagery);
         this.root.add(mesh);
     }
 

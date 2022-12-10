@@ -94,7 +94,7 @@ export class TileImageryProviderRenderManager {
         queue.foreach((tile: QuadtreeTile, index: number) => {
             tile.data && tile.data.recyleTileImagery(provider);
         });
-        queue.clearAll();
+        queue.clear();
     }
 
     /**

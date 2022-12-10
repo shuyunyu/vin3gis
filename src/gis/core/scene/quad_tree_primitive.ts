@@ -13,6 +13,10 @@ export class QuadtreePrimitive {
 
     private _tileCacheSize: number;
 
+    //最小的瓦片等级
+    //高德地图 天地图 等 最小缩放等级在3 那么选中的渲染瓦片至少要在这个缩放等级
+    public readonly minimumLevel: number = 3;
+
     public get tileCacheSize () {
         return this._tileCacheSize;
     }
