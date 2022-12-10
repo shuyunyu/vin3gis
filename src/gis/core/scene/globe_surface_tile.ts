@@ -178,7 +178,7 @@ export class GlobeSurfaceTile {
         //缩放等级之外没有贴图图片
         if (Utils.defined(textureImagery)) {
             //重新渲染瓦片图片
-            this._tileNodeRenderer.render(tileImagery.tile, tileImagery.textureImagery.rectangle, tileImagery);
+            this._tileNodeRenderer.render(tileImagery.tile, tileImagery.textureImagery);
         }
     }
 

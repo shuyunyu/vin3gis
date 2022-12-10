@@ -77,7 +77,8 @@ export namespace MeshDefines {
     export type TileMeshAttribute = {
         vertices: Float32Array,
         indices: number[],
-        uvs: Float32Array,
+        baseUvs?: Float32Array,
+        overlayUvs?: Float32Array,
         normals: Float32Array
     }
 

@@ -1,7 +1,6 @@
 import { Object3D } from "three";
-import { Rectangle } from "../geometry/rectangle";
+import { Imagery } from "../scene/imagery";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
-import { TileImagery } from "../scene/tile_imagery";
 import { TileNode } from "./tile_node";
 
 /**
@@ -26,13 +25,11 @@ export class TileNodeRenderer {
      * @param baseImagery 底层瓦片贴图
      * @param overlayImagery 上层瓦片贴图
      */
-    public render (tile: QuadtreeTile, imageryRectangle: Rectangle, baseImagery?: TileImagery, overlayImagery?: TileImagery) {
-        const baseImageAsset = baseImagery ? baseImagery.textureImagery.imageAsset : null;
-        const overlayImageAsset = overlayImagery ? overlayImagery.textureImagery.imageAsset : null;
+    public render (tile: QuadtreeTile, baseImagery?: Imagery, overlayImager?: Imagery) {
         this.unrender(tile);
         let tileNode = new TileNode(tile.id);
         this._tileNodeRecord[tile.id] = tileNode;
-        const mesh = tileNode.createTileMesh(tile, imageryRectangle, baseImageAsset, overlayImageAsset);
+        const mesh = tileNode.createTileMesh(tile, baseImagery, overlayImager);
         this.root.add(mesh);
     }
 

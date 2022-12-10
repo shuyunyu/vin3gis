@@ -3,6 +3,7 @@ import { MeshDefines } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
 import { tileMaterialPool } from "../pool/tile_material_pool";
 import { tileTexturePool } from "../pool/tile_texture_pool";
+import { Imagery } from "../scene/imagery";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { Transform } from "../transform/transform";
 
@@ -14,35 +15,50 @@ export class TileMesh {
     /**
      * 创建瓦片显示用的mesh
      * @param tile 
-     * @param imageryRectangle 当前瓦片贴图的矩形范围
-     * @param baseImagery 当前瓦片的底层贴图
-     * @param overlayImagery 当前瓦片的上层贴图
+     * @param baseTileImagery 当前瓦片的底层贴图
+     * @param overlayTileImagery 当前瓦片的上层贴图
      * @returns 
      */
-    public static createTileMesh (tile: QuadtreeTile, imageryRectangle: Rectangle, baseImagery?: ImageBitmap, overlayImagery?: ImageBitmap) {
+    public static createTileMesh (tile: QuadtreeTile, baseTileImagery?: Imagery, overlayTileImagery?: Imagery) {
         let baseTexture: Texture;
-        if (baseImagery) {
-            baseTexture = tileTexturePool.create(baseImagery);
+        let baseTextureRectangle: Rectangle;
+        if (baseTileImagery) {
+            baseTexture = tileTexturePool.create(baseTileImagery.imageAsset);
+            baseTextureRectangle = baseTileImagery.rectangle;
         }
         let overlayTexture: Texture;
-        if (overlayImagery) {
-            overlayTexture = tileTexturePool.create(overlayImagery);
+        let overlayTextureRectangle: Rectangle;
+        if (overlayTileImagery) {
+            overlayTexture = tileTexturePool.create(overlayTileImagery.imageAsset);
+            overlayTextureRectangle = overlayTileImagery.rectangle;
         }
         const tileNativeRectangle = tile.nativeRectangle;
         const center = tileNativeRectangle.center;
         const plane = new BufferGeometry();
-        const meshAttr = this.createTileMeshAttribute(imageryRectangle, tileNativeRectangle);
+        const meshAttr = this.createTileMeshAttribute(tileNativeRectangle, baseTextureRectangle, overlayTextureRectangle);
         plane.setAttribute('position', new BufferAttribute(meshAttr.vertices, 3));
         plane.setIndex(meshAttr.indices);
         plane.setAttribute('normal', new BufferAttribute(meshAttr.normals, 3));
-        plane.setAttribute('uv', new BufferAttribute(meshAttr.uvs, 2));
+        if (meshAttr.baseUvs) {
+            plane.setAttribute('uv', new BufferAttribute(meshAttr.baseUvs, 2));
+        }
+        if (meshAttr.overlayUvs) {
+            plane.setAttribute('a_overlay_uv', new BufferAttribute(meshAttr.overlayUvs, 2));
+        }
         const mtl = tileMaterialPool.create([baseTexture, overlayTexture]);
         const mesh = new Mesh(plane, mtl);
         Transform.earthCar3ToWorldVec3(center, mesh.position);
         return mesh;
     }
 
-    private static createTileMeshAttribute (textureRectangle: Rectangle, tileRectangle: Rectangle): MeshDefines.TileMeshAttribute {
+    /**
+     * 创建tileMesh属性
+     * @param tileRectangle 瓦片矩形范围
+     * @param baseTextureRectangle 底层贴图矩形范围
+     * @param overlayTextureRectangle 上层贴图矩形范围
+     * @returns 
+     */
+    private static createTileMeshAttribute (tileRectangle: Rectangle, baseTextureRectangle?: Rectangle, overlayTextureRectangle?: Rectangle): MeshDefines.TileMeshAttribute {
         const positions: number[] = [];
         const indices: number[] = [];
         const normals: number[] = [];
@@ -65,12 +81,21 @@ export class TileMesh {
 
         normals.push(0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0);
 
-        return {
+        const res: MeshDefines.TileMeshAttribute = {
             vertices: new Float32Array(positions),
             indices: indices,
-            normals: new Float32Array(normals),
-            uvs: this.calcUvs(textureRectangle, tileRectangle)
+            normals: new Float32Array(normals)
+        };
+
+        if (baseTextureRectangle) {
+            res.baseUvs = this.calcUvs(baseTextureRectangle, tileRectangle);
         }
+
+        if (overlayTextureRectangle) {
+            res.overlayUvs = this.calcUvs(overlayTextureRectangle, tileRectangle);
+        }
+
+        return res;
     }
 
     /**
