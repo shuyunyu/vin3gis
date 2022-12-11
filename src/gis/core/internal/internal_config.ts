@@ -23,6 +23,9 @@ export class InternalConfig {
      */
     public static TILE_TEXTURE_MTL_CACHE_SIZE = 100;
 
+    //se
+    public static SPACE_ERROR = 2;
+
     /**
      * 校验相机的pitch是否有效
      * @param pitch 

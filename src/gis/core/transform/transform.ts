@@ -5,6 +5,7 @@ import { Utils } from "../../../core/utils/utils";
 import { ICartesian3Like } from "../../@types/core/gis";
 import { Cartesian3 } from "../cartesian/cartesian3";
 import { Cartographic } from "../cartographic";
+import { InternalConfig } from "../internal/internal_config";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { FrameState } from "../scene/frame_state";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
@@ -169,7 +170,7 @@ export class Transform {
     public static validateSpaceError (tile: QuadtreeTile, imageryTileProvider: IImageryTileProvider, frameState: FrameState) {
         let error = this.computeSpaceError(imageryTileProvider, tile, frameState);
         // return error < (sys.isMobile ? 3 : );
-        return error < 2;
+        return error < InternalConfig.SPACE_ERROR;
     }
 
 }
