@@ -16,6 +16,7 @@ export class MapStatsMonitor {
         "SelectTileCount",
         "RendererTileCount",
         "XHRRequestCount",
+        "TileCache",
         "ImageryCache"
     ];
 
@@ -31,7 +32,8 @@ export class MapStatsMonitor {
         this._rendererStats.setStatsItemVal(0, this._scene.globleSurfaceManager.curFrameSelectTIleCount);
         this._rendererStats.setStatsItemVal(1, this._scene.tileNodeRenderer.renderTileNodeCount);
         this._rendererStats.setStatsItemVal(2, RequestScheduler.curRequestCount);
-        this._rendererStats.setStatsItemVal(3, imageryCache.size);
+        this._rendererStats.setStatsItemVal(3, this._scene.quadtreePrimitive.tileReplacementQueue.count);
+        this._rendererStats.setStatsItemVal(4, imageryCache.size);
     }
 
 }

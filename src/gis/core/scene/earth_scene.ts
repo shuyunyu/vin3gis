@@ -25,7 +25,7 @@ export class EarthScene {
 
     public readonly tilingScheme: ITilingScheme;
 
-    private _quadtreePrimitive: QuadtreePrimitive;
+    public readonly quadtreePrimitive: QuadtreePrimitive;
 
     public readonly lateUpdateEvent = new GenericEvent<number>;
 
@@ -39,10 +39,10 @@ export class EarthScene {
         this._renderer.scene.add(this.tileNodeRenderer.root);
         this.imageryProviders = new ImageryTileProviderCollection();
         this.imageryProviders.add(imageryTileProvider);
-        this._quadtreePrimitive = new QuadtreePrimitive(this.imageryProviders.get(0)!, tileCacheSize);
-        this.tilingScheme = this._quadtreePrimitive.tileProvider.tilingScheme;
+        this.quadtreePrimitive = new QuadtreePrimitive(this.imageryProviders.get(0)!, tileCacheSize);
+        this.tilingScheme = this.quadtreePrimitive.tileProvider.tilingScheme;
         this.camera = new EarthCamera(this._renderer, this.tilingScheme);
-        this.globleSurfaceManager = new GlobeSurfaceTileManager(this._quadtreePrimitive, terrainProvider, this);
+        this.globleSurfaceManager = new GlobeSurfaceTileManager(this.quadtreePrimitive, terrainProvider, this);
         this.ready = true;
     }
 
@@ -52,7 +52,7 @@ export class EarthScene {
         this.imageryProviders.remove(oldProvider);
         provider.visible = true;
         this.imageryProviders.lowerToBottom(provider);
-        this._quadtreePrimitive.tileProvider = provider;
+        this.quadtreePrimitive.tileProvider = provider;
     }
 
     public postRender (delay: number) {
