@@ -26,6 +26,7 @@ export namespace SystemDefines {
         MEDIUM = 100,
         HIGH = 200,
         INTERACTION = 190,
+        TWEEN = 180,
         REQUEST = 150,
         EVENT_SYSTEM = 195
     }
