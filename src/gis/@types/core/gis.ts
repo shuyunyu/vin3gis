@@ -1,5 +1,6 @@
 import { ViewPort } from "../../core/misc/view_port";
 import { IImageryTileProvider } from "../../core/provider/imagery_tile_provider";
+import { Imagery } from "../../core/scene/imagery";
 
 export interface ICartesian2Like {
     x: number;
@@ -86,3 +87,10 @@ export namespace MeshDefines {
 
 //图片请求结果
 export type ImageRequestResult = HTMLImageElement | ImageBitmap | Blob;
+
+
+//贴图瓦片渲染参数
+export type ImageryTileRenderParam = {
+    imagery: Imagery;
+    opacity: number;
+}

@@ -6,6 +6,8 @@ export interface ImageryTileProviderOptions {
     tms?: boolean;
     //可见性
     visible?: boolean;
+    //不透明度
+    opacity?: number;
     //格式
     format?: string;
     //最大缩放等级

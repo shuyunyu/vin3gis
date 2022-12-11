@@ -16,6 +16,8 @@ export interface IImageryTileProvider {
     format: string;
     //是否可见
     visible: boolean;
+    //不透明度
+    opacity: number;
     //是否是tms类型瓦片地图 default fasle
     tms: boolean;
     //最大缩放等级

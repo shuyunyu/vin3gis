@@ -27,6 +27,8 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
     public readonly format: string = '.png';
     //是否可见
     private _visible: boolean;
+    //不透明度
+    private _opacity: number;
     //最大缩放等级
     public readonly maximumLevel: number = 3;
     //等小缩放等级
@@ -54,12 +56,20 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
         this.visibilityChanged.invoke(this);
     }
 
+    public get opacity () {
+        return this._opacity;
+    }
+
+    public set opacity (val: number) {
+        this._opacity = val;
+    }
 
     public constructor (imageryTileProviderOptions?: ImageryTileProviderOptions) {
         imageryTileProviderOptions = imageryTileProviderOptions || {};
         this.id = Utils.createGuid();
         this.tms = Utils.defaultValue(imageryTileProviderOptions.tms, false);
         this._visible = Utils.defaultValue(imageryTileProviderOptions.visible, true);
+        this._opacity = Utils.defaultValue(imageryTileProviderOptions.opacity, 1.0);
         this.format = Utils.defaultValue(imageryTileProviderOptions.format, '.png');
         this.minimumLevel = Utils.defaultValue(imageryTileProviderOptions.minimumLevel, 3);
         this.maximumLevel = Utils.defaultValue(imageryTileProviderOptions.maximumLevel, 21);

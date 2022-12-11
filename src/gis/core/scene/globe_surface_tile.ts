@@ -1,5 +1,5 @@
 import { Utils } from "../../../core/utils/utils";
-import { QuadtreeTileLoadState } from "../../@types/core/gis";
+import { ImageryTileRenderParam, QuadtreeTileLoadState } from "../../@types/core/gis";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
 import { TileNodeRenderer } from "../renderer/tile_node_renderer";
@@ -21,8 +21,8 @@ export class GlobeSurfaceTile {
     //保存该瓦片对应的每个瓦片提供者的图片信息
     private _tileImageryRecord: Record<string, TileImagery> = Object.create(null);
 
-    //保存上一帧渲染的贴图
-    private _beforeRenderImagery: Imagery[] = [];
+    //保存上一帧渲染的贴图参数
+    private _beforeRenderImagery: ImageryTileRenderParam[] = [];
 
     //判断是否可以卸载瓦片资源
     public get eligibleForUnloading () {
@@ -151,11 +151,15 @@ export class GlobeSurfaceTile {
      * 判断是否应该更新瓦片贴图
      * @param imagerys 
      */
-    private needsUpdateTileImagery (imagerys: Imagery[]) {
+    private needsUpdateTileImagery (imagerys: ImageryTileRenderParam[]) {
         for (let i = 0; i < imagerys.length; i++) {
             const imagery = imagerys[i];
             const bImagerg = this._beforeRenderImagery[i];
-            if (imagery !== bImagerg) return true;
+            if (imagery && bImagerg) {
+                if (imagery.imagery !== bImagerg.imagery || imagery.opacity !== bImagerg.opacity) return true;
+            } else {
+                return true;
+            }
         }
         return false;
     }
@@ -165,7 +169,7 @@ export class GlobeSurfaceTile {
      */
     public rendererTileImagerys () {
         //TODO 多个overlay贴图提供者需要处理合图
-        const toRenderImagerys: Imagery[] = [];
+        const toRenderImagerys: ImageryTileRenderParam[] = [];
         this._imageryProviderCollection.foreach((provider: IImageryTileProvider, index: number) => {
             const tileImagery = this._tileImageryRecord[provider.id];
             if (tileImagery) {
@@ -173,12 +177,19 @@ export class GlobeSurfaceTile {
                 if (imageryChanged) {
                     tileImagery.imageryChanged = false;
                 }
-                const textureImagery = tileImagery.createTextureImagery();
                 if (provider.visible) {
+                    const textureImagery = tileImagery.createTextureImagery();
                     if (textureImagery) {
-                        toRenderImagerys.push(textureImagery);
+                        toRenderImagerys.push({
+                            imagery: textureImagery,
+                            opacity: provider.opacity
+                        });
                     } else {
-                        toRenderImagerys.push(this._beforeRenderImagery[index]);
+                        const beforeParam = this._beforeRenderImagery[index];
+                        toRenderImagerys.push({
+                            imagery: beforeParam ? beforeParam.imagery : null,
+                            opacity: provider.opacity
+                        });
                     }
                 } else {
                     toRenderImagerys.push(null);

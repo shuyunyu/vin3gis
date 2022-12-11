@@ -1,9 +1,8 @@
 import { BufferAttribute, BufferGeometry, Mesh, Texture } from "three";
-import { MeshDefines } from "../../@types/core/gis";
+import { ImageryTileRenderParam, MeshDefines } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
 import { tileMaterialPool } from "../pool/tile_material_pool";
 import { tileTexturePool } from "../pool/tile_texture_pool";
-import { Imagery } from "../scene/imagery";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { Transform } from "../transform/transform";
 
@@ -19,18 +18,22 @@ export class TileMesh {
      * @param overlayTileImagery 当前瓦片的上层贴图
      * @returns 
      */
-    public static createTileMesh (tile: QuadtreeTile, baseTileImagery?: Imagery, overlayTileImagery?: Imagery) {
+    public static createTileMesh (tile: QuadtreeTile, baseTileImagery?: ImageryTileRenderParam, overlayTileImagery?: ImageryTileRenderParam) {
         let baseTexture: Texture;
         let baseTextureRectangle: Rectangle;
-        if (baseTileImagery) {
-            baseTexture = tileTexturePool.create(baseTileImagery.imageAsset);
-            baseTextureRectangle = baseTileImagery.rectangle;
+        let baseTextureOpacity = 1.0;
+        if (baseTileImagery && baseTileImagery.imagery) {
+            baseTexture = tileTexturePool.create(baseTileImagery.imagery.imageAsset);
+            baseTextureRectangle = baseTileImagery.imagery.rectangle;
+            baseTextureOpacity = baseTileImagery.opacity;
         }
         let overlayTexture: Texture;
         let overlayTextureRectangle: Rectangle;
-        if (overlayTileImagery) {
-            overlayTexture = tileTexturePool.create(overlayTileImagery.imageAsset);
-            overlayTextureRectangle = overlayTileImagery.rectangle;
+        let overlayTextureOpacity = 1.0;
+        if (overlayTileImagery && overlayTileImagery.imagery) {
+            overlayTexture = tileTexturePool.create(overlayTileImagery.imagery.imageAsset);
+            overlayTextureRectangle = overlayTileImagery.imagery.rectangle;
+            overlayTextureOpacity = overlayTileImagery.opacity;
         }
         const tileNativeRectangle = tile.nativeRectangle;
         const center = tileNativeRectangle.center;
@@ -45,7 +48,10 @@ export class TileMesh {
         if (meshAttr.overlayUvs) {
             plane.setAttribute('a_overlay_uv', new BufferAttribute(meshAttr.overlayUvs, 2));
         }
-        const mtl = tileMaterialPool.create([baseTexture, overlayTexture]);
+        const mtl = tileMaterialPool.create([
+            { texture: baseTexture, opacity: baseTextureOpacity },
+            { texture: overlayTexture, opacity: overlayTextureOpacity }
+        ]);
         const mesh = new Mesh(plane, mtl);
         Transform.earthCar3ToWorldVec3(center, mesh.position);
         return mesh;

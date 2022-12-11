@@ -1,5 +1,5 @@
 import { Object3D } from "three";
-import { Imagery } from "../scene/imagery";
+import { ImageryTileRenderParam } from "../../@types/core/gis";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { TileNode } from "./tile_node";
 
@@ -27,7 +27,7 @@ export class TileNodeRenderer {
      * @param baseImagery 底层瓦片贴图
      * @param overlayImagery 上层瓦片贴图
      */
-    public render (tile: QuadtreeTile, baseImagery?: Imagery, overlayImagery?: Imagery) {
+    public render (tile: QuadtreeTile, baseImagery?: ImageryTileRenderParam, overlayImagery?: ImageryTileRenderParam) {
         this.unrender(tile);
         //必须有一个才渲染
         if (!baseImagery && !overlayImagery) return;

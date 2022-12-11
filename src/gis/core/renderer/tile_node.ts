@@ -1,8 +1,8 @@
 import { Mesh, ShaderMaterial, Texture } from "three";
+import { ImageryTileRenderParam } from "../../@types/core/gis";
 import { TileMesh } from "../mesh/tile_mesh";
 import { tileMaterialPool } from "../pool/tile_material_pool";
 import { tileTexturePool } from "../pool/tile_texture_pool";
-import { Imagery } from "../scene/imagery";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
 
 /**
@@ -28,7 +28,7 @@ export class TileNode {
      * @param baseImagery 
      * @param overlayImagery 
      */
-    public createTileMesh (tile: QuadtreeTile, baseImagery?: Imagery, overlayImagery?: Imagery) {
+    public createTileMesh (tile: QuadtreeTile, baseImagery?: ImageryTileRenderParam, overlayImagery?: ImageryTileRenderParam) {
         this._mesh = TileMesh.createTileMesh(tile, baseImagery, overlayImagery);
         return this._mesh;
     }
