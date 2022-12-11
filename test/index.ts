@@ -17,7 +17,7 @@ window.onload = () => {
         //AMapImageryTileProvider
         //TdtImageryTileProvider
         imageryTileProivder: new AMapImageryTileProvider({
-            style: 'aerial',
+            style: 'street',
             // style: 'aerial',
             key: '1d109683f4d84198e37a38c442d68311'
         }),
@@ -38,9 +38,9 @@ window.onload = () => {
         // dampingFactor: 0.1
         // maxDistance: 16000000
     });
-    mapViewer.scene.imageryProviders.add(new AMapImageryTileProvider({
-        style: 'note'
-    }));
+    // mapViewer.scene.imageryProviders.add(new AMapImageryTileProvider({
+    //     style: 'note'
+    // }));
     global.mapViewer = mapViewer;
     GISTest.run(mapViewer.renderer);
 }

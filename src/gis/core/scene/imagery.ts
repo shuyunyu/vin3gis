@@ -31,6 +31,8 @@ export class Imagery {
 
     private _state: ImageryState;
 
+    private _isValid: boolean;
+
     private _imageAsset?: ImageBitmap;
 
     private _tileImageAssetProcessor?: TileImageAssetProcessor;
@@ -59,7 +61,7 @@ export class Imagery {
     }
 
     public get isValid () {
-        return this._state === ImageryState.LOADED && Utils.defined(this._imageAsset) && !!this._imageAsset!.width;
+        return this._isValid;
     }
 
     public set priority (val: number) {
@@ -77,6 +79,7 @@ export class Imagery {
         this._priority = tile.priority;
         this._rectangle = tile.nativeRectangle;
         this._state = ImageryState.UNLOAD;
+        this._isValid = false;
         this._imageryTileProvider = imageryTileProvider;
         this._referenceCount = 0;
         this._parent = Utils.defined(tile.parent) ? imageryCache.getImagery(tile.parent!, imageryTileProvider) : undefined;
@@ -102,6 +105,7 @@ export class Imagery {
                         this._tileImageAssetProcessor = null;
                         this._imageAsset = imageAsset;
                         this._state = ImageryState.LOADED;
+                        this._isValid = true;
                     }).catch(err => {
                         this._state = ImageryState.FAILED;
                     });
@@ -140,6 +144,7 @@ export class Imagery {
         }
         this._imageAsset = undefined;
         this._state = ImageryState.UNLOAD;
+        this._isValid = false;
     }
 
 }
