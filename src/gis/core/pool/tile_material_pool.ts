@@ -32,6 +32,9 @@ class TileMaterialPool extends BasePool<ShaderMaterial, MtlParams[]>{
     //上层贴图透明度
     public readonly overlayOpacity = "u_overlay_opacity";
 
+    //淡出效果
+    public readonly fadeout = "u_fadeout";
+
     public constructor () {
         super(ShaderMaterial, InternalConfig.TILE_TEXTURE_MTL_CACHE_SIZE);
     }
@@ -53,6 +56,7 @@ class TileMaterialPool extends BasePool<ShaderMaterial, MtlParams[]>{
     private setUniforms (uniforms: Record<string, any>, p?: MtlParams[]) {
         const baseTextureParam = p[0];
         const overTextureParam = p[1];
+        uniforms[this.fadeout] = { value: 1.0 };
         if (baseTextureParam) {
             uniforms[this.baseTexture] = { value: baseTextureParam.texture };
             uniforms[this.baseFlag] = { value: 1.0 };

@@ -34,6 +34,15 @@ export class TileNode {
     }
 
     /**
+     * 淡出瓦片
+     * @param fadeout 
+     */
+    public fadeout (fadeout: number) {
+        const mtl = this._mesh.material as ShaderMaterial;
+        mtl.uniforms[tileMaterialPool.fadeout].value = fadeout;
+    }
+
+    /**
      * 回收此瓦片节点 并释放资源
      */
     public recycle () {

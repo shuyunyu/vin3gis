@@ -26,6 +26,9 @@ export class InternalConfig {
     //se
     public static SPACE_ERROR = 2;
 
+    //是否开启图片瓦片的fadeout效果
+    public static ENABLE_IMAGEY_TILE_FADE_OUT = false;
+
     /**
      * 校验相机的pitch是否有效
      * @param pitch 
