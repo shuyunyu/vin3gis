@@ -20,8 +20,10 @@ class ImageryCache {
         return this._instance;
     }
 
+    private _size = 0;
+
     public get size () {
-        return Object.keys(this._cache).length;
+        return this._size;
     }
 
     /**
@@ -32,6 +34,7 @@ class ImageryCache {
         let imagery = this._cache[key];
         if (!Utils.defined(imagery)) {
             imagery = this._cache[key] = new Imagery(tile, provider);
+            this._size++;
         }
         imagery.addReference();
         return imagery;
@@ -42,7 +45,10 @@ class ImageryCache {
      */
     public removeImagery (x: number, y: number, level: number, provider: IImageryTileProvider) {
         let key = this.getCacheKey(x, y, level, provider);
-        delete this._cache[key];
+        if (this._cache[key]) {
+            delete this._cache[key];
+            this._size--;
+        }
     }
 
     //获取缓存key

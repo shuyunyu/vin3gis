@@ -8,6 +8,8 @@ class Panel {
 
     private name: string;
 
+    public value: number;
+
     private min: number;
 
     private max: number;
@@ -94,7 +96,8 @@ class Panel {
         this.context.globalAlpha = 1;
         this.context.fillRect(0, 0, this.WIDTH, this.GRAPH_Y);
         this.context.fillStyle = this.fg;
-        this.context.fillText(Math.round(value) + ' ' + this.name + ' (' + Math.round(this.min) + '-' + Math.round(this.max) + ')', this.TEXT_X, this.TEXT_Y);
+        this.value = Math.round(value);
+        this.context.fillText(this.value + ' ' + this.name + ' (' + Math.round(this.min) + '-' + Math.round(this.max) + ')', this.TEXT_X, this.TEXT_Y);
 
         this.context.drawImage(this.canvas, this.GRAPH_X + this.PR, this.GRAPH_Y, this.GRAPH_WIDTH - this.PR, this.GRAPH_HEIGHT, this.GRAPH_X, this.GRAPH_Y, this.GRAPH_WIDTH - this.PR, this.GRAPH_HEIGHT);
 
@@ -122,11 +125,11 @@ class Stats {
 
     private prevTime: number;
 
-    private fpsPanel: Panel;
+    public fpsPanel: Panel;
 
-    private msPanel: Panel;
+    public msPanel: Panel;
 
-    private memPanel: Panel;
+    public memPanel: Panel;
 
     private _enableTogglePanel: boolean = true;
 

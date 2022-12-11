@@ -13,9 +13,11 @@ export class TileNodeRenderer {
 
     private _tileNodeRecord: Record<string, TileNode> = Object.create(null);
 
+    private _renderTileNodeCount = 0;
+
     //当前渲染瓦片节点数量
     public get renderTileNodeCount () {
-        return Object.keys(this._tileNodeRecord).length;
+        return this._renderTileNodeCount;
     }
 
     public constructor () { }
@@ -33,6 +35,7 @@ export class TileNodeRenderer {
         this._tileNodeRecord[tile.id] = tileNode;
         const mesh = tileNode.createTileMesh(tile, baseImagery, overlayImagery);
         this.root.add(mesh);
+        this._renderTileNodeCount++;
     }
 
     /**
@@ -44,6 +47,7 @@ export class TileNodeRenderer {
         if (tileNode) {
             tileNode.recycle();
             delete this._tileNodeRecord[tile.id];
+            this._renderTileNodeCount--;
         }
     }
 
