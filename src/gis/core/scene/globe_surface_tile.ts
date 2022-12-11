@@ -24,13 +24,8 @@ export class GlobeSurfaceTile {
     //保存该瓦片对应的每个瓦片提供者的图片信息
     private _tileImageryRecord: Record<string, TileImagery> = Object.create(null);
 
-    //等待渲染的 瓦片提供者
-    private _tileImageryProviderToRenderQueue: IImageryTileProvider[] = [];
-
     //保存上一帧渲染的贴图
     private _beforeRenderImagery: Imagery[] = [];
-
-    private _tileImageryRendered: boolean = false;
 
     //判断是否可以卸载瓦片资源
     public get eligibleForUnloading () {
@@ -86,8 +81,10 @@ export class GlobeSurfaceTile {
     //准备新的瓦片数据
     private prepareNewTile () {
         this._imageryProviderCollection.foreach((provider: IImageryTileProvider, index: number) => {
-            let tileImagery = new TileImagery(this._tile, provider);
-            this._tileImageryRecord[provider.id] = tileImagery;
+            if (provider.visible) {
+                let tileImagery = new TileImagery(this._tile, provider);
+                this._tileImageryRecord[provider.id] = tileImagery;
+            }
         });
     }
 
@@ -123,7 +120,8 @@ export class GlobeSurfaceTile {
             tileImagery.priority = this._tile.priority;
             //最底下的图层使用loading图片加载
             if (provider.visible) {
-                tileImagery.processStateMachine(index !== 0);
+                // tileImagery.processStateMachine(index !== 0);
+                tileImagery.processStateMachine(false);
             }
         });
     }
@@ -147,7 +145,7 @@ export class GlobeSurfaceTile {
      * 判断是否应该更新瓦片贴图
      * @param imagerys 
      */
-    private shouldUpdateTileImagery (imagerys: Imagery[]) {
+    private needsUpdateTileImagery (imagerys: Imagery[]) {
         for (let i = 0; i < imagerys.length; i++) {
             const imagery = imagerys[i];
             const bImagerg = this._beforeRenderImagery[i];
@@ -160,131 +158,64 @@ export class GlobeSurfaceTile {
      * 渲染瓦片图像
      */
     public rendererTileImagerys () {
+        //TODO 多个overlay贴图提供者需要处理合图
         const toRenderImagerys: Imagery[] = [];
         this._imageryProviderCollection.foreach((provider: IImageryTileProvider, index: number) => {
             const tileImagery = this._tileImageryRecord[provider.id];
-            const imageryChanged = tileImagery.imageryChanged;
-            if (imageryChanged) {
-                tileImagery.imageryChanged = false;
-            }
-            const textureImagery = tileImagery.createTextureImagery();
-            if (textureImagery) {
-                toRenderImagerys.push(textureImagery);
+            if (tileImagery) {
+                const imageryChanged = tileImagery.imageryChanged;
+                if (imageryChanged) {
+                    tileImagery.imageryChanged = false;
+                }
+                const textureImagery = tileImagery.createTextureImagery();
+                if (provider.visible) {
+                    if (textureImagery) {
+                        toRenderImagerys.push(textureImagery);
+                    } else {
+                        toRenderImagerys.push(this._beforeRenderImagery[index]);
+                    }
+                } else {
+                    toRenderImagerys.push(null);
+                }
             }
         });
-        if (toRenderImagerys.length && this.shouldUpdateTileImagery(toRenderImagerys)) {
+        if (toRenderImagerys.length && this.needsUpdateTileImagery(toRenderImagerys)) {
             this._tileNodeRenderer.render(this._tile, toRenderImagerys[0], toRenderImagerys[1]);
             this._beforeRenderImagery.length = 0;
             this._beforeRenderImagery.push(...toRenderImagerys);
         }
-        // this.processImagery();
-        // let index = this._imageryProviderCollection.indexOf(imageryProvider);
-        // let tileImagery = this._tileImageryRecord[imageryProvider.id];
-        // this._tileImageryProviderToRenderQueue[index] = imageryProvider;
-        // let loadingImageryChanged = tileImagery.imageryChanged;
-        // if (loadingImageryChanged) {
-        //     tileImagery.imageryChanged = false;
-        //     this._tileImageryRendered = false;
-        //     //只渲染最下层的
-        //     if (index === 0) {
-        //         this.renderTileImagery(imageryProvider);
-        //     }
-        // } else {
-        //     if (this._tileImageryRendered) {
-        //         return;
-        //     }
-        //     let allImageryDone = true;
-        //     this._imageryProviderCollection.foreach((provider: IImageryTileProvider, i: number) => {
-        //         if (provider.visible) {
-        //             let tImagery = this._tileImageryRecord[provider.id];
-        //             //如果最下层还未渲染 先渲染它 不必等到上层加载完成
-        //             if (i === 0 && !Utils.defined(tImagery.textureImagery)) {
-        //                 this.renderTileImagery(provider);
-        //             }
-        //             allImageryDone = allImageryDone && Utils.defined(this._tileImageryProviderToRenderQueue[i]) && tImagery.loaded;
-        //             if (!allImageryDone) {
-        //                 //break
-        //                 return false;
-        //             }
-        //         }
-        //     });
-        //     //按图层顺序重置瓦片节点
-        //     if (allImageryDone) {
-        //         //只调整上层瓦片
-        //         for (let i = 1; i < this._tileImageryProviderToRenderQueue.length; i++) {
-        //             const provider = this._tileImageryProviderToRenderQueue[i];
-        //             this.renderTileImagery(provider);
-        //         }
-        //         this._tileImageryProviderToRenderQueue.length = 0;
-        //         this._tileImageryRendered = true;
-        //     }
-        // }
     }
 
     /**
-     * 渲染单个瓦片贴图
+     * 取消单个provinder的贴图渲染
      */
-    private renderTileImagery (provider: IImageryTileProvider) {
-        const queue = this._tileImagerProviderRenderManager.getProviderRenderQueue(provider);
-        if (!queue.contains(this._tile)) {
-            queue.enqueue(this._tile);
-        }
+    public unrenderProviderTileImagery (provider: IImageryTileProvider) {
         let tileImagery = this._tileImageryRecord[provider.id];
-        //移除原来的渲染
-        this.unrenderTileImagery(tileImagery);
-        let textureImagery = tileImagery.createTextureImagery();
-        //缩放等级之外没有贴图图片
-        if (Utils.defined(textureImagery)) {
-            //重新渲染瓦片图片
-            this._tileNodeRenderer.render(tileImagery.tile, tileImagery.textureImagery);
-        }
+        if (tileImagery) tileImagery.recyleTextureImageryResource();
+        delete this._tileImageryRecord[provider.id];
+        this.rendererTileImagerys();
     }
 
-    /**
-     * 回收瓦片贴图(节点)
-     */
-    public recyleTileImagery (provider: IImageryTileProvider) {
-        let tileImagery = this._tileImageryRecord[provider.id];
-        this.unrenderTileImagery(tileImagery);
-        this.markToRerenderTileImagery();
-    }
 
     /**
-     * 标记为需要重新渲染tileImagery
-     */
-    public markToRerenderTileImagery () {
-        this._tileImageryRendered = false;
-        this._tileImageryProviderToRenderQueue.length = 0;
-    }
-
-    /**
-     * 释放资源
+     * 释放瓦片所有资源
      */
     public releaseResource () {
+        this._tileNodeRenderer.unrender(this._tile);
         for (const key in this._tileImageryRecord) {
             const tileImagery = this._tileImageryRecord[key];
             this.releaseTileImageryResource(tileImagery);
         }
         this._tileImageryRecord = Object.create(null);
         this._beforeRenderImagery = [];
-        this.markToRerenderTileImagery();
     }
 
     /**
-     * 取消渲染瓦片
-     * @param tileImagery 
-     */
-    private unrenderTileImagery (tileImagery: TileImagery) {
-        if (tileImagery.textureImagery) this._tileNodeRenderer.unrender(tileImagery.tile);
-        tileImagery.recyleTextureImageryResource();
-    }
-
-    /**
-     * 释放瓦片资源
+     * 释放瓦片贴图资源
      * @param tileImagery 
      */
     private releaseTileImageryResource (tileImagery: TileImagery) {
-        this.unrenderTileImagery(tileImagery);
+        tileImagery.recyleTextureImageryResource();
         tileImagery.releaseResource();
     }
 

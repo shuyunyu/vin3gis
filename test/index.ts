@@ -38,9 +38,9 @@ window.onload = () => {
         // dampingFactor: 0.1
         // maxDistance: 16000000
     });
-    // mapViewer.scene.imageryProviders.add(new AMapImageryTileProvider({
-    //     style: 'note'
-    // }));
+    mapViewer.scene.imageryProviders.add(new AMapImageryTileProvider({
+        style: 'note'
+    }));
     GISTest.run(mapViewer.renderer);
 }
 

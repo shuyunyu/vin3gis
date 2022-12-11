@@ -47,12 +47,14 @@ class TileMaterialPool extends BasePool<ShaderMaterial, Texture[]>{
             uniforms[this.baseTexture] = { value: baseTexture };
             uniforms[this.baseFlag] = { value: 1.0 };
         } else {
+            uniforms[this.baseTexture] = { value: null };
             uniforms[this.baseFlag] = { value: 0.0 };
         }
         if (overTexture) {
             uniforms[this.overlayTexture] = { value: p[1] };
             uniforms[this.overlayFlag] = { value: 1.0 };
         } else {
+            uniforms[this.overlayTexture] = { value: null }
             uniforms[this.overlayFlag] = { value: 0.0 };
         }
     }

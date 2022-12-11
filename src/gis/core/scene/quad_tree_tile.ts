@@ -2,8 +2,6 @@ import { Box3, Sphere } from "three";
 import { Utils } from "../../../core/utils/utils";
 import { QuadtreeTileLoadState } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
-import { IImageryTileProvider } from "../provider/imagery_tile_provider";
-import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { FrameState } from "./frame_state";
 import { GlobeSurfaceTile } from "./globe_surface_tile";
@@ -230,38 +228,6 @@ export class QuadtreeTile {
     public get needsLoading () {
         return !this.data || this.data.needsLoading;
     }
-
-    /**
-     * 判断瓦片是否可以渲染
-     */
-    // public canRender (imageryProviderCollection: ImageryTileProviderCollection, considerAllProvider?: boolean) {
-    //     const size = imageryProviderCollection.size;
-    //     if (size === 0) {
-    //         return true;
-    //     } else if (!Utils.defined(this.data)) {
-    //         return false;
-    //     } else {
-    //         if (considerAllProvider) {
-    //             let textureCount = 0;
-    //             let targetCount = 0;
-    //             imageryProviderCollection.foreach((provider: IImageryTileProvider, i: number) => {
-    //                 if (provider.visible) {
-    //                     targetCount++;
-    //                     //考虑 3-18 前三级是没有texture的
-    //                     if (this.data!.hasTileImagery(provider) || this.level < provider.minimumLevel) {
-    //                         textureCount++;
-    //                     }
-    //                 }
-    //             });
-    //             return textureCount === targetCount;
-    //         } else {
-    //             if (size === 0) return true;
-    //             let baseImageryProvider = imageryProviderCollection.get(0);
-    //             //此处 && this.level <= baseImageryProvider.maximumLevel 在没有地形数据的时候 不能让遍历持续到最大缩放等级之下  会导致超过等级的瓦片消息  最终是需要使用父级瓦片的贴图来贴超过等级的瓦片
-    //             return (this.data!.hasTileImagery(baseImageryProvider) || this.level < baseImageryProvider.minimumLevel) && this.level <= baseImageryProvider.maximumLevel;
-    //         }
-    //     }
-    // }
 
     /**
      * 创建 level=0 的瓦片

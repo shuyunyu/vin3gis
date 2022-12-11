@@ -92,7 +92,7 @@ export class TileImageryProviderRenderManager {
         const queue = this.getProviderRenderQueue(provider);
         if (!queue) return;
         queue.foreach((tile: QuadtreeTile, index: number) => {
-            tile.data && tile.data.recyleTileImagery(provider);
+            tile.data && tile.data.unrenderProviderTileImagery(provider);
         });
         queue.clear();
     }
@@ -105,7 +105,7 @@ export class TileImageryProviderRenderManager {
         if (this.baseImageryTileProvider) {
             const queue = this.getProviderRenderQueue(provider);
             queue.foreach((tile: QuadtreeTile, index: number) => {
-                tile.data && tile.data.markToRerenderTileImagery();
+                // tile.data && tile.data.markToRerenderTileImagery();
             });
         }
     }
