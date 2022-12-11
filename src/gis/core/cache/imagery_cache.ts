@@ -20,6 +20,10 @@ class ImageryCache {
         return this._instance;
     }
 
+    public get size () {
+        return Object.keys(this._cache).length;
+    }
+
     /**
      * 从缓存中获取Imagery
      */

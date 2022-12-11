@@ -191,7 +191,7 @@ export class GlobeSurfaceTile {
      */
     public unrenderProviderTileImagery (provider: IImageryTileProvider) {
         let tileImagery = this._tileImageryRecord[provider.id];
-        if (tileImagery) tileImagery.recyleTextureImageryResource();
+        if (tileImagery) tileImagery.releaseResource();;
         delete this._tileImageryRecord[provider.id];
         this.rendererTileImagerys();
     }
@@ -204,19 +204,10 @@ export class GlobeSurfaceTile {
         this._tileNodeRenderer.unrender(this._tile);
         for (const key in this._tileImageryRecord) {
             const tileImagery = this._tileImageryRecord[key];
-            this.releaseTileImageryResource(tileImagery);
+            tileImagery.releaseResource();;
         }
         this._tileImageryRecord = Object.create(null);
         this._beforeRenderImagery = [];
-    }
-
-    /**
-     * 释放瓦片贴图资源
-     * @param tileImagery 
-     */
-    private releaseTileImageryResource (tileImagery: TileImagery) {
-        tileImagery.recyleTextureImageryResource();
-        tileImagery.releaseResource();
     }
 
 }

@@ -146,17 +146,10 @@ export class TileImagery {
     }
 
     /**
-     * 回收贴图图片节点资源
-     */
-    public recyleTextureImageryResource () {
-        this._textureImagery = null;
-    }
-
-    /**
      * 释放资源
      */
     public releaseResource () {
-        this.recyleTextureImageryResource();
+        this._textureImagery = null;
         if (Utils.defined(this._imagery)) {
             this._imagery.releaseResource();
         }

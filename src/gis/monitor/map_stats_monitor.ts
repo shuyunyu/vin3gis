@@ -2,6 +2,7 @@ import { FrameRenderer } from "../../core/renderer/frame_renderer";
 import { RequestScheduler } from "../../core/xhr/scheduler/request_scheduler";
 import { DebugTools } from "../../tools/debug_tools";
 import { RendererStats } from "../../tools/renderer_stats";
+import { imageryCache } from "../core/cache/imagery_cache";
 import { EarthScene } from "../core/scene/earth_scene";
 
 /**
@@ -14,7 +15,8 @@ export class MapStatsMonitor {
     private _items = [
         "SelectTileCount",
         "RendererTileCount",
-        "XHRRequestCount"
+        "XHRRequestCount",
+        "ImageryCache"
     ];
 
     private _rendererStats: RendererStats;
@@ -29,6 +31,7 @@ export class MapStatsMonitor {
         this._rendererStats.setStatsItemVal(0, this._scene.globleSurfaceManager.curFrameSelectTIleCount);
         this._rendererStats.setStatsItemVal(1, this._scene.tileNodeRenderer.renderTileNodeCount);
         this._rendererStats.setStatsItemVal(2, RequestScheduler.curRequestCount);
+        this._rendererStats.setStatsItemVal(3, imageryCache.size);
     }
 
 }
