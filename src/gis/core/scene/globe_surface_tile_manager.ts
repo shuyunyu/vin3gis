@@ -1,6 +1,7 @@
 import { math } from "../../../core/math/math";
 import { Utils } from "../../../core/utils/utils";
 import { Cartesian3 } from "../cartesian/cartesian3";
+import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { ITerrainProvider } from "../terrain/terrain_provider";
 import { Transform } from "../transform/transform";
 import { EarthScene } from "./earth_scene";
@@ -59,6 +60,8 @@ export class GlobeSurfaceTileManager {
         this._quadtreePrimitive = quadtreePrimitive;
         this._terrainProvider = terrainProvider;
         this._scene = scene;
+        this._scene.imageryProviders.providerRemoved.addEventListener(this.onImageryTileProviderRemoved, this);
+        this._scene.imageryProviders.providerShownOrHidden.addEventListener(this.onImageryTileProviderVisibilityChanged, this);
     }
 
     public render (delay: number, frameState: FrameState) {
@@ -240,6 +243,24 @@ export class GlobeSurfaceTileManager {
             tile.data.rendererTileImagerys();
         });
         this._tileRenderQueue.length = 0;
+    }
+
+    /**
+     * 瓦片影像提供者可见性改变
+     * @param provider 
+     */
+    private onImageryTileProviderVisibilityChanged (provider: IImageryTileProvider) {
+        if (!provider.visible) {
+            this.onImageryTileProviderRemoved(provider);
+        }
+    }
+
+    /**
+     * 瓦片影像提供者移除
+     * @param provider 
+     */
+    private onImageryTileProviderRemoved (provider: IImageryTileProvider) {
+        this._beforeFrameTileRenderQueue.foreach(tile => tile.data?.unrenderProviderTileImagery(provider));
     }
 
 }

@@ -183,6 +183,8 @@ export class GlobeSurfaceTile {
                 } else {
                     toRenderImagerys.push(null);
                 }
+            } else {
+                toRenderImagerys.push(null);
             }
         });
         if (toRenderImagerys.length && this.needsUpdateTileImagery(toRenderImagerys)) {
@@ -197,7 +199,7 @@ export class GlobeSurfaceTile {
      */
     public unrenderProviderTileImagery (provider: IImageryTileProvider) {
         let tileImagery = this._tileImageryRecord[provider.id];
-        if (tileImagery) tileImagery.releaseResource();;
+        if (tileImagery) tileImagery.releaseResource();
         delete this._tileImageryRecord[provider.id];
         this.rendererTileImagerys();
     }

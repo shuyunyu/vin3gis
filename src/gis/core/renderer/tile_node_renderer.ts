@@ -27,6 +27,8 @@ export class TileNodeRenderer {
      */
     public render (tile: QuadtreeTile, baseImagery?: Imagery, overlayImagery?: Imagery) {
         this.unrender(tile);
+        //必须有一个才渲染
+        if (!baseImagery && !overlayImagery) return;
         let tileNode = new TileNode(tile.id);
         this._tileNodeRecord[tile.id] = tileNode;
         const mesh = tileNode.createTileMesh(tile, baseImagery, overlayImagery);
