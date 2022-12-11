@@ -2,7 +2,6 @@ import { PerspectiveCamera } from "three";
 import { GenericEvent } from "../../../core/event/generic_event";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { EarthCamera } from "../camera/earth_camera";
-import { TileImageryProviderRenderManager } from "../manager/tile_imagery_provider_render_manager";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
 import { TileNodeRenderer } from "../renderer/tile_node_renderer";
@@ -24,8 +23,6 @@ export class EarthScene {
 
     public readonly imageryProviders: ImageryTileProviderCollection;
 
-    public readonly imageryProviderRenderManager: TileImageryProviderRenderManager;
-
     public readonly tilingScheme: ITilingScheme;
 
     private _quadtreePrimitive: QuadtreePrimitive;
@@ -41,7 +38,6 @@ export class EarthScene {
         //将渲染根节点添加到场景中
         this._renderer.scene.add(this.tileNodeRenderer.root);
         this.imageryProviders = new ImageryTileProviderCollection();
-        this.imageryProviderRenderManager = new TileImageryProviderRenderManager(this.imageryProviders);
         this.imageryProviders.add(imageryTileProvider);
         this._quadtreePrimitive = new QuadtreePrimitive(this.imageryProviders.get(0)!, tileCacheSize);
         this.tilingScheme = this._quadtreePrimitive.tileProvider.tilingScheme;
@@ -73,7 +69,6 @@ export class EarthScene {
 
 
     public destroy () {
-        this.imageryProviderRenderManager.destroy();
     }
 
 }

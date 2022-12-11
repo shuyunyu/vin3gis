@@ -1,6 +1,5 @@
 import { Utils } from "../../../core/utils/utils";
 import { QuadtreeTileLoadState } from "../../@types/core/gis";
-import { TileImageryProviderRenderManager } from "../manager/tile_imagery_provider_render_manager";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
 import { TileNodeRenderer } from "../renderer/tile_node_renderer";
@@ -16,8 +15,6 @@ export class GlobeSurfaceTile {
     private _terrainProvider: ITerrainProvider;
 
     private _imageryProviderCollection: ImageryTileProviderCollection;
-
-    private _tileImagerProviderRenderManager: TileImageryProviderRenderManager;
 
     private _tileNodeRenderer: TileNodeRenderer;
 
@@ -57,20 +54,19 @@ export class GlobeSurfaceTile {
         return count < targetCount;
     }
 
-    constructor (tile: QuadtreeTile, terrainProvider: ITerrainProvider, tileImagerProviderRenderManager: TileImageryProviderRenderManager, tileNodeRenderer: TileNodeRenderer) {
+    constructor (tile: QuadtreeTile, terrainProvider: ITerrainProvider, imageryProviderCollection: ImageryTileProviderCollection, tileNodeRenderer: TileNodeRenderer) {
         this._tile = tile;
         this._terrainProvider = terrainProvider;
-        this._tileImagerProviderRenderManager = tileImagerProviderRenderManager;
-        this._imageryProviderCollection = tileImagerProviderRenderManager.imageryProviders;
+        this._imageryProviderCollection = imageryProviderCollection;
         this._tileNodeRenderer = tileNodeRenderer;
     }
 
     /**
      * 初始化
      */
-    public static initialize (tile: QuadtreeTile, terrainProvider: ITerrainProvider, tileImagerProviderRenderManager: TileImageryProviderRenderManager, tileNodeRenderer: TileNodeRenderer) {
+    public static initialize (tile: QuadtreeTile, terrainProvider: ITerrainProvider, imageryProviderCollection: ImageryTileProviderCollection, tileNodeRenderer: TileNodeRenderer) {
         if (!Utils.defined(tile.data)) {
-            tile.data = new GlobeSurfaceTile(tile, terrainProvider, tileImagerProviderRenderManager, tileNodeRenderer);
+            tile.data = new GlobeSurfaceTile(tile, terrainProvider, imageryProviderCollection, tileNodeRenderer);
         }
         if (tile.state === QuadtreeTileLoadState.START) {
             tile.state = QuadtreeTileLoadState.LOADING;
@@ -78,21 +74,31 @@ export class GlobeSurfaceTile {
         }
     }
 
-    //准备新的瓦片数据
+    /**
+     * 准备新的瓦片数据
+     */
     private prepareNewTile () {
         this._imageryProviderCollection.foreach((provider: IImageryTileProvider, index: number) => {
-            if (provider.visible) {
-                let tileImagery = new TileImagery(this._tile, provider);
-                this._tileImageryRecord[provider.id] = tileImagery;
-            }
+            this.prepareProviderNewTile(provider);
         });
+    }
+
+    /**
+     * 准备provider的瓦片数据
+     * @param provider 
+     */
+    private prepareProviderNewTile (provider: IImageryTileProvider) {
+        if (provider.visible) {
+            let tileImagery = new TileImagery(this._tile, provider);
+            this._tileImageryRecord[provider.id] = tileImagery;
+        }
     }
 
     /**
      * 状态处理
      */
     public processStateMachine () {
-        GlobeSurfaceTile.initialize(this._tile, this._terrainProvider, this._tileImagerProviderRenderManager, this._tileNodeRenderer);
+        GlobeSurfaceTile.initialize(this._tile, this._terrainProvider, this._imageryProviderCollection, this._tileNodeRenderer);
         this.processTerrain();
         this.processImagery();
     }
@@ -114,7 +120,7 @@ export class GlobeSurfaceTile {
         //状态处理
         this._imageryProviderCollection.foreach((provider: IImageryTileProvider, index: number) => {
             let tileImagery = this._tileImageryRecord[provider.id];
-            if (!Utils.defined(tileImagery)) {
+            if (!tileImagery) {
                 tileImagery = this._tileImageryRecord[provider.id] = new TileImagery(this._tile, provider);
             }
             tileImagery.priority = this._tile.priority;

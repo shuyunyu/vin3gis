@@ -83,9 +83,6 @@ export class GlobeSurfaceTileManager {
                 const rootTile = this._quadtreePrimitive.levelZeroTiles![i];
                 this._quadtreePrimitive.tileReplacementQueue.markTileRendered(rootTile);
                 //如果可以渲染 并且可见  将其加入 遍历队列
-                // if (rootTile.canRender(this._scene.imageryProviders)) {
-                //     this._traversalQueue.enqueue(rootTile);
-                // }
                 if (rootTile.renderable && this._quadtreePrimitive.tileProvider.computeTileVisibility(rootTile, frameState.frustum)) {
                     this._traversalQueue.enqueue(rootTile);
                 }
@@ -120,7 +117,7 @@ export class GlobeSurfaceTileManager {
     private processSingleTileDownloadQueue (frameState: FrameState, endTime: number, queue: QuadtreeTile[], didSomeLoading: boolean) {
         for (let i = 0; i < queue.length; i++) {
             const quadtreeTile = queue[i];
-            GlobeSurfaceTile.initialize(quadtreeTile, this._terrainProvider, this._scene.imageryProviderRenderManager, this._scene.tileNodeRenderer);
+            GlobeSurfaceTile.initialize(quadtreeTile, this._terrainProvider, this._scene.imageryProviders, this._scene.tileNodeRenderer);
             quadtreeTile.priority = this.computeTileLoadPriority(quadtreeTile, frameState);
         }
         //保证 当前帧需要下载的瓦片优先级最高
@@ -143,7 +140,7 @@ export class GlobeSurfaceTileManager {
     private selectTilesToRender (frameState: FrameState) {
         let tile: QuadtreeTile;
         while (tile = this._traversalQueue.dequeue()) {
-            GlobeSurfaceTile.initialize(tile, this._terrainProvider, this._scene.imageryProviderRenderManager, this._scene.tileNodeRenderer);
+            GlobeSurfaceTile.initialize(tile, this._terrainProvider, this._scene.imageryProviders, this._scene.tileNodeRenderer);
             //摄像机到屏幕中心的距离 小于 摄像机到瓦片的距离  说明瓦片精度更高 可以直接渲染
             tile.updateDistanceToCamera(frameState);
             //满足sse 并且满足最小缩放等级

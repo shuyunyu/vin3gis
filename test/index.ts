@@ -41,6 +41,7 @@ window.onload = () => {
     mapViewer.scene.imageryProviders.add(new AMapImageryTileProvider({
         style: 'note'
     }));
+    global.mapViewer = mapViewer;
     GISTest.run(mapViewer.renderer);
 }
 
