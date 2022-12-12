@@ -209,21 +209,25 @@ export class GlobeSurfaceTile {
      * 取消单个provinder的贴图渲染
      */
     public unrenderProviderTileImagery (provider: IImageryTileProvider) {
-        let tileImagery = this._tileImageryRecord[provider.id];
-        if (tileImagery) tileImagery.releaseResource();
-        delete this._tileImageryRecord[provider.id];
+        this.releaseTileImagery(provider);
         this.rendererTileImagerys();
     }
 
+    /**
+     * 释放瓦片贴图
+     * @param provider 
+     */
+    private releaseTileImagery (provider: IImageryTileProvider) {
+        let tileImagery = this._tileImageryRecord[provider.id];
+        if (tileImagery) tileImagery.releaseResource();
+        delete this._tileImageryRecord[provider.id];
+    }
 
     /**
      * 释放瓦片所有资源
      */
     public releaseResource () {
-        for (const key in this._tileImageryRecord) {
-            const tileImagery = this._tileImageryRecord[key];
-            tileImagery.releaseResource();
-        }
+        this._imageryProviderCollection.foreach((provider: IImageryTileProvider) => this.releaseTileImagery(provider));
         this._tileImageryRecord = Object.create(null);
         this._beforeRenderImagery = [];
     }
