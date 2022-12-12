@@ -50,5 +50,6 @@ job2:
     - echo $targetPath_dec
     - echo $CI_PROJECT_DIR/dist/*----------to----------$targetPath_dec
     - sudo rm -rf $targetPath_dec
+    - sudo mkdir $targetPath_dec
     - sudo cp -r $CI_PROJECT_DIR/dist/* $targetPath_dec
     
