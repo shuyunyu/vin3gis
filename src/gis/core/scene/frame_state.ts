@@ -32,7 +32,7 @@ export class FrameState {
 
     public camera: PerspectiveCamera;
 
-    public domEle: HTMLElement;
+    public readonly drawContextHeihgt: number;
 
     /**
      * 上一帧摄像机位置及欧拉角信息
@@ -76,14 +76,14 @@ export class FrameState {
 
     public frustum: Frustum;
 
-    constructor (camera: PerspectiveCamera, domEle: HTMLElement) {
+    constructor (camera: PerspectiveCamera, size: { width: number, height: number }) {
         this.camera = camera;
-        this.domEle = domEle;
+        this.drawContextHeihgt = size.height;
         this.cameraWorldRTS.position = camera.getWorldPosition(vec3_1);
         this.cameraPositionWC = Transform.worldCar3ToGeoCar3(this.cameraWorldRTS.position, scratchCameraPosWC);
         this.cameraWorldRTS.rotation = camera.getWorldQuaternion(quat_1);
         this.cameraWorldRTS.scale = camera.getWorldScale(vec3_3);
-        this.canvasSize = { width: domEle.clientWidth, height: domEle.clientHeight };
+        this.canvasSize = { width: size.width, height: size.height };
         let viewLineRay = CameraUtils.screenPointToRay(VecConstants.ZERO_VEC2, this.camera, tempRay);
         this.cameraDirection = vec3_2.copy(viewLineRay.direction).normalize();
         this.cameraDirectionWC = Transform.worldCar3ToEarthVec3(this.cameraDirection, scratchDirectionWC).normalize();

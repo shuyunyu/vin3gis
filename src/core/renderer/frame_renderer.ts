@@ -38,6 +38,12 @@ export class FrameRenderer {
         return this._renderer.domElement.parentElement;
     }
 
+    private _size: { width: number; height: number };
+
+    public get size () {
+        return this._size;
+    }
+
     /**
      * 获取当前场景中几何体的占用的内存
      */
@@ -76,6 +82,7 @@ export class FrameRenderer {
             const height = this._target.clientHeight;
             this._renderer.setSize(width, height);
             this.updateCameraProps({ aspect: width / height });
+            this._size = { width: width, height: height };
         } else if (this._camera instanceof OrthographicCamera) {
 
         }

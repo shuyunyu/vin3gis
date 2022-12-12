@@ -157,7 +157,7 @@ export class Transform {
         //当前等级下 1像素多少米
         let maxGeometricError = imageryTileProvider.getLevelMaximumGeometricError(tile.level);
         let sseDenominator = frameState.sseDenominator;
-        let height = frameState.domEle.clientHeight;
+        let height = frameState.drawContextHeihgt;
         let tileDistance = this.computeCameraDinstanceToTile(tile, frameState);
         return (maxGeometricError * height) / (tileDistance * sseDenominator);
     }
