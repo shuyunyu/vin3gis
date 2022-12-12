@@ -1,5 +1,6 @@
 import { Mesh, Object3D, OrthographicCamera, PerspectiveCamera, Scene, WebGLRenderer, WebGLRendererParameters } from "three";
 import { OrthographicCameraProps, PerspectiveCameraProps } from "../../@types/global/global";
+import { Size } from "../msic/size";
 import { GeometryUtils } from "../utils/geometry_utils";
 import { Object3Utils } from "../utils/object3_utils";
 import { Utils } from "../utils/utils";
@@ -38,7 +39,7 @@ export class FrameRenderer {
         return this._renderer.domElement.parentElement;
     }
 
-    private _size: { width: number; height: number };
+    private _size: Size = new Size();
 
     public get size () {
         return this._size;
@@ -82,7 +83,8 @@ export class FrameRenderer {
             const height = this._target.clientHeight;
             this._renderer.setSize(width, height);
             this.updateCameraProps({ aspect: width / height });
-            this._size = { width: width, height: height };
+            this._size.width = width;
+            this._size.height = height;
         } else if (this._camera instanceof OrthographicCamera) {
 
         }
