@@ -28,7 +28,8 @@ export namespace SystemDefines {
         INTERACTION = 190,
         TWEEN = 180,
         REQUEST = 150,
-        EVENT_SYSTEM = 195
+        EVENT_SYSTEM = 195,
+        DISPOSE_SYSTEM = Infinity
     }
 
     //请求任务类型
@@ -66,5 +67,9 @@ export namespace SystemDefines {
         T extends SystemEventType.KEY_UP ? KeyboardEvent :
         T extends SystemEventType.KEY_PRESS ? KeyboardEvent :
         never
+
+    export interface Disposable {
+        dispose: () => void;
+    }
 
 }

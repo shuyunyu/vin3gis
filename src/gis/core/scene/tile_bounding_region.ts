@@ -109,7 +109,7 @@ export class TileBoundingRegion {
         let result = 0;
         let rectangle = this._tile.rectangle;
 
-        if (!rectangle.containsCartesian2({ x: cameraPosition.x, y: cameraPosition.z })) {
+        if (!rectangle.containsCartesian2(cameraPosition)) {
             let southwestCornerCartesian3 = rectangle.southWest;
             let northeastCornerCartesian3 = rectangle.northEast;
             let westNormal = westNormal2D;

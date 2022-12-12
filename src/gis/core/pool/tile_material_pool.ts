@@ -3,6 +3,7 @@ import { InternalConfig } from "../internal/internal_config";
 import { BasePool } from "./pool";
 import tileVtShader from "../shader/tile.vt.glsl";
 import tileFsShader from "../shader/tile.fs.glsl";
+import { disposeSystem } from "../../../core/system/dispose_system";
 
 type MtlParams = {
     texture: Texture,
@@ -87,7 +88,7 @@ class TileMaterialPool extends BasePool<ShaderMaterial, MtlParams[]>{
     }
 
     protected onAbandon (o: ShaderMaterial): void {
-        o.dispose();
+        disposeSystem.disposeObj(o);
     }
 
 }

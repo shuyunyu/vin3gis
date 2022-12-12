@@ -1,4 +1,5 @@
 import { Texture } from "three";
+import { disposeSystem } from "../../../core/system/dispose_system";
 import { TextureUtils } from "../../../core/utils/texture_utils";
 import { InternalConfig } from "../internal/internal_config";
 import { BasePool } from "./pool";
@@ -42,7 +43,7 @@ class TileTexturePool extends BasePool<Texture, ImageBitmap>{
     }
 
     protected onAbandon (o: Texture): void {
-        o.dispose();
+        disposeSystem.disposeObj(o);
     }
 
 

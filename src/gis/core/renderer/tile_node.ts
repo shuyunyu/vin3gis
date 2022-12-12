@@ -1,4 +1,5 @@
 import { Mesh, ShaderMaterial, Texture } from "three";
+import { disposeSystem } from "../../../core/system/dispose_system";
 import { ImageryTileRenderParam } from "../../@types/core/gis";
 import { TileMesh } from "../mesh/tile_mesh";
 import { tileMaterialPool } from "../pool/tile_material_pool";
@@ -57,8 +58,9 @@ export class TileNode {
             }
             tileMaterialPool.recycle(mtl);
         }
-        this._mesh.geometry.dispose();
+        // this._mesh.geometry.dispose();
         this._mesh.removeFromParent();
+        disposeSystem.disposeObj(this._mesh.geometry);
         this._mesh = null;
     }
 
