@@ -156,11 +156,10 @@ export class Transform {
     public static computeSpaceError (imageryTileProvider: IImageryTileProvider, tile: QuadtreeTile, frameState: FrameState) {
         //当前等级下 1像素多少米
         let maxGeometricError = imageryTileProvider.getLevelMaximumGeometricError(tile.level);
-        let seeDenominator = frameState.sseDenominator;
+        let sseDenominator = frameState.sseDenominator;
         let height = frameState.domEle.clientHeight;
-        let L = maxGeometricError * (height / seeDenominator);
         let tileDistance = this.computeCameraDinstanceToTile(tile, frameState);
-        return L / tileDistance;
+        return (maxGeometricError * height) / (tileDistance * sseDenominator);
     }
 
 
@@ -169,7 +168,6 @@ export class Transform {
      */
     public static validateSpaceError (tile: QuadtreeTile, imageryTileProvider: IImageryTileProvider, frameState: FrameState) {
         let error = this.computeSpaceError(imageryTileProvider, tile, frameState);
-        // return error < (sys.isMobile ? 3 : );
         return error < InternalConfig.SPACE_ERROR;
     }
 

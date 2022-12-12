@@ -33,8 +33,7 @@ window.onload = () => {
         enablePan: true,
         enableZoom: true,
         enableRotate: true,
-        enableDamping: true,
-        fov: 60
+        enableDamping: true
         // dampingFactor: 0.1
         // maxDistance: 16000000
     });

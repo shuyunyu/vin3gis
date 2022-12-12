@@ -23,8 +23,11 @@ export class InternalConfig {
      */
     public static TILE_TEXTURE_MTL_CACHE_SIZE = 100;
 
-    //se
+    //SSE
     public static SPACE_ERROR = 2;
+
+    //默认相机的fov
+    public static DEFAULT_CAMERA_FOV = 60;
 
     //是否开启图片瓦片的fadeout效果
     public static ENABLE_IMAGEY_TILE_FADE_OUT = false;

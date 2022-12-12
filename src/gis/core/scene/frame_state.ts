@@ -89,7 +89,10 @@ export class FrameState {
         this.cameraDirectionWC = Transform.worldCar3ToEarthVec3(this.cameraDirection, scratchDirectionWC).normalize();
         this.frustum = CameraUtils.getFrustum(this.camera);
         this.cameraChanged = FrameState.renderedFrameCount === 0 || !Utils.equalsRTS(this.cameraWorldRTS, FrameState.preCameraState);
-        this.sseDenominator = 2 * Math.tan(math.toRadians(camera.fov * 0.5));
+        const aspectRatio = camera.aspect;
+        //仅在fov和aspectRatio改变时计算此值
+        const fov = aspectRatio <= 1 ? math.toRadians(camera.fov) : Math.atan(Math.tan(math.toRadians(camera.fov * 0.5)) / aspectRatio) * 2.0;
+        this.sseDenominator = 2 * Math.tan(fov * 0.5);
     }
 
     public endFrame () {
