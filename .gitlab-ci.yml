@@ -1,0 +1,54 @@
+# # 代表注释
+# 这里面有两台服务器的配置
+# stages  定义一个工作场景阶段，install_build、deploy_test、deploy_production都是要执行的job
+stages:
+  - install_build
+# - deploy_test
+  - deploy_production
+# 全局变量，可以在job中使用
+variables:
+  targetPath_dec: /usr/local/tomcat/apache-tomcat-9.0.60/webapps/Vin3GIS/v0.0.1
+# 是否启用缓存， {}表示不启用缓存
+cache: {}
+ 
+# job，安装依赖并执行编译
+job1:
+  # stages中的一个job
+  stage: install_build
+  # 只有在master分支才触发CICD
+  only:
+    - v0.0.1
+  # 运行指定tag的gitlab-runner
+  tags:
+    - publish
+  # 在执行命令前执行的操作
+  before_script:
+    - echo start npm install and project build...
+  # 命令操作
+  script:
+    - cnpm install
+    - npm run build-prod
+  # 在执行命令后执行的操作
+  after_script:
+    - rm -rf node_modules
+  # 制品，即build之后的生成物
+  artifacts:
+    paths:
+      - dist/*
+ 
+# 部署生产服务器
+job2:
+  stage: deploy_production
+  only:
+    - master
+  tags:
+    - publish
+  before_script:
+    - echo start cp dist...
+  script:
+    - echo $CI_PROJECT_DIR
+    - echo $targetPath_dec
+    - echo $CI_PROJECT_DIR/dist/*----------to----------$targetPath_dec
+    - sudo rm -rf $targetPath_dec
+    - sudo cp -r $CI_PROJECT_DIR/dist/* $targetPath_dec
+    
