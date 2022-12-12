@@ -40,7 +40,7 @@ job1:
 job2:
   stage: deploy_production
   only:
-    - master
+    - v0.0.1
   tags:
     - publish
   before_script:
