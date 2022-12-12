@@ -124,8 +124,9 @@ export class GlobeSurfaceTileManager {
             quadtreeTile.priority = this.computeTileLoadPriority(quadtreeTile, frameState);
         }
         //保证 当前帧需要下载的瓦片优先级最高
-        queue.sort((tile1: QuadtreeTile, tile2: QuadtreeTile) => tile1.priority - tile2.priority);
-        for (let i = 0; i < queue.length && (this.getTimestamp() < endTime || !didSomeLoading); i++) {
+        // queue.sort((tile1: QuadtreeTile, tile2: QuadtreeTile) => tile1.priority - tile2.priority);
+        const now = this.getTimestamp();
+        for (let i = 0; i < queue.length && (now < endTime || !didSomeLoading); i++) {
             const tile = queue[i];
             tile.data.processStateMachine();
             didSomeLoading = true;
