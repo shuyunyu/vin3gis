@@ -48,12 +48,19 @@ export class RendererStats {
     public setStatsItemVal (item: string | number, val: string | number) {
         const index = typeof item === "number" ? item : this._appendItems.indexOf(item);
         if (index > -1) {
-            this._appendItemEles[index].innerText = "" + val;
+            const newVal = "" + val;
+            if (this.needsUpdate(this._appendItemEles[index], newVal)) this._appendItemEles[index].innerText = newVal;
         }
     }
 
+    private needsUpdate (span: HTMLSpanElement, val: string) {
+        return span.innerText !== val;
+    }
+
     private setInternalItemVal (index: number, val: number | string) {
-        (this._ele.children[index].children[1] as HTMLSpanElement).innerText = "" + val;
+        const ele = (this._ele.children[index].children[1] as HTMLSpanElement);
+        const newVal = "" + val;
+        if (this.needsUpdate(ele, newVal)) ele.innerText = newVal;
     }
 
     public begine () {
