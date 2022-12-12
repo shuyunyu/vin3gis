@@ -104,6 +104,7 @@ export class TileImagery {
                 if (Utils.defined(ancestor) && ancestor.isValid) {
                     this._loaded = true;
                     this._imageryChanged = true;
+                    this._imagery.releaseResource();
                     this._imagery = ancestor;
                     ancestor.addReference();
                 }

@@ -1,5 +1,6 @@
 import { Frustum } from "three";
 import { GenericEvent } from "../../../core/event/generic_event";
+import { math } from "../../../core/math/math";
 import { IntersectUtils } from "../../../core/utils/intersect_utils";
 import { Utils } from "../../../core/utils/utils";
 import { IScheduleRequestTask, RequestTaskStatus } from "../../../core/xhr/scheduler/@types/request";
@@ -61,7 +62,7 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
     }
 
     public set opacity (val: number) {
-        this._opacity = val;
+        this._opacity = math.clamp(val, 0, 1);
     }
 
     public constructor (imageryTileProviderOptions?: ImageryTileProviderOptions) {

@@ -252,9 +252,10 @@ export class GlobeSurfaceTileManager {
      * @param provider 
      */
     private onImageryTileProviderVisibilityChanged (provider: IImageryTileProvider) {
-        if (!provider.visible) {
-            this.onImageryTileProviderRemoved(provider);
-        }
+        //可见性改变 直接会导致渲染的瓦片队列发生改变 直接就能达到效果 所以无需操作
+        // if (!provider.visible) {
+        //     this.onImageryTileProviderRemoved(provider);
+        // }
     }
 
     /**

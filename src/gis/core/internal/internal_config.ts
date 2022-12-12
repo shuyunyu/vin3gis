@@ -30,7 +30,7 @@ export class InternalConfig {
     public static ENABLE_IMAGEY_TILE_FADE_OUT = false;
 
     //默认最大瓦片缓存数量
-    public static DEFAUTL_MAX_TILE_CACHE_COUNT = 300;
+    public static DEFAUTL_MAX_TILE_CACHE_COUNT = 1000;
 
     /**
      * 校验相机的pitch是否有效
