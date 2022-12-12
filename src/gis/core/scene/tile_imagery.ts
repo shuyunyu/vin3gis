@@ -84,42 +84,42 @@ export class TileImagery {
      */
     public processStateMachine (skipLoading?: boolean) {
         if (!this.loaded) {
-            this._imagery!.processStateMachine();
+            this._imagery.processStateMachine();
             if (Utils.defined(this._loadingImagery)) {
-                this._loadingImagery!.processStateMachine();
+                this._loadingImagery.processStateMachine();
             }
             if (this._imagery.state === ImageryState.LOADED) {
                 this._loaded = true;
                 this._imageryChanged = true;
                 if (Utils.defined(this._loadingImagery)) {
-                    this._loadingImagery!.releaseResource();
+                    this._loadingImagery.releaseResource();
                     this._loadingImagery = undefined;
                 }
             } else if (this._imagery.state === ImageryState.FAILED) {
                 //如果失败了 那最近的加载好的父级瓦片作为当前瓦片
                 let ancestor = this._imagery.parent;
-                while (Utils.defined(ancestor) && ancestor!.state !== ImageryState.LOADED) {
-                    ancestor = ancestor!.parent;
+                while (Utils.defined(ancestor) && ancestor.state !== ImageryState.LOADED) {
+                    ancestor = ancestor.parent;
                 }
-                if (Utils.defined(ancestor) && ancestor!.isValid) {
+                if (Utils.defined(ancestor) && ancestor.isValid) {
                     this._loaded = true;
                     this._imageryChanged = true;
-                    this._imagery = ancestor!;
-                    ancestor!.addReference();
+                    this._imagery = ancestor;
+                    ancestor.addReference();
                 }
             } else if (!skipLoading) {
                 //如果需要的贴图正在加载 则使用最近的父级贴图先替代
                 let ancestor = this._imagery.parent;
-                while (Utils.defined(ancestor) && !ancestor!.isValid) {
-                    ancestor = ancestor!.parent;
+                while (Utils.defined(ancestor) && !ancestor.isValid) {
+                    ancestor = ancestor.parent;
                 }
                 if (this._loadingImagery !== ancestor) {
                     if (Utils.defined(this._loadingImagery)) {
-                        this._loadingImagery!.releaseResource();
+                        this._loadingImagery.releaseResource();
                     }
                     this._loadingImagery = ancestor;
                     if (Utils.defined(ancestor)) {
-                        ancestor!.addReference();
+                        ancestor.addReference();
                         this._imageryChanged = true;
                     }
                 }
@@ -151,9 +151,11 @@ export class TileImagery {
         this._textureImagery = null;
         if (Utils.defined(this._imagery)) {
             this._imagery.releaseResource();
+            this._imagery = null;
         }
         if (Utils.defined(this._loadingImagery)) {
             this._loadingImagery.releaseResource();
+            this._loadingImagery = null;
         }
     }
 
