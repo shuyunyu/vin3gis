@@ -29,6 +29,9 @@ export class InternalConfig {
     //是否开启图片瓦片的fadeout效果
     public static ENABLE_IMAGEY_TILE_FADE_OUT = false;
 
+    //默认最大瓦片缓存数量
+    public static DEFAUTL_MAX_TILE_CACHE_COUNT = 300;
+
     /**
      * 校验相机的pitch是否有效
      * @param pitch 

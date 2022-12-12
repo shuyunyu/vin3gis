@@ -82,7 +82,7 @@ export class Imagery {
         this._isValid = false;
         this._imageryTileProvider = imageryTileProvider;
         this._referenceCount = 0;
-        this._parent = Utils.defined(tile.parent) ? imageryCache.getImagery(tile.parent!, imageryTileProvider) : undefined;
+        this._parent = tile.parent ? imageryCache.getImagery(tile.parent, imageryTileProvider) : null;
     }
 
     //添加引用

@@ -176,7 +176,7 @@ export class MapViewer {
         this.renderer = this.createRenderer(viewerOptions.target);
         this._terrainProvider = new SimpleTerrainProvider();
         this._imageryTileProvider = viewerOptions.imageryTileProivder;
-        this.scene = new EarthScene(this.renderer, this.imageryTileProivder, this._terrainProvider, Utils.defaultValue(viewerOptions.tileCacheSize, 100));
+        this.scene = new EarthScene(this.renderer, this.imageryTileProivder, this._terrainProvider, Utils.defaultValue(viewerOptions.tileCacheSize, InternalConfig.DEFAUTL_MAX_TILE_CACHE_COUNT));
         this.enablePan = Utils.defaultValue(viewerOptions.enablePan, true);
         this.panSpeed = Utils.defaultValue(viewerOptions.panSpeed, 1.2);
         this.enableZoom = Utils.defaultValue(viewerOptions.enableZoom, true);

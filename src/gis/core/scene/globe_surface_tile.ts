@@ -4,7 +4,6 @@ import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
 import { TileNodeRenderer } from "../renderer/tile_node_renderer";
 import { ITerrainProvider } from "../terrain/terrain_provider";
-import { Imagery } from "./imagery";
 import { QuadtreeTile } from "./quad_tree_tile";
 import { TileImagery } from "./tile_imagery";
 
@@ -100,7 +99,7 @@ export class GlobeSurfaceTile {
     public processStateMachine () {
         GlobeSurfaceTile.initialize(this._tile, this._terrainProvider, this._imageryProviderCollection, this._tileNodeRenderer);
         this.processTerrain();
-        this.processImagery();
+        // this.processImagery();
     }
 
     /**
@@ -168,6 +167,7 @@ export class GlobeSurfaceTile {
      * 渲染瓦片图像
      */
     public rendererTileImagerys () {
+        this.processImagery();
         //TODO 多个overlay贴图提供者需要处理合图
         const toRenderImagerys: ImageryTileRenderParam[] = [];
         this._imageryProviderCollection.foreach((provider: IImageryTileProvider, index: number) => {
@@ -220,10 +220,9 @@ export class GlobeSurfaceTile {
      * 释放瓦片所有资源
      */
     public releaseResource () {
-        this._tileNodeRenderer.unrender(this._tile);
         for (const key in this._tileImageryRecord) {
             const tileImagery = this._tileImageryRecord[key];
-            tileImagery.releaseResource();;
+            tileImagery.releaseResource();
         }
         this._tileImageryRecord = Object.create(null);
         this._beforeRenderImagery = [];

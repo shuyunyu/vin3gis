@@ -135,7 +135,7 @@ export class TileImagery {
         if (this.loaded) {
             textureImagery = this._imagery;
         } else {
-            if (this._loadingImagery && this._loadingImagery.state === ImageryState.LOADED) {
+            if (this._loadingImagery && this._loadingImagery.isValid) {
                 textureImagery = this._loadingImagery;
             }
         }

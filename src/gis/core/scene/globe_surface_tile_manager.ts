@@ -148,8 +148,10 @@ export class GlobeSurfaceTileManager {
             tile.updateDistanceToCamera(frameState);
             //满足sse 并且满足最小缩放等级
             if (Transform.validateSpaceError(tile, this._quadtreePrimitive.tileProvider, frameState) && tile.level >= this._quadtreePrimitive.minimumLevel) {
-                this.addTileToRenderQueue(tile);
-                this._quadtreePrimitive.tileReplacementQueue.markTileRendered(tile);
+                if (this._quadtreePrimitive.tileProvider.computeTileVisibility(tile, frameState.frustum)) {
+                    this.addTileToRenderQueue(tile);
+                    this._quadtreePrimitive.tileReplacementQueue.markTileRendered(tile);
+                }
             } else if (this.queueChildrenLoadAndDetermineIfChildrenAreAllRenderable(tile, frameState)) {
                 let children = tile.children;
                 for (let i = 0; i < children.length; i++) {
