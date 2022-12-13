@@ -218,6 +218,10 @@ class BaseInterceptor implements Interceptor {
 
 }
 
+export interface XHRCancelable {
+    abort: () => void;
+}
+
 /**
  * 用来控制 xhr请求 取消的类
  */
@@ -225,7 +229,7 @@ export class XHRCancelToken {
 
     private static xctIndex: number = 0;
 
-    private _httpRequest: XMLHttpRequest | undefined;
+    private _httpRequest: XMLHttpRequest | XHRCancelable | undefined;
 
     private _id: string;
 
@@ -249,7 +253,7 @@ export class XHRCancelToken {
         return this._httpRequest;
     }
 
-    public set httpRequest (request: XMLHttpRequest | undefined) {
+    public set httpRequest (request: XMLHttpRequest | XHRCancelable | undefined) {
         this._httpRequest = request;
     }
 
