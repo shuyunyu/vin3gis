@@ -1,0 +1,9 @@
+{
+  "additionalPuglifyroperties": false,
+  "properties": {
+    "base64Encode": {
+      "type": "boolean"
+    }
+  },
+  "type": "object"
+}

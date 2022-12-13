@@ -4,6 +4,7 @@ import { BasePool } from "./pool";
 import tileVtShader from "../shader/tile.vt.glsl";
 import tileFsShader from "../shader/tile.fs.glsl";
 import { disposeSystem } from "../../../core/system/dispose_system";
+import { Utils } from "../../../core/utils/utils";
 
 type MtlParams = {
     texture: Texture,
@@ -36,8 +37,16 @@ class TileMaterialPool extends BasePool<ShaderMaterial, MtlParams[]>{
     //淡出效果
     public readonly fadeout = "u_fadeout";
 
+    //瓦片渲染用的 顶点着色器
+    private _tileVtShader: string;
+
+    //瓦片渲染用的 片元着色器
+    private _tileFsShader: string;
+
     public constructor () {
         super(ShaderMaterial, InternalConfig.TILE_TEXTURE_MTL_CACHE_SIZE);
+        this._tileVtShader = Utils.base64Decode(tileVtShader);
+        this._tileFsShader = Utils.base64Decode(tileFsShader);
     }
 
     protected onConstructor (p?: MtlParams[]): ShaderMaterial {
@@ -45,8 +54,8 @@ class TileMaterialPool extends BasePool<ShaderMaterial, MtlParams[]>{
         this.setUniforms(uniforms, p);
         const mtl = new ShaderMaterial({
             uniforms: uniforms,
-            vertexShader: tileVtShader,
-            fragmentShader: tileFsShader,
+            vertexShader: this._tileVtShader,
+            fragmentShader: this._tileFsShader,
             transparent: true,
             side: BackSide
         });
