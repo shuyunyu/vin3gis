@@ -29,6 +29,7 @@ export type RequestTaskResult = {
 
 export interface RequestTaskOptions extends XHRRequestOptions {
     taskType: RequestTaskType;//任务类型
+    requestInWorker?: boolean;//是否在worker中请求 default false
     imageTask?: boolean;//是否是图片请求任务
     priority?: number;//任务优先级
     throttle?: boolean;//是否需要考虑并发限制
@@ -40,6 +41,7 @@ export interface RequestTaskOptions extends XHRRequestOptions {
 //主要是为了使得requestTask.execute方法不在RequestScheduler的外部调用
 export interface IScheduleRequestTask {
     priority: number;//任务优先级
+    readonly requestInWorker: boolean;//是否在worker中请求
     readonly imageTask: boolean;//是否是图片请求任务
     readonly taskType: RequestTaskType;//任务类型
     readonly throttle: boolean;//是否需要考虑并发限制
