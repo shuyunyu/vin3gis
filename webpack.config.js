@@ -56,7 +56,12 @@ module.exports = {
             },
             {
                 test: /worker\.js?$/,
-                type: 'asset/source',
+                use: {
+                    loader: path.resolve(__dirname, "./loader/worker-loader/worker_loader.js"),
+                    options: {
+                        uglify: false
+                    }
+                },
                 exclude: /node_modules/
             },
             {

@@ -1,0 +1,9 @@
+{
+  "additionalPuglifyroperties": false,
+  "properties": {
+    "uglify": {
+      "type": "boolean"
+    }
+  },
+  "type": "object"
+}

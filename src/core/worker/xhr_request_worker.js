@@ -624,18 +624,13 @@ var XHRRequest = /** @class */ (function () {
 XHR.XHRRequest = XHRRequest;
 
 
-if (typeof self === "undefined") {
-    //eslint-disable-next-line no-implicit-globals, no-global-assign
-    self = {};
-}
-
-var postMessage = self.webkitPostMessage || self.postMessage;
+var postMessage = globalThis.webkitPostMessage || globalThis.postMessage;
 
 //save all request 
 //format=> {request:XMLHttpRequest,data:any,requestId:"",cancelFunc:function}
 var requests = [];
 
-self.onmessage = function (event) {
+globalThis.onmessage = function (event) {
     var data = event.data;
     //XHRRequest.create的参数
     var options = data.params.options;

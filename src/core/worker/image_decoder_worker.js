@@ -65,14 +65,9 @@ var base64BloblToImageBitMapMulti = function (blobs, data, options, onComplete) 
     }
 }
 
-if (typeof self === "undefined") {
-    //eslint-disable-next-line no-implicit-globals, no-global-assign
-    self = {};
-}
+var postMessage = globalThis.webkitPostMessage || globalThis.postMessage;
 
-var postMessage = self.webkitPostMessage || self.postMessage;
-
-self.onmessage = function (event) {
+globalThis.onmessage = function (event) {
     var data = event.data;
     var type = data.params.type;
     var options = data.params.options || [];
@@ -85,7 +80,7 @@ self.onmessage = function (event) {
 
 };
 
-function onDecoded (imageArr, data) {
+function onDecoded(imageArr, data) {
     let transferObjs = imageArr.filter(img => img.width);
     postMessage({
         id: data.id,
