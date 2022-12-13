@@ -1,5 +1,6 @@
 import { DebugTools } from "../tools/debug_tools";
 import { director } from "./director";
+import { disposeSystem } from "./system/dispose_system";
 import { eventSystem } from "./system/event_system";
 import { interactionSystem } from "./system/interaction_system";
 import { rendererSystem } from "./system/renderer_system";
@@ -25,6 +26,7 @@ export class Engine {
         director.registerSystem(interactionSystem);
         director.registerSystem(tweenSystem);
         director.registerSystem(requestSystem);
+        director.registerSystem(disposeSystem);
         director.init();
     }
 

@@ -25,15 +25,16 @@ export class GlobeSurfaceTile {
 
     //判断是否可以卸载瓦片资源
     public get eligibleForUnloading () {
-        let shouleRemoveTile = true;
-        for (const key in this._tileImageryRecord) {
-            const tileImagery = this._tileImageryRecord[key];
-            shouleRemoveTile = !tileImagery.loadingImagery;
-            if (!shouleRemoveTile) {
-                break;
-            }
-        }
-        return shouleRemoveTile;
+        // let shouleRemoveTile = true;
+        // for (const key in this._tileImageryRecord) {
+        //     const tileImagery = this._tileImageryRecord[key];
+        //     shouleRemoveTile = !tileImagery.loadingImagery;
+        //     if (!shouleRemoveTile) {
+        //         break;
+        //     }
+        // }
+        // return shouleRemoveTile;
+        return true;
     }
 
     /**

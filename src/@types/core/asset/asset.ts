@@ -7,6 +7,7 @@ export namespace AssetDefines {
      */
     export type LoadAssetParams = {
         url: string;
+        requestInWorker?: boolean;
         taskType?: SystemDefines.RequestTaskeType,
         params?: any;
         priority?: number;

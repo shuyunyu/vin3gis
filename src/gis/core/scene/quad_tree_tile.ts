@@ -123,11 +123,7 @@ export class QuadtreeTile {
      * 是否可以卸载资源
      */
     public get eligibleForUnloading () {
-        let res = true;
-        if (this._data) {
-            return this._data.eligibleForUnloading;
-        }
-        return res;
+        return !this._data || this._data.eligibleForUnloading;
     }
 
     public get priority () {

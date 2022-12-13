@@ -172,15 +172,15 @@ export class MapViewer {
         Engine.DEBUG = InternalConfig.DEBUG;
         Engine.init();
         Transform.THREEJS_UNIT_PER_METERS = Utils.defaultValue(viewerOptions.UNIT_PER_METERS, 10000);
-        this._fov = Utils.defaultValue(viewerOptions.fov, 30);
+        this._fov = Utils.defaultValue(viewerOptions.fov, InternalConfig.DEFAULT_CAMERA_FOV);
         this.renderer = this.createRenderer(viewerOptions.target);
         this._terrainProvider = new SimpleTerrainProvider();
         this._imageryTileProvider = viewerOptions.imageryTileProivder;
         this.scene = new EarthScene(this.renderer, this.imageryTileProivder, this._terrainProvider, Utils.defaultValue(viewerOptions.tileCacheSize, InternalConfig.DEFAUTL_MAX_TILE_CACHE_COUNT));
         this.enablePan = Utils.defaultValue(viewerOptions.enablePan, true);
-        this.panSpeed = Utils.defaultValue(viewerOptions.panSpeed, 1.2);
+        this.panSpeed = Utils.defaultValue(viewerOptions.panSpeed, 1.5);
         this.enableZoom = Utils.defaultValue(viewerOptions.enableZoom, true);
-        this.zoomSpeed = Utils.defaultValue(viewerOptions.zoomSpeed, 2.0);
+        this.zoomSpeed = Utils.defaultValue(viewerOptions.zoomSpeed, 2.5);
         this.enableRotate = Utils.defaultValue(viewerOptions.enableRotate, true);
         this.rotateSpeed = Utils.defaultValue(viewerOptions.rotateSpeed, 1.0);
         this.dampingFactor = Utils.defaultValue(viewerOptions.dampingFactor, 0.05);

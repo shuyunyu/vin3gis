@@ -2,6 +2,7 @@ import { Frustum, PerspectiveCamera, Quaternion, Ray, Vector3 } from "three";
 import { RTS } from "../../../@types/global/global";
 import { VecConstants } from "../../../core/constants/vec_constants";
 import { math } from "../../../core/math/math";
+import { Size } from "../../../core/msic/size";
 import { CameraUtils } from "../../../core/utils/camera_utils";
 import { Utils } from "../../../core/utils/utils";
 import { Cartesian3 } from "../cartesian/cartesian3";
@@ -32,7 +33,7 @@ export class FrameState {
 
     public camera: PerspectiveCamera;
 
-    public domEle: HTMLElement;
+    public readonly drawContextHeihgt: number;
 
     /**
      * 上一帧摄像机位置及欧拉角信息
@@ -63,11 +64,6 @@ export class FrameState {
     public cameraDirectionWC: Cartesian3;
 
     /**
-     * canvas的尺寸
-     */
-    public canvasSize: { width: number, height: number };
-
-    /**
      * 标识摄像机是否改变
      */
     public cameraChanged: boolean;
@@ -76,20 +72,22 @@ export class FrameState {
 
     public frustum: Frustum;
 
-    constructor (camera: PerspectiveCamera, domEle: HTMLElement) {
+    constructor (camera: PerspectiveCamera, size: Size) {
         this.camera = camera;
-        this.domEle = domEle;
+        this.drawContextHeihgt = size.height;
         this.cameraWorldRTS.position = camera.getWorldPosition(vec3_1);
         this.cameraPositionWC = Transform.worldCar3ToGeoCar3(this.cameraWorldRTS.position, scratchCameraPosWC);
         this.cameraWorldRTS.rotation = camera.getWorldQuaternion(quat_1);
         this.cameraWorldRTS.scale = camera.getWorldScale(vec3_3);
-        this.canvasSize = { width: domEle.clientWidth, height: domEle.clientHeight };
         let viewLineRay = CameraUtils.screenPointToRay(VecConstants.ZERO_VEC2, this.camera, tempRay);
         this.cameraDirection = vec3_2.copy(viewLineRay.direction).normalize();
         this.cameraDirectionWC = Transform.worldCar3ToEarthVec3(this.cameraDirection, scratchDirectionWC).normalize();
         this.frustum = CameraUtils.getFrustum(this.camera);
         this.cameraChanged = FrameState.renderedFrameCount === 0 || !Utils.equalsRTS(this.cameraWorldRTS, FrameState.preCameraState);
-        this.sseDenominator = 2 * Math.tan(math.toRadians(camera.fov * 0.5));
+        const aspectRatio = camera.aspect;
+        //仅在fov和aspectRatio改变时计算此值
+        const fov = aspectRatio >= 1 ? math.toRadians(camera.fov) : Math.atan(Math.tan(math.toRadians(camera.fov * 0.5)) / aspectRatio) * 2.0;
+        this.sseDenominator = 2 * Math.tan(fov * 0.5);
     }
 
     public endFrame () {

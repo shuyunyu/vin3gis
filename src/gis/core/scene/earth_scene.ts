@@ -57,7 +57,7 @@ export class EarthScene {
 
     public postRender (delay: number) {
         if (!this.ready) return;
-        let frameState = new FrameState(this._renderer.camera as PerspectiveCamera, this._renderer.domElement);
+        let frameState = new FrameState(this._renderer.camera as PerspectiveCamera, this._renderer.size);
         this.globleSurfaceManager.render(delay, frameState);
         this.camera.postRender(delay, frameState);
         frameState.endFrame();

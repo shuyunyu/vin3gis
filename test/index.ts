@@ -1,9 +1,10 @@
 import { BoxGeometry, BufferAttribute, DoubleSide, FrontSide, Mesh, PlaneGeometry, ShaderMaterial, TextureLoader, Vector3 } from "three";
-import { FrameRenderer, math } from "../src";
+import { FrameRenderer, math, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, Cartographic, EmptyImageryTileProvider, MapViewer, Orientation, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
+import { xhrWorker } from "../src/core/worker/xhr_worker";
 
 window.onload = () => {
 
@@ -33,8 +34,7 @@ window.onload = () => {
         enablePan: true,
         enableZoom: true,
         enableRotate: true,
-        enableDamping: true,
-        fov: 60
+        enableDamping: true
         // dampingFactor: 0.1
         // maxDistance: 16000000
     });
@@ -48,6 +48,7 @@ window.onload = () => {
 class GISTest {
 
     public static run (render: FrameRenderer) {
+        this.testXHRWorker();
         // this.testShader(render);
         // this.testTileGeometry(render);
         // this.testWorker();
@@ -55,6 +56,23 @@ class GISTest {
         // this.testDataTexture(render);
     }
 
+    private static testXHRWorker () {
+        globalThis.testXHRWorker = () => {
+            const url = "https://webst04.is.autonavi.com/appmaptile?style=6&x=33&y=30&z=6";
+            xhrWorker.create({
+                url: url,
+                params: {},
+                responseType: XHRResponseType.BLOB,
+                cancelToken: new XHRCancelToken((cancelFunc: Function) => {
+                    // cancelFunc();
+                })
+            }).then(res => {
+                console.log("xhrWorker", res);
+            }).catch(err => {
+                console.error(err);
+            });
+        }
+    }
 
     private static testShader (render: FrameRenderer) {
         const geo0 = new PlaneGeometry(10, 10).rotateX(-math.PI_OVER_TWO);

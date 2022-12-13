@@ -19,6 +19,7 @@ export class AssetLoader {
         return new Promise<HTMLImageElement>((resolve, reject) => {
             requestSystem.request({
                 url: params.url,
+                requestInWorker: params.requestInWorker,
                 taskType: params.taskType || SystemDefines.RequestTaskeType.IMAGE,
                 imageTask: true,
                 params: params.params,
@@ -44,6 +45,7 @@ export class AssetLoader {
         return new Promise<{ image?: HTMLImageElement, result: RequestTaskResult }>((resolve, reject) => {
             requestSystem.request({
                 url: params.url,
+                requestInWorker: params.requestInWorker,
                 taskType: params.taskType || SystemDefines.RequestTaskeType.IMAGE,
                 imageTask: true,
                 params: params.params,
@@ -83,6 +85,7 @@ export class AssetLoader {
     public static requestImageBlobAsync (params: AssetDefines.LoadAssetParams, cb: (res: { image?: Blob, result: RequestTaskResult }) => void) {
         return requestSystem.request({
             url: params.url,
+            requestInWorker: params.requestInWorker,
             taskType: params.taskType || SystemDefines.RequestTaskeType.IMAGE,
             imageTask: false,
             params: params.params,

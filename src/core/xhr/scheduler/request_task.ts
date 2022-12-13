@@ -1,3 +1,4 @@
+import { xhrWorker } from "../../worker/xhr_worker";
 import { XHRCancelToken, XHRRequest, XHRResponse } from "../xhr_request";
 import { RequestTaskOptions, RequestTaskPriority, RequestTaskStatus, RequestTaskType } from "./@types/request";
 import { RequestServer } from "./request_server";
@@ -17,6 +18,8 @@ export class RequestTask {
 
     //单个请求任务完成时的回调
     public static onTaskComplete?: (task: RequestTask) => void;
+
+    public requestInWorker: boolean;
 
     //任务类型
     private _taskType: RequestTaskType;
@@ -91,6 +94,7 @@ export class RequestTask {
      * @param options 
      */
     private init (options: RequestTaskOptions) {
+        this.requestInWorker = options.requestInWorker ?? false;
         this._taskType = options.taskType;
         this.priority = options.priority ?? RequestTaskPriority.LOW;
         this._imageTask = options.imageTask ?? false;
@@ -156,7 +160,7 @@ export class RequestTask {
      * 执行一般请求
      */
     private executeNormalTask () {
-        XHRRequest.create(this._options).then((response: XHRResponse) => {
+        (this._options.requestInWorker ? xhrWorker : XHRRequest).create(this._options).then((response: XHRResponse) => {
             if (!response.abort) {
                 this._options.onComplete({
                     response: response,

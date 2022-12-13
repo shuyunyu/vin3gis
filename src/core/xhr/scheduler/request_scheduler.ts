@@ -8,13 +8,13 @@ import { RequestTask } from "./request_task";
 export class RequestScheduler {
 
     //最大并发量
-    public static maxConcurrency: number = 20;
+    public static maxConcurrency: number = 50;
 
     //每台服务器最大并发数
-    public static maxServerConcurrency: number = 5;
+    public static maxServerConcurrency: number = 6;
 
     //每帧发出的最大请求量
-    public static maxFrameRequestCount: number = 10;
+    public static maxFrameRequestCount: number = 20;
 
     //当前正在进行的请求数量
     private static _curRequestCount: number = 0;

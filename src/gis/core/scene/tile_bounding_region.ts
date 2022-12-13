@@ -107,7 +107,7 @@ export class TileBoundingRegion {
     public distanceToCamera (frameState: FrameState) {
         let cameraPosition = Transform.worldCar3ToGeoCar3(frameState.cameraWorldRTS.position, scratchCartesian);
         let result = 0;
-        let rectangle = this._tile.rectangle!;
+        let rectangle = this._tile.rectangle;
 
         if (!rectangle.containsCartesian2(cameraPosition)) {
             let southwestCornerCartesian3 = rectangle.southWest;
@@ -116,7 +116,6 @@ export class TileBoundingRegion {
             let eastNormal = eastNormal2D;
             let northNormal = northNormal2D;
             let southNormal = southNormal2D;
-
 
             Cartesian3.subtract(vectorFromSouthwestCorner, cameraPosition, southwestCornerCartesian3);
             let distanceToWestPlane = Cartesian3.dot(vectorFromSouthwestCorner, westNormal);
