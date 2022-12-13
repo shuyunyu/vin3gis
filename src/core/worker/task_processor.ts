@@ -1,6 +1,6 @@
 import { GenericEvent } from "../event/generic_event";
 import { Utils } from "../utils/utils";
-import TransferTypedArrayTestScript from "./transfer_typed_array_test.worker";
+import TransferTypedArrayTestScript from "./transfer_typed_array_test_worker.js";
 
 let testing: boolean = false;
 let testAwiters: Record<string, Function>[] = [];

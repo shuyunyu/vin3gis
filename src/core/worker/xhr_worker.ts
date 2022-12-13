@@ -1,6 +1,13 @@
 import { XHRCancelable, XHRRequestOptions, XHRResponse } from "../xhr/xhr_request";
 import { TaskProcessor } from "./task_processor";
-import XHRRequestWorkerScriptStr from "./xhr_request_worker.worker";
+import XHRRequestWorkerScriptStr from "./xhr_request_worker.js";
+
+export interface XHRWorkerRequestOptions extends XHRRequestOptions {
+    //当responseType为blob时 是否在worker中返回ImageBitMap
+    createImageBitMap?: boolean;
+    //构建imagebitmap用的参数
+    imageBitMapOptions?: ImageBitmapOptions;
+}
 
 enum TaskType {
     EXECUTE = "execute",
@@ -29,12 +36,15 @@ class XHRWorkerCancelToken implements XHRCancelable {
 
     private _requestId: number;
 
-    public constructor (requestId: number) {
+    private _options: XHRRequestOptions;
+
+    public constructor (requestId: number, options: XHRRequestOptions) {
         this._requestId = requestId;
+        this._options = options;
     }
 
     public abort () {
-        xhrWorker.abort(this._requestId);
+        xhrWorker.abort(this._requestId, this._options);
     }
 
 }
@@ -76,14 +86,14 @@ class XHRWorker {
      * @param options 
      * @returns 
      */
-    public create (options: XHRRequestOptions) {
+    public create (options: XHRWorkerRequestOptions) {
         options = this.handleOptions(options, ["cancelToken"]);
         this.init();
         return new Promise<XHRResponse>((resolve, reject) => {
             const requestId = ++this._requestId;
             let canceled = false;
             if (options.cancelToken) {
-                options.cancelToken.httpRequest = new XHRWorkerCancelToken(requestId);
+                options.cancelToken.httpRequest = new XHRWorkerCancelToken(requestId, options);
                 canceled = options.cancelToken.canceled;
             }
             if (!canceled) {
@@ -112,7 +122,8 @@ class XHRWorker {
                 const response: XHRResponse = {
                     data: null,
                     status: null,
-                    abort: true
+                    abort: true,
+                    config: options
                 }
                 resolve(response);
             }
@@ -124,7 +135,7 @@ class XHRWorker {
      * 终止请求
      * @param requestId 
      */
-    public abort (requestId: number) {
+    public abort (requestId: number, options?: XHRRequestOptions) {
         this.init();
         this._taskProcessor.scheduleTask({
             requestId: requestId,
@@ -137,7 +148,9 @@ class XHRWorker {
                 const response: XHRResponse = {
                     data: null,
                     status: null,
-                    abort: true
+                    abort: true,
+                    //@ts-ignore
+                    config: options || {}
                 }
                 item.resolve(response);
             }

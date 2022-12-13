@@ -5,7 +5,7 @@ export namespace AssetDefines {
     /**
      * 加载资源的参数
      */
-    export type LoadAssetParams = {
+    export interface LoadAssetParams {
         url: string;
         requestInWorker?: boolean;
         taskType?: SystemDefines.RequestTaskeType,
@@ -13,6 +13,13 @@ export namespace AssetDefines {
         priority?: number;
         throttle?: boolean;
         throttleServer?: boolean;
+    }
+
+    /**
+     * 加载ImageBitMap资源的参数
+     */
+    export interface LoadImageBitMapAssetParams extends LoadAssetParams {
+        imageBitMapOptions?: ImageBitmapOptions;
     }
 
 }

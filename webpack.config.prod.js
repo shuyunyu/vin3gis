@@ -52,12 +52,23 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.(glsl)$/,
-                loader: 'raw-loader'
+                test: /worker\.js?$/,
+                use: {
+                    loader: path.resolve(__dirname, "./loader/worker-loader/worker_loader.js"),
+                    options: {
+                        uglify: true
+                    }
+                },
+                exclude: /node_modules/
             },
             {
-                test: /\.(worker)$/,
-                loader: 'raw-loader'
+                test: /\.(glsl)$/,
+                use: {
+                    loader: path.resolve(__dirname, "./loader/glsl-loader/glsl_loader.js"),
+                    options: {
+                        base64Encode: true
+                    }
+                }
             },
             {
                 test: /\.tsx?$/,

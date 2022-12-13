@@ -1,5 +1,5 @@
 import { TaskProcessor } from "./task_processor";
-import ImageDecoderWorkerScriptStr from "./image_decoder_worker.worker";
+import ImageDecoderWorkerScriptStr from "./image_decoder_worker.js";
 
 enum TaskType {
     BUFFER = "base64BufferToImageBitMap",

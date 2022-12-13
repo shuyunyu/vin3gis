@@ -29,13 +29,9 @@ var mergerImages = function (canvas, finalWidth, finalHeihgt, imageWidth, imageH
     onMerged(resImage, data);
 }
 
-if (typeof self === "undefined") {
-    self = {};
-}
+var postMessage = globalThis.webkitPostMessage || globalThis.postMessage;
 
-var postMessage = self.webkitPostMessage || self.postMessage;
-
-self.onmessage = function (event) {
+globalThis.onmessage = function (event) {
     var params = event.data.params;
     var canvas = params.canvas;
     var finalWidth = params.width;
@@ -48,7 +44,7 @@ self.onmessage = function (event) {
     doMerge(canvas, finalWidth, finalHeihgt, imageWidth, imageHeight, imageBlobs, imageBitMaps, options, event.data, onMerged);
 };
 
-function onMerged (image, data) {
+function onMerged(image, data) {
     var transferObjs = [image];
     postMessage({
         id: data.id,
