@@ -35,6 +35,9 @@ export class InternalConfig {
     //默认最大瓦片缓存数量
     public static DEFAUTL_MAX_TILE_CACHE_COUNT = 1000;
 
+    //是否在webWorker中加载瓦片贴图
+    public static REQUEST_RASTER_TILE_IN_WORKER = true;
+
     /**
      * 校验相机的pitch是否有效
      * @param pitch 

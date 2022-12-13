@@ -3,6 +3,7 @@ import { AssetLoader } from "../../../core/asset/asset_loader";
 import { Utils } from "../../../core/utils/utils";
 import { IScheduleRequestTask, RequestTaskStatus } from "../../../core/xhr/scheduler/@types/request";
 import { ImageRequestResult } from "../../@types/core/gis";
+import { InternalConfig } from "../internal/internal_config";
 import { BaseImageryTileProvider } from "./base_imagery_tile_provider";
 import { ImageryTileProviderOptions } from "./imagery_tile_provider_options";
 
@@ -49,16 +50,30 @@ export class UrlTemplateImageryProvider extends BaseImageryTileProvider {
         //满足缩放等级范围才去请求瓦片
         if (this.validateTileLevelIsInRange(level)) {
             let url = this.createTileImageryUrl(x, y, level);
-            return AssetLoader.requestImageBlobAsync({
-                url: url,
-                priority: priority,
-                requestInWorker: true,
-                taskType: SystemDefines.RequestTaskeType.RASTER_TILE,
-                throttle: true,
-                throttleServer: true
-            }, (res) => {
-                onComplete(res.image, res.result.status);
-            })
+            if (InternalConfig.REQUEST_RASTER_TILE_IN_WORKER) {
+                return AssetLoader.requestImageBitMapInWorkerAsync({
+                    url: url,
+                    priority: priority,
+                    requestInWorker: true,
+                    taskType: SystemDefines.RequestTaskeType.RASTER_TILE,
+                    throttle: true,
+                    throttleServer: true,
+                    imageBitMapOptions: { imageOrientation: 'flipY' }
+                }, (res) => {
+                    onComplete(res.image, res.result.status);
+                });
+            } else {
+                return AssetLoader.requestImageBlobAsync({
+                    url: url,
+                    priority: priority,
+                    requestInWorker: false,
+                    taskType: SystemDefines.RequestTaskeType.RASTER_TILE,
+                    throttle: true,
+                    throttleServer: true
+                }, (res) => {
+                    onComplete(res.image, res.result.status);
+                });
+            }
         } else {
             //返回一个空的asset
             onComplete(null, RequestTaskStatus.ABORT);

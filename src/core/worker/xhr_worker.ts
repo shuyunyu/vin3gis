@@ -2,6 +2,13 @@ import { XHRCancelable, XHRRequestOptions, XHRResponse } from "../xhr/xhr_reques
 import { TaskProcessor } from "./task_processor";
 import XHRRequestWorkerScriptStr from "./xhr_request_worker.worker";
 
+export interface XHRWorkerRequestOptions extends XHRRequestOptions {
+    //当responseType为blob时 是否在worker中返回ImageBitMap
+    createImageBitMap?: boolean;
+    //构建imagebitmap用的参数
+    imageBitMapOptions?: ImageBitmapOptions;
+}
+
 enum TaskType {
     EXECUTE = "execute",
     ABORT = "abort"
@@ -76,7 +83,7 @@ class XHRWorker {
      * @param options 
      * @returns 
      */
-    public create (options: XHRRequestOptions) {
+    public create (options: XHRWorkerRequestOptions) {
         options = this.handleOptions(options, ["cancelToken"]);
         this.init();
         return new Promise<XHRResponse>((resolve, reject) => {

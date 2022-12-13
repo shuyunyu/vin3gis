@@ -110,6 +110,43 @@ export class AssetLoader {
     }
 
     /**
+     * 从worker中请求ImageBitMap
+     * @param params 
+     * @param cb 
+     * @returns 
+     */
+    public static requestImageBitMapInWorkerAsync (params: AssetDefines.LoadImageBitMapAssetParams, cb: (res: { image?: ImageBitmap, result: RequestTaskResult }) => void) {
+        return requestSystem.request({
+            url: params.url,
+            requestInWorker: true,
+            //@ts-ignore
+            imageBitMapOptions: params.imageBitMapOptions || {},
+            //@ts-ignore
+            createImageBitMap: true,
+            taskType: params.taskType || SystemDefines.RequestTaskeType.IMAGE,
+            imageTask: false,
+            params: params.params,
+            priority: params.priority,
+            responseType: XHRResponseType.BLOB,
+            throttle: params.throttle,
+            throttleServer: params.throttleServer,
+            onComplete: (result: RequestTaskResult) => {
+                if (result.status === RequestTaskStatus.SUCCESS) {
+                    cb({
+                        image: result.response.data,
+                        result: result
+                    });
+                } else {
+                    cb({
+                        image: null,
+                        result: result
+                    });
+                }
+            }
+        });
+    }
+
+    /**
      * 加载贴图资源
      * @returns 
      */

@@ -658,13 +658,33 @@ var executeRequest = function (requestId, options, data) {
     });
     var request = XHRRequest.create(options);
     requests.push({ requestId: requestId, request: request, data: data, cancelFunc: _cancelFunc });
+    var shouldCreateImageBitMap = options.responseType === XHRResponseType.BLOB && options.createImageBitMap;
     request.then(function (response) {
-        if (!request.__aborted) {
-            removeRequest(requestId);
-            //remove request property
-            delete response.request;
-            if (response.config) delete response.config.cancelToken;
-            if (!response.abort) sendCompleteMessage(data, response, requestId, 'success');
+        if (!shouldCreateImageBitMap) {
+            if (!request.__aborted) {
+                removeRequest(requestId);
+                //remove request property
+                delete response.request;
+                if (response.config) delete response.config.cancelToken;
+                if (!response.abort) sendCompleteMessage(data, response, requestId, 'success');
+            }
+        } else {
+            if (!request.__aborted) {
+                createImageBitmap(response.data, options.imageBitMapOptions || {}).then(function (imageBitMap) {
+                    //remove request property
+                    delete response.request;
+                    if (response.config) delete response.config.cancelToken;
+                    if (!response.abort) {
+                        response.data = imageBitMap;
+                        sendCompleteMessage(data, response, requestId, 'success', [imageBitMap]);
+                    }
+                }).catch(function (err) {
+                    if (!request.__aborted) {
+                        removeRequest(requestId);
+                        sendCompleteMessage(data, { message: err }, requestId, 'error');
+                    }
+                })
+            }
         }
     }).catch(function (err) {
         removeRequest(requestId);
@@ -702,12 +722,7 @@ var findRequestIndex = function (requestId) {
 }
 
 //发送完成消息
-var sendCompleteMessage = function (data, response, requestId, stats) {
-    //TODO transfer ArrayBuffer & ImageBitMap
-    var transferObjs = [];
-    if (response && response.data && response.config && response.config.responseType === XHRResponseType.ARRAYBUFFER) {
-        transferObjs.push(response.data);
-    }
+var sendCompleteMessage = function (data, response, requestId, stats, transferObjs) {
     postMessage({
         id: data.id,
         error: null,
@@ -716,5 +731,5 @@ var sendCompleteMessage = function (data, response, requestId, stats) {
             response: response,
             requestId: requestId
         }
-    }, transferObjs);
+    }, transferObjs || null);
 }
