@@ -55,8 +55,9 @@ module.exports = {
                 loader: 'raw-loader'
             },
             {
-                test: /\.(worker)$/,
-                loader: 'raw-loader'
+                test: /worker\.js?$/,
+                type: 'asset/source',
+                exclude: /node_modules/
             },
             {
                 test: /\.tsx?$/,

@@ -1,6 +1,6 @@
 import { XHRCancelable, XHRRequestOptions, XHRResponse } from "../xhr/xhr_request";
 import { TaskProcessor } from "./task_processor";
-import XHRRequestWorkerScriptStr from "./xhr_request_worker.worker";
+import * as XHRRequestWorkerScriptStr from "./xhr_request_worker.js";
 
 export interface XHRWorkerRequestOptions extends XHRRequestOptions {
     //当responseType为blob时 是否在worker中返回ImageBitMap
