@@ -36,12 +36,15 @@ class XHRWorkerCancelToken implements XHRCancelable {
 
     private _requestId: number;
 
-    public constructor (requestId: number) {
+    private _options: XHRRequestOptions;
+
+    public constructor (requestId: number, options: XHRRequestOptions) {
         this._requestId = requestId;
+        this._options = options;
     }
 
     public abort () {
-        xhrWorker.abort(this._requestId);
+        xhrWorker.abort(this._requestId, this._options);
     }
 
 }
@@ -90,7 +93,7 @@ class XHRWorker {
             const requestId = ++this._requestId;
             let canceled = false;
             if (options.cancelToken) {
-                options.cancelToken.httpRequest = new XHRWorkerCancelToken(requestId);
+                options.cancelToken.httpRequest = new XHRWorkerCancelToken(requestId, options);
                 canceled = options.cancelToken.canceled;
             }
             if (!canceled) {
@@ -119,7 +122,8 @@ class XHRWorker {
                 const response: XHRResponse = {
                     data: null,
                     status: null,
-                    abort: true
+                    abort: true,
+                    config: options
                 }
                 resolve(response);
             }
@@ -131,7 +135,7 @@ class XHRWorker {
      * 终止请求
      * @param requestId 
      */
-    public abort (requestId: number) {
+    public abort (requestId: number, options?: XHRRequestOptions) {
         this.init();
         this._taskProcessor.scheduleTask({
             requestId: requestId,
@@ -144,7 +148,9 @@ class XHRWorker {
                 const response: XHRResponse = {
                     data: null,
                     status: null,
-                    abort: true
+                    abort: true,
+                    //@ts-ignore
+                    config: options || {}
                 }
                 item.resolve(response);
             }
