@@ -41,6 +41,10 @@ export * from "./core/xhr/scheduler/request_server";
 export * from "./core/xhr/scheduler/request_task";
 export * from "./core/xhr/scheduler/request_util";
 
+export * from "./core/worker/image_decoder";
+export * from "./core/worker/image_merger";
+export * from "./core/worker/xhr_worker";
+
 export * from "./tools/debug_tools";
 export * from "./tools/stats";
 

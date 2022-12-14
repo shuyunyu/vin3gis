@@ -97,7 +97,7 @@ export class Director extends Event {
      * @returns 
      */
     private calcDeltaTime () {
-        const now = performance.now();
+        const now = (performance || Date).now();
         this._deltaTime = now > this._startTime ? (now - this._startTime) / 1000 : 0;
         this._startTime = now;
         return this._deltaTime;
