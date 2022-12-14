@@ -152,6 +152,30 @@ export class Utils {
     }
 
     /**
+     * 防抖
+     * @param fn 
+     * @param context 
+     * @param delay 
+     * @returns 
+     */
+    public static debounce (fn: Function, context: any, delay?: number): Function {
+        delay = delay ?? 300;
+        let timer: number | undefined;
+        return function () {
+            let args = arguments;
+            if (Utils.defined(timer)) {
+                clearTimeout(timer);
+            }
+            //@ts-ignore
+            timer = setTimeout(() => {
+                timer = undefined;
+                fn.apply(context, args);
+            }, delay);
+        }
+        setTimeout
+    }
+
+    /**
      * 比较两个rts是否相等
      * @param left 
      * @param right 
