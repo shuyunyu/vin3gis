@@ -5,6 +5,7 @@ import { AMapImageryTileProvider, Cartographic, EmptyImageryTileProvider, MapVie
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
 import { xhrWorker } from "../src/core/worker/xhr_worker";
+import { GridImageryTileProvider } from "../src/gis/core/provider/grid_imagery_tile_provider";
 
 window.onload = () => {
 
@@ -17,11 +18,12 @@ window.onload = () => {
         //EmptyImageryTileProvider
         //AMapImageryTileProvider
         //TdtImageryTileProvider
-        imageryTileProivder: new AMapImageryTileProvider({
-            style: 'street',
-            // style: 'aerial',
-            key: '1d109683f4d84198e37a38c442d68311'
-        }),
+        // imageryTileProivder: new AMapImageryTileProvider({
+        //     style: 'street',
+        //     // style: 'aerial',
+        //     key: '1d109683f4d84198e37a38c442d68311'
+        // }),
+        imageryTileProivder: new GridImageryTileProvider(),
         // imageryTileProivder: new EmptyImageryTileProvider(),
         // imageryTileProivder: new ArcGISImageryTileProvider({
         //     url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
