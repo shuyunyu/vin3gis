@@ -13,6 +13,7 @@ type InputParams = {
     };
     font?: string;
     fontColor?: string;
+    options?: ImageBitmapOptions;
 }
 
 /**
@@ -38,9 +39,11 @@ class TileGridFactory {
     public createGrid (input: InputParams) {
         this.init();
         return new Promise<ImageBitmap>((resolve, reject) => {
-            const canvas = new OffscreenCanvas(input.tileWidth, input.tileHeight);
+            const canvas = new globalThis.OffscreenCanvas(input.tileWidth, input.tileHeight);
             //@ts-ignore
             input.canvas = canvas;
+            //@ts-ignore
+            input.z = input.level;
             this._taskProcessor.scheduleTask(input, [canvas]).then(image => {
                 resolve(image);
             }).catch(reject);

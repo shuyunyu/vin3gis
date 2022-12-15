@@ -8,6 +8,9 @@ import { BaseImageryTileProvider } from "./base_imagery_tile_provider";
  */
 export class GridImageryTileProvider extends BaseImageryTileProvider {
 
+    public minimumLevel: number = 0;
+
+    public maximumLevel: number = 21;
 
     public constructor () {
         super();
@@ -21,11 +24,14 @@ export class GridImageryTileProvider extends BaseImageryTileProvider {
             tileWidth: this.tileWidth,
             tileHeight: this.tileHeight,
             border: {
-                width: 3,
+                width: 2,
                 color: "#FFD700",
             },
             font: "30px serif",
-            fontColor: "#FFD700"
+            fontColor: "#FFD700",
+            options: {
+                imageOrientation: 'flipY'
+            }
         }).then((image) => {
             onComplete(image, RequestTaskStatus.SUCCESS);
         }).catch(err => {
