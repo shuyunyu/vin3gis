@@ -6,6 +6,7 @@ import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
 import { xhrWorker } from "../src/core/worker/xhr_worker";
 import { GridImageryTileProvider } from "../src/gis/core/provider/grid_imagery_tile_provider";
+import { createScheduler, removeScheduler } from "../src/core/utils/schedule_utils";
 
 window.onload = () => {
 
@@ -43,6 +44,7 @@ window.onload = () => {
     // mapViewer.scene.imageryProviders.add(new AMapImageryTileProvider({
     //     style: 'note'
     // }));
+    // mapViewer.scene.imageryProviders.add(new GridImageryTileProvider());
     global.mapViewer = mapViewer;
     GISTest.run(mapViewer.renderer);
 }
@@ -51,11 +53,26 @@ class GISTest {
 
     public static run (render: FrameRenderer) {
         this.testXHRWorker();
+        // this.testSchedule();
         // this.testShader(render);
         // this.testTileGeometry(render);
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
+    }
+
+    private static testSchedule () {
+        let start = performance.now();
+        let count = 0;
+        let id = createScheduler(() => {
+            const now = performance.now();
+            console.log("schedule: ", now - start);
+            start = now;
+            count++;
+            if (count == 10) {
+                removeScheduler(id);
+            }
+        }, 30)
     }
 
     private static testXHRWorker () {

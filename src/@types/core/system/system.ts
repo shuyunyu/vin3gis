@@ -22,14 +22,15 @@ export namespace SystemDefines {
 
     //系统优先级
     export enum Priority {
-        LOW = 0,
-        MEDIUM = 100,
+        DISPOSE_SYSTEM = Infinity,
         HIGH = 200,
+        EVENT_SYSTEM = 195,
         INTERACTION = 190,
         TWEEN = 180,
+        SCHEDULE = 170,
         REQUEST = 150,
-        EVENT_SYSTEM = 195,
-        DISPOSE_SYSTEM = Infinity
+        MEDIUM = 100,
+        LOW = 0
     }
 
     //请求任务类型
