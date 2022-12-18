@@ -77,7 +77,7 @@ class Scheduler implements ISchedulable {
 
 /**封装schedule实现的定时器,提供setInterval同样的功能。 */
 export const createScheduler = (handler: Function, timeout: number, context?: any, args?: any[]) => {
-    return new Scheduler(handler, timeout, false, context, args).scheduleId;
+    return new Scheduler(handler, timeout, false, 0, context, args).scheduleId;
 }
 
 /**移除定时器,与createScheduler配套使用。 */
@@ -87,7 +87,7 @@ export const removeScheduler = (schedulerId: number) => {
 
 /**封装schedule实现的延时器,提供setTimeout同样的功能。 */
 export const createSchedulerOnce = (handler: Function, timeout: number, context?: any, args?: any[]) => {
-    return new Scheduler(handler, timeout, true, context, args).scheduleId;
+    return new Scheduler(handler, timeout, true, 0, context, args).scheduleId;
 }
 
 /**移除延时器,与createSchedulerOnce配套使用。 */

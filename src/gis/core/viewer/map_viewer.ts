@@ -1,9 +1,10 @@
 import { PerspectiveCamera, Scene } from "three";
-import { Director, director } from "../../../core/director";
 import { Engine } from "../../../core/engine";
+import { math } from "../../../core/math/math";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { interactionSystem } from "../../../core/system/interaction_system";
 import { rendererSystem } from "../../../core/system/renderer_system";
+import { createScheduler, removeScheduler } from "../../../core/utils/schedule_utils";
 import { Utils } from "../../../core/utils/utils";
 import { DebugTools } from "../../../tools/debug_tools";
 import { MapViewerOptions } from "../../@types/core/gis";
@@ -21,6 +22,8 @@ export class MapViewer {
     public readonly renderer: FrameRenderer;
 
     public readonly scene: EarthScene;
+
+    public readonly renderFPS: number;
 
     private _mapStatsMonitor?: MapStatsMonitor;
 
@@ -58,6 +61,8 @@ export class MapViewer {
     private _maxDistance: number;
 
     private _fov: number;
+
+    private _scheduleId?: number;
 
     public get imageryTileProivder () {
         return this._imageryTileProvider;
@@ -174,6 +179,7 @@ export class MapViewer {
         Transform.THREEJS_UNIT_PER_METERS = Utils.defaultValue(viewerOptions.UNIT_PER_METERS, 10000);
         this._fov = Utils.defaultValue(viewerOptions.fov, InternalConfig.DEFAULT_CAMERA_FOV);
         this.renderer = this.createRenderer(viewerOptions.target);
+        this.renderFPS = math.clamp(Utils.defaultValue(viewerOptions.RENDER_RPS, InternalConfig.VIEWER_RENDER_FPS), 20, 60);
         this._terrainProvider = new SimpleTerrainProvider();
         this._imageryTileProvider = viewerOptions.imageryTileProivder;
         this.scene = new EarthScene(this.renderer, this.imageryTileProivder, this._terrainProvider, Utils.defaultValue(viewerOptions.tileCacheSize, InternalConfig.DEFAUTL_MAX_TILE_CACHE_COUNT));
@@ -194,7 +200,7 @@ export class MapViewer {
             this._mapStatsMonitor = new MapStatsMonitor(this.renderer, this.scene);
         }
 
-        director.addEventListener(Director.EVENT_DRAW_FRAME, this.renderFrame, this);
+        this._scheduleId = createScheduler(this.renderFrame, 1000 / 30, this);
 
     }
 
@@ -215,16 +221,20 @@ export class MapViewer {
     /**
      * 按帧渲染
      */
-    renderFrame (delay: number) {
+    private renderFrame (delay: number) {
         this.scene.postRender(delay);
         if (this._mapStatsMonitor) this._mapStatsMonitor.update();
     }
 
-    renderLateUpdate (delay: number) {
+    private renderLateUpdate (delay: number) {
         this.scene.renderLateUpdate(delay);
     }
 
-    destroy () {
+    public destroy () {
+        if (Utils.defined(this._scheduleId)) {
+            removeScheduler(this._scheduleId);
+            this._scheduleId = null;
+        }
         this.scene?.destroy();
     }
 
