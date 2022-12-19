@@ -19,8 +19,8 @@ window.onload = () => {
         //EmptyImageryTileProvider
         //AMapImageryTileProvider
         //TdtImageryTileProvider
-        // imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
-        imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
+        imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
+        // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
         // imageryTileProivder: new EmptyImageryTileProvider(),
         // imageryTileProivder: new ArcGISImageryTileProvider({
@@ -38,7 +38,7 @@ window.onload = () => {
         // dampingFactor: 0.1
         // maxDistance: 16000000
     });
-    mapViewer.scene.imageryProviders.add(new AMapImageryTileProvider({ style: 'note' }));
+    // mapViewer.scene.imageryProviders.add(new AMapImageryTileProvider({ style: 'note' }));
     // mapViewer.scene.imageryProviders.add(new GridImageryTileProvider());
     global.mapViewer = mapViewer;
     GISTest.run(mapViewer.renderer);
