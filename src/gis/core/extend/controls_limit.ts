@@ -32,6 +32,11 @@ export class ControlsLimit {
     }
 
     private onMouseWheel (event: WheelEvent) {
+
+        //连续缩放时 需要更新controls的target
+        interactionSystem.updateControlsTarget(this._renderer, { x: event.clientX, y: event.clientY });
+
+
         //禁用相机的lookAt 使其能够沿着当前鼠标位置的中心点缩放
         interactionSystem.updateControlsProps(this._renderer, { shouldLookAt: false });
         //滚轮聚焦的点
