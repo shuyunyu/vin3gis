@@ -1,7 +1,6 @@
 import { Plane, Ray, Vector3 } from "three";
 import { Cartesian3 } from "../cartesian/cartesian3";
 import { Rectangle } from "../geometry/rectangle";
-import { Transform } from "../transform/transform";
 import { FrameState } from "./frame_state";
 import { QuadtreeTile } from "./quad_tree_tile";
 
@@ -105,7 +104,7 @@ export class TileBoundingRegion {
      * 计算瓦片到摄像机的距离
      */
     public distanceToCamera (frameState: FrameState) {
-        let cameraPosition = Transform.worldCar3ToGeoCar3(frameState.cameraWorldRTS.position, scratchCartesian);
+        let cameraPosition = frameState.cameraPositionWC;
         let result = 0;
         let rectangle = this._tile.rectangle;
 
