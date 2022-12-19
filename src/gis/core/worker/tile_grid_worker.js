@@ -29,7 +29,7 @@ var createGridImage = function (event) {
         var left = 50 * scale;
         ctx.fillText("X: " + event.data.params.x, left, startX, maxWidth);
         ctx.fillText("Y: " + event.data.params.y, left, startX + offet, maxWidth);
-        ctx.fillText("Z: " + event.data.params.z, left, startX + offet * 2, maxWidth);
+        ctx.fillText("L: " + event.data.params.z, left, startX + offet * 2, maxWidth);
         ctx.lineWidth = event.data.params.border.width;
         ctx.strokeRect(0, 0, event.data.params.tileWidth, event.data.params.tileHeight);
         const imageData = ctx.getImageData(0, 0, event.data.params.tileWidth, event.data.params.tileHeight);
