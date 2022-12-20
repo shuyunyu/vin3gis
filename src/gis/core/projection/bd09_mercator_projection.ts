@@ -165,9 +165,8 @@ export class BD09MercatorProject extends BaseProjection {
 
     private isWgs84 = false;
 
-    public constructor (isWgs84: boolean, ellipsoid?: Ellipsoid) {
+    public constructor (ellipsoid?: Ellipsoid) {
         super(ellipsoid);
-        this.isWgs84 = isWgs84;
         this._rectangle = new Rectangle(-20037726.37, -12474104.17, 20037726.37, 12474104.17);
     }
 

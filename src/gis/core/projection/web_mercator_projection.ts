@@ -16,13 +16,17 @@ export class WebMercatorProjection extends BaseProjection {
 
     private _maximumLatitude: number;
 
-    public constructor (ellipsoid?: Ellipsoid) {
+    public constructor (ellipsoid?: Ellipsoid, specRectangle?: Rectangle) {
         super(ellipsoid);
-        this._semimajorAxis = this.ellipsoid.maximumRadius;
-        this._oneOverSemimajorAxis = 1.0 / this._semimajorAxis;
-        this._maximumLatitude = this.mercatorAngleToGeodeticLatitude(Math.PI);
-        let d = this.R * Math.PI;
-        this._rectangle = new Rectangle(-d, -d, d, d);
+        if (specRectangle) {
+            this._rectangle = specRectangle.clone();
+        } else {
+            this._semimajorAxis = this.ellipsoid.maximumRadius;
+            this._oneOverSemimajorAxis = 1.0 / this._semimajorAxis;
+            this._maximumLatitude = this.mercatorAngleToGeodeticLatitude(Math.PI);
+            let d = this.R * Math.PI;
+            this._rectangle = new Rectangle(-d, -d, d, d);
+        }
     }
 
     public project (cartographic: Cartographic, out?: Cartesian3): Cartesian3 {
