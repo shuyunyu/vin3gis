@@ -11,7 +11,7 @@ import { WebMercatorTilingScheme } from "./web_mercator_tiling_scheme";
 export class BD09MercatorTilingScheme extends WebMercatorTilingScheme {
 
     public constructor () {
-        super(new BD09MercatorProject(EllipsoidWGS84));
+        super(new BD09MercatorProject(false, EllipsoidWGS84));
     }
 
     public getResolutionAtLevel (level: number) {

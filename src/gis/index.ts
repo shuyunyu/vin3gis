@@ -13,11 +13,15 @@ export * from "./core/ellipsoid/ellipsoid";
 
 export * from "./core/geometry/rectangle";
 
+export * from "./core/misc/crs/coordinate_transform";
+
 export * from "./core/projection/base_projection";
 export * from "./core/projection/web_mercator_projection";
+export * from "./core/projection/bd09_mercator_projection";
 
 export * from "./core/tilingscheme/tiling_scheme";
 export * from "./core/tilingscheme/web_mercator_tiling_scheme";
+export * from "./core/tilingscheme/bd09_mercator_tiling_scheme";
 
 export * from "./core/provider/base_imagery_tile_provider";
 export * from "./core/provider/empty_imagery_tile_provider";
@@ -26,6 +30,7 @@ export * from "./core/provider/amap_imagery_tile_provider";
 export * from "./core/provider/tdt_imagery_tile_provider";
 export * from "./core/provider/arcgis_imagery_tile_provider";
 export * from "./core/provider/tencent_imagery_tile_provider";
+export * from "./core/provider/baidu_imagery_tile_provider";
 
 export * from "./core/viewer/map_viewer";
 export * from "./core/camera/earth_camera";
