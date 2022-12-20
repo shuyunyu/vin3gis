@@ -200,7 +200,7 @@ export class MapViewer {
             this._mapStatsMonitor = new MapStatsMonitor(this.renderer, this.scene);
         }
 
-        this._scheduleId = createScheduler(this.renderFrame, 1000 / 30, this);
+        this._scheduleId = createScheduler(this.renderFrame, 1000 / this.renderFPS, this);
 
     }
 
