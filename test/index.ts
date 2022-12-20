@@ -7,11 +7,12 @@ import fsShader from "../src/gis/core/shader/tile.fs.glsl"
 import { xhrWorker } from "../src/core/worker/xhr_worker";
 import { GridImageryTileProvider } from "../src/gis/core/provider/grid_imagery_tile_provider";
 import { createScheduler, removeScheduler } from "../src/core/utils/schedule_utils";
+import { BaiduImageryTileProvider } from "../src/gis/core/provider/baidu_imagery_tile_provider";
 
 window.onload = () => {
 
-    const initCameraPosition = new Vector3(118.256, 24.418, 165000);
-    // const initCameraPosition = new Vector3(0, 0, 165000);
+    // const initCameraPosition = new Vector3(118.256, 24.418, 165000);
+    const initCameraPosition = new Vector3(0, 0, 16500000);
     const initCameraOrientation = new Vector3(0, -90, 0);
     const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), Orientation.fromDegreeEulerAngles(initCameraOrientation));
     const mapViewer = new MapViewer({
@@ -19,7 +20,8 @@ window.onload = () => {
         //EmptyImageryTileProvider
         //AMapImageryTileProvider
         //TdtImageryTileProvider
-        imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
+        // imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
+        imageryTileProivder: new BaiduImageryTileProvider(),
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
         // imageryTileProivder: new EmptyImageryTileProvider(),

@@ -5,6 +5,7 @@ import { Cartesian3 } from "../cartesian/cartesian3";
 import { Cartographic } from "../cartographic";
 import { EllipsoidWGS84 } from "../ellipsoid/ellipsoid";
 import { Rectangle } from "../geometry/rectangle";
+import { IProjection } from "../projection/projection";
 import { WebMercatorProjection } from "../projection/web_mercator_projection";
 import { Transform } from "../transform/transform";
 import { ITilingScheme } from "./tiling_scheme";
@@ -15,7 +16,7 @@ const tempVec3 = new Vector3();
 export class WebMercatorTilingScheme implements ITilingScheme {
 
     //投影
-    public readonly projection = new WebMercatorProjection(EllipsoidWGS84);
+    public projection: IProjection;
 
     public readonly tileWidth = 256;
 
@@ -29,6 +30,10 @@ export class WebMercatorTilingScheme implements ITilingScheme {
 
     // box的高度 单位 米
     private _boxHeight: number = 0;
+
+    public constructor (projection?: IProjection) {
+        this.projection = projection ?? new WebMercatorProjection(EllipsoidWGS84);
+    }
 
     /**
      * 获取指定等级下的分辨率 米/像素
