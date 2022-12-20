@@ -21,7 +21,7 @@ window.onload = () => {
         //AMapImageryTileProvider
         //TdtImageryTileProvider
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
-        imageryTileProivder: new BaiduImageryTileProvider(),
+        imageryTileProivder: new BaiduImageryTileProvider({ correction: true }),
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
         // imageryTileProivder: new EmptyImageryTileProvider(),
