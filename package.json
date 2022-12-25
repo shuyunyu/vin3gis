@@ -24,6 +24,8 @@
     "three": "^0.146.0"
   },
   "devDependencies": {
+    "loader-utils": "^2.0.0",
+    "schema-utils": "^3.0.0",
     "add-asset-html-webpack-plugin": "^5.0.2",
     "copy-webpack-plugin": "^10.2.4",
     "css-loader": "^6.7.1",
