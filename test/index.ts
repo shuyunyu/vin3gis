@@ -1,15 +1,20 @@
 import { BoxGeometry, BufferAttribute, DoubleSide, FrontSide, Mesh, PlaneGeometry, ShaderMaterial, TextureLoader, Vector3 } from "three";
 import { FrameRenderer, math, XHRCancelToken, XHRResponseType } from "../src";
-import { AMapImageryTileProvider, Cartographic, EmptyImageryTileProvider, MapViewer, Orientation, ViewPort } from "../src/gis";
+import { AMapImageryTileProvider, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, Orientation, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
 import { xhrWorker } from "../src/core/worker/xhr_worker";
+import { GridImageryTileProvider } from "../src/gis/core/provider/grid_imagery_tile_provider";
+import { createScheduler, removeScheduler } from "../src/core/utils/schedule_utils";
+import { BaiduImageryTileProvider } from "../src/gis/core/provider/baidu_imagery_tile_provider";
+import { BD09MercatorProject } from "../src/gis/core/projection/bd09_mercator_projection";
 
 window.onload = () => {
-
+    // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
+    // const initCameraPosition = new Vector3(wgs84LngLat[0], wgs84LngLat[1], 16500000);
     const initCameraPosition = new Vector3(118.256, 24.418, 165000);
-    // const initCameraPosition = new Vector3(0, 0, 165000);
+    // const initCameraPosition = new Vector3(0, 0, 16500000);
     const initCameraOrientation = new Vector3(0, -90, 0);
     const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), Orientation.fromDegreeEulerAngles(initCameraOrientation));
     const mapViewer = new MapViewer({
@@ -17,11 +22,10 @@ window.onload = () => {
         //EmptyImageryTileProvider
         //AMapImageryTileProvider
         //TdtImageryTileProvider
-        imageryTileProivder: new AMapImageryTileProvider({
-            style: 'street',
-            // style: 'aerial',
-            key: '1d109683f4d84198e37a38c442d68311'
-        }),
+        // imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
+        imageryTileProivder: new BaiduImageryTileProvider({ correction: true }),
+        // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
+        // imageryTileProivder: new GridImageryTileProvider(),
         // imageryTileProivder: new EmptyImageryTileProvider(),
         // imageryTileProivder: new ArcGISImageryTileProvider({
         //     url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
@@ -38,9 +42,8 @@ window.onload = () => {
         // dampingFactor: 0.1
         // maxDistance: 16000000
     });
-    // mapViewer.scene.imageryProviders.add(new AMapImageryTileProvider({
-    //     style: 'note'
-    // }));
+    // mapViewer.scene.imageryProviders.add(new AMapImageryTileProvider({ style: 'note' }));
+    // mapViewer.scene.imageryProviders.add(new GridImageryTileProvider());
     global.mapViewer = mapViewer;
     GISTest.run(mapViewer.renderer);
 }
@@ -49,11 +52,26 @@ class GISTest {
 
     public static run (render: FrameRenderer) {
         this.testXHRWorker();
+        // this.testSchedule();
         // this.testShader(render);
         // this.testTileGeometry(render);
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
+    }
+
+    private static testSchedule () {
+        let start = performance.now();
+        let count = 0;
+        let id = createScheduler(() => {
+            const now = performance.now();
+            console.log("schedule: ", now - start);
+            start = now;
+            count++;
+            if (count == 10) {
+                removeScheduler(id);
+            }
+        }, 30)
     }
 
     private static testXHRWorker () {

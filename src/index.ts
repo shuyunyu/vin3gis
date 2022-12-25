@@ -26,6 +26,8 @@ export * from "./core/system/event_system";
 export * from "./core/system/interaction_system";
 export * from "./core/system/renderer_system";
 export * from "./core/system/request_system";
+export * from "./core/system/tween_system";
+export * from "./core/system/schedule_system";
 
 export * from "./core/utils/utils";
 export * from "./core/utils/camera_utils";
@@ -34,12 +36,17 @@ export * from "./core/utils/intersect_utils";
 export * from "./core/utils/ray_utils";
 export * from "./core/utils/texture_utils";
 export * from "./core/utils/image_utils";
+export * from "./core/utils/schedule_utils";
 
 export * from "./core/xhr/xhr_request";
 export * from "./core/xhr/scheduler/request_scheduler";
 export * from "./core/xhr/scheduler/request_server";
 export * from "./core/xhr/scheduler/request_task";
 export * from "./core/xhr/scheduler/request_util";
+
+export * from "./core/worker/image_decoder";
+export * from "./core/worker/image_merger";
+export * from "./core/worker/xhr_worker";
 
 export * from "./tools/debug_tools";
 export * from "./tools/stats";

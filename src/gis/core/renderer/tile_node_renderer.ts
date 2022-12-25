@@ -1,9 +1,21 @@
 import { Object3D } from "three";
 import { TWEEN } from "../../../core/tween/Index";
+import Tween from "../../../core/tween/Tween";
 import { ImageryTileRenderParam } from "../../@types/core/gis";
+import { Rectangle } from "../geometry/rectangle";
 import { InternalConfig } from "../internal/internal_config";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { TileNode } from "./tile_node";
+
+type fadeoutObj = {
+    fadeout: number;
+}
+
+type FadeoutTile = {
+    id: string;
+    rectangle: Rectangle;
+    tween: Tween<fadeoutObj>;
+}
 
 /**
  * 瓦片节点渲染器
@@ -23,7 +35,7 @@ export class TileNodeRenderer {
     }
 
     //当前正在fadeout的瓦片节点
-    private _fadeoutTiles: string[] = [];
+    private _fadeoutTiles: FadeoutTile[] = [];
 
     public constructor () { }
 
@@ -70,20 +82,24 @@ export class TileNodeRenderer {
             const obj = { fadeout: 1.0 };
             //set renderer order
             tileNode.mesh.renderOrder = 1;
-            this._fadeoutTiles.push(tileNode.tileId);
-            new TWEEN.Tween(obj)
+            const tween = new TWEEN.Tween(obj)
                 .to({ fadeout: 0.0 }, 300)
                 .onUpdate(() => {
                     tileNode.fadeout(obj.fadeout);
                 })
                 .onComplete(() => {
                     tileNode.recycle();
-                    const index = this._fadeoutTiles.indexOf(tileNode.tileId);
+                    const index = this.findFadeoutTileIndex(tileNode.tileId);
                     if (index > -1) {
                         this._fadeoutTiles.splice(index, 1);
                     }
-                })
-                .start();
+                });
+            this._fadeoutTiles.push({
+                id: tileNode.tileId,
+                rectangle: tile.rectangle,
+                tween: tween
+            });
+            tween.start();
         } else {
             tileNode.recycle();
         }
@@ -97,15 +113,24 @@ export class TileNodeRenderer {
      * @returns 
      */
     private selfOrParentInFadeout (tileNode: TileNode, tile: QuadtreeTile) {
-        if (this._fadeoutTiles.indexOf(tileNode.tileId) > -1) return true;
+        if (this.findFadeoutTileIndex(tileNode.tileId) > -1) return true;
         let parent = tile.parent;
         while (parent) {
-            if (this._fadeoutTiles.indexOf(parent.id) > -1) {
+            if (this.findFadeoutTileIndex(tileNode.tileId) > -1) {
                 return true;
             };
             parent = parent.parent;
         }
         return false;
+    }
+
+    /**
+     * 查找fadeoutTile的索引
+     * @param tileId 
+     * @returns 
+     */
+    private findFadeoutTileIndex (tileId: string) {
+        return this._fadeoutTiles.findIndex(item => item.id === tileId);
     }
 
 }

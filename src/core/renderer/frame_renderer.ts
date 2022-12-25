@@ -45,6 +45,16 @@ export class FrameRenderer {
         return this._size;
     }
 
+    private _updateRenderSize: Function;
+
+    /**
+     * 更新渲染尺寸的方法
+     *  - 经过了防抖处理
+     */
+    public get updateRenderSize () {
+        return this._updateRenderSize;
+    }
+
     /**
      * 获取当前场景中几何体的占用的内存
      */
@@ -70,6 +80,8 @@ export class FrameRenderer {
         this._camera = camera;
         this._target = target;
         this._target.appendChild(this.domElement);
+        this._updateRenderSize = Utils.debounce(this.internalUpdateRenderSize, this, 100);
+
     }
 
     /**
@@ -77,7 +89,7 @@ export class FrameRenderer {
      * @param width 
      * @param height 
      */
-    public updateRenderSize () {
+    private internalUpdateRenderSize () {
         if (this._camera instanceof PerspectiveCamera) {
             const width = this._target.clientWidth;
             const height = this._target.clientHeight;

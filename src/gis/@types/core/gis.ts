@@ -42,6 +42,8 @@ export enum CoordinateType {
 export type MapViewerOptions = {
     //没threejs单位距离代表实际的多少米
     UNIT_PER_METERS?: number;
+    //渲染fps 默认30
+    RENDER_RPS?: number;
     //坐标方案
     coordinateOType?: CoordinateType;
     //地图渲染的html元素或者元素的id

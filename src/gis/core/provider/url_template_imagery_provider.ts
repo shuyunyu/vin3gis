@@ -39,10 +39,18 @@ export class UrlTemplateImageryProvider extends BaseImageryTileProvider {
         }
         let url = this.url.replace('{x}', x.toString()).replace('{y}', y.toString()).replace('{z}', level.toString());
         if (this.subdomains.length) {
-            let index = Math.floor(Math.random() * this.subdomains.length);
-            url = url.replace('{s}', this.subdomains[index]);
+            url = url.replace('{s}', this.getSubdomain());
         }
         return url;
+    }
+
+    /**
+     * 获取subdomain
+     * @returns 
+     */
+    protected getSubdomain () {
+        const index = Math.floor(Math.random() * this.subdomains.length);
+        return this.subdomains[index];
     }
 
     //请求图片资源

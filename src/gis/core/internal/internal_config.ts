@@ -26,6 +26,9 @@ export class InternalConfig {
     //SSE
     public static SPACE_ERROR = 2;
 
+    //mapview的渲染fps
+    public static VIEWER_RENDER_FPS = 30;
+
     //默认相机的fov
     public static DEFAULT_CAMERA_FOV = 60;
 

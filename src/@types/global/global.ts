@@ -34,3 +34,16 @@ export type OrthographicCameraProps = {
     near?: number;
     far?: number;
 }
+
+/**
+ * 可调度对象接口
+ * - 实现此接口可以被调度系统调用
+ */
+export interface ISchedulable {
+    //对象的唯一标识
+    uuid: string;
+    //优先级
+    priority: number;
+    //对象每次被调度器调用时执行的函数
+    update: (deltaTime: number) => void;
+}

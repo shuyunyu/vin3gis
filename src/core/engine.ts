@@ -5,6 +5,7 @@ import { eventSystem } from "./system/event_system";
 import { interactionSystem } from "./system/interaction_system";
 import { rendererSystem } from "./system/renderer_system";
 import { requestSystem } from "./system/request_system";
+import { scheduleSystem } from "./system/schedule_system";
 import { tweenSystem } from "./system/tween_system";
 import { RequestTask } from "./xhr/scheduler/request_task";
 
@@ -27,6 +28,7 @@ export class Engine {
         director.registerSystem(tweenSystem);
         director.registerSystem(requestSystem);
         director.registerSystem(disposeSystem);
+        director.registerSystem(scheduleSystem);
         director.init();
     }
 
