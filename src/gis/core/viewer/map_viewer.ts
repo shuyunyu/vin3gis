@@ -209,7 +209,8 @@ export class MapViewer {
      * @param target 
      */
     private createRenderer (target: string | HTMLElement) {
-        const ele = typeof target === 'string' ? document.getElementById(target) : target;
+        const elType = typeof target;
+        const ele = (elType === 'string' ? document.getElementById(target as string) : target) as HTMLElement;
         const scene = new Scene();
         const camera = new PerspectiveCamera(this._fov, ele.clientWidth / ele.clientHeight, 0.00001, Transform.THREEJS_UNIT_PER_METERS * 100);
         const renderer = new FrameRenderer(scene, camera, target as HTMLElement);
