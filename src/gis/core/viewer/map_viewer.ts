@@ -212,7 +212,7 @@ export class MapViewer {
         const ele = (Utils.isString(target) ? document.getElementById(target as string) : target) as HTMLElement;
         const scene = new Scene();
         const camera = new PerspectiveCamera(this._fov, ele.clientWidth / ele.clientHeight, 0.00001, Transform.THREEJS_UNIT_PER_METERS * 100);
-        const renderer = new FrameRenderer(scene, camera, target as HTMLElement);
+        const renderer = new FrameRenderer(scene, camera, ele);
         rendererSystem.addRenderTarget(renderer)
         interactionSystem.enableInteraction(renderer);
         return renderer;
