@@ -2,6 +2,10 @@ import { RTS } from "../../@types/global/global";
 
 export class Utils {
 
+    public static isString (str: any) {
+        return typeof str === "string";
+    }
+
     public static defaultValue<T> (a: T, b: T) {
         return this.defined(a) ? a : b;
     }
