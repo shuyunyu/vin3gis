@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Scene } from "three";
+import { Color, PerspectiveCamera, Scene } from "three";
 import { Engine } from "../../../core/engine";
 import { math } from "../../../core/math/math";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
@@ -179,6 +179,13 @@ export class MapViewer {
         Transform.THREEJS_UNIT_PER_METERS = Utils.defaultValue(viewerOptions.UNIT_PER_METERS, 10000);
         this._fov = Utils.defaultValue(viewerOptions.fov, InternalConfig.DEFAULT_CAMERA_FOV);
         this.renderer = this.createRenderer(viewerOptions.target);
+        const defaultBackgroundColor = new Color(255, 255, 255);
+        const background = viewerOptions.background || {
+            alpha: 1,
+            color: defaultBackgroundColor
+        };
+        this.setBackgroundColor(Utils.defaultValue(background.color, defaultBackgroundColor));
+        this.setBackgroundAlpha(Utils.defaultValue(background.alpha, 1));
         this.renderFPS = math.clamp(Utils.defaultValue(viewerOptions.RENDER_RPS, InternalConfig.VIEWER_RENDER_FPS), 20, 60);
         this._terrainProvider = new SimpleTerrainProvider();
         this._imageryTileProvider = viewerOptions.imageryTileProivder;
@@ -228,6 +235,22 @@ export class MapViewer {
 
     private renderLateUpdate (delay: number) {
         this.scene.renderLateUpdate(delay);
+    }
+
+    /**
+     * 设置背景颜色
+     * @param color 
+     */
+    public setBackgroundColor (color: Color) {
+        this.renderer.renderer.setClearColor(color);
+    }
+
+    /**
+     * 设置背景不透明度
+     * @param alpha 
+     */
+    public setBackgroundAlpha (alpha: number) {
+        this.renderer.renderer.setClearAlpha(alpha);
     }
 
     public destroy () {

@@ -1,3 +1,4 @@
+import { Color } from "three";
 import { ViewPort } from "../../core/misc/view_port";
 import { IImageryTileProvider } from "../../core/provider/imagery_tile_provider";
 import { Imagery } from "../../core/scene/imagery";
@@ -30,22 +31,12 @@ export enum QuadtreeTileLoadState {
     FAILED
 }
 
-/**
- * 坐标类型
- */
-export enum CoordinateType {
-    WGS84 = "wgs84",
-    GCJ02 = "gcj02",
-    BD09 = "bd09"
-}
 
 export type MapViewerOptions = {
     //没threejs单位距离代表实际的多少米
     UNIT_PER_METERS?: number;
     //渲染fps 默认30
     RENDER_RPS?: number;
-    //坐标方案
-    coordinateOType?: CoordinateType;
     //地图渲染的html元素或者元素的id
     target: string | HTMLElement;
     //瓦片提供者
@@ -73,6 +64,13 @@ export type MapViewerOptions = {
     tileCacheSize?: number;
     //相机的fov
     fov?: number;
+    //背景
+    background?: {
+        //不透明度
+        alpha?: number;
+        //颜色
+        color?: Color;
+    }
 }
 
 export namespace MeshDefines {
