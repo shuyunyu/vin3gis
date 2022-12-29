@@ -9,6 +9,7 @@ import { Utils } from "../../../core/utils/utils";
 import { DebugTools } from "../../../tools/debug_tools";
 import { MapViewerOptions } from "../../@types/core/gis";
 import { MapStatsMonitor } from "../../monitor/map_stats_monitor";
+import { EarthCamera } from "../camera/earth_camera";
 import { ControlsLimit } from "../extend/controls_limit";
 import { InternalConfig } from "../internal/internal_config";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
@@ -22,6 +23,8 @@ export class MapViewer {
     public readonly renderer: FrameRenderer;
 
     public readonly scene: EarthScene;
+
+    public readonly camera: EarthCamera;
 
     public readonly renderFPS: number;
 
@@ -190,6 +193,7 @@ export class MapViewer {
         this._terrainProvider = new SimpleTerrainProvider();
         this._imageryTileProvider = viewerOptions.imageryTileProivder;
         this.scene = new EarthScene(this.renderer, this.imageryTileProivder, this._terrainProvider, Utils.defaultValue(viewerOptions.tileCacheSize, InternalConfig.DEFAUTL_MAX_TILE_CACHE_COUNT));
+        this.camera = this.scene.camera;
         this.enablePan = Utils.defaultValue(viewerOptions.enablePan, true);
         this.panSpeed = Utils.defaultValue(viewerOptions.panSpeed, 1.5);
         this.enableZoom = Utils.defaultValue(viewerOptions.enableZoom, true);
