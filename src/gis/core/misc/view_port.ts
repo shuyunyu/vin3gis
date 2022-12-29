@@ -25,8 +25,19 @@ export class ViewPort {
         this._orientation = orientation;
     }
 
-    clone () {
+    public clone () {
         return new ViewPort(this.cartogarphic.clone(), this.orientation.clone());
+    }
+
+    /**
+     * 从数组构建 ViewPort
+     * - e.g. [lon,lat,height] , [lon,lat,height,yaw,pitch,roll]
+     * @param array 
+     */
+    public static fromArray (array: number[]) {
+        let cartogarphic: Cartographic = Cartographic.fromArray(array);
+        let orientation: Orientation = array.length > 3 ? Orientation.fromArray(array, 3) : new Orientation(0, -90, 0);
+        return new ViewPort(cartogarphic, orientation);
     }
 
 }
