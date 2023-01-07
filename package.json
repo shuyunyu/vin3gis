@@ -1,7 +1,7 @@
 {
   "name": "vin3gis",
   "version": "0.0.1",
-  "description": "three.js study project.",
+  "description": "my gis framework base on three.js",
   "main": "src/index.ts",
   "scripts": {
     "dev": "webpack-dev-server --hot",
@@ -15,9 +15,10 @@
     "url": "https://github.com/shuyunyu/vin3gis"
   },
   "keywords": [
-    "gis"
+    "gis",
+    "three.js"
   ],
-  "author": "yumubai",
+  "author": "shuyunyu",
   "license": "ISC",
   "dependencies": {
     "@types/three": "^0.146.0",
