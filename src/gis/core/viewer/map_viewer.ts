@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Scene } from "three";
+import { Color, PerspectiveCamera, Scene } from "three";
 import { Engine } from "../../../core/engine";
 import { math } from "../../../core/math/math";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
@@ -9,6 +9,7 @@ import { Utils } from "../../../core/utils/utils";
 import { DebugTools } from "../../../tools/debug_tools";
 import { MapViewerOptions } from "../../@types/core/gis";
 import { MapStatsMonitor } from "../../monitor/map_stats_monitor";
+import { EarthCamera } from "../camera/earth_camera";
 import { ControlsLimit } from "../extend/controls_limit";
 import { InternalConfig } from "../internal/internal_config";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
@@ -22,6 +23,8 @@ export class MapViewer {
     public readonly renderer: FrameRenderer;
 
     public readonly scene: EarthScene;
+
+    public readonly camera: EarthCamera;
 
     public readonly renderFPS: number;
 
@@ -179,10 +182,18 @@ export class MapViewer {
         Transform.THREEJS_UNIT_PER_METERS = Utils.defaultValue(viewerOptions.UNIT_PER_METERS, 10000);
         this._fov = Utils.defaultValue(viewerOptions.fov, InternalConfig.DEFAULT_CAMERA_FOV);
         this.renderer = this.createRenderer(viewerOptions.target);
+        const defaultBackgroundColor = new Color(255, 255, 255);
+        const background = viewerOptions.background || {
+            alpha: 1,
+            color: defaultBackgroundColor
+        };
+        this.setBackgroundColor(Utils.defaultValue(background.color, defaultBackgroundColor));
+        this.setBackgroundAlpha(Utils.defaultValue(background.alpha, 1));
         this.renderFPS = math.clamp(Utils.defaultValue(viewerOptions.RENDER_RPS, InternalConfig.VIEWER_RENDER_FPS), 20, 60);
         this._terrainProvider = new SimpleTerrainProvider();
         this._imageryTileProvider = viewerOptions.imageryTileProivder;
         this.scene = new EarthScene(this.renderer, this.imageryTileProivder, this._terrainProvider, Utils.defaultValue(viewerOptions.tileCacheSize, InternalConfig.DEFAUTL_MAX_TILE_CACHE_COUNT));
+        this.camera = this.scene.camera;
         this.enablePan = Utils.defaultValue(viewerOptions.enablePan, true);
         this.panSpeed = Utils.defaultValue(viewerOptions.panSpeed, 1.5);
         this.enableZoom = Utils.defaultValue(viewerOptions.enableZoom, true);
@@ -228,6 +239,22 @@ export class MapViewer {
 
     private renderLateUpdate (delay: number) {
         this.scene.renderLateUpdate(delay);
+    }
+
+    /**
+     * 设置背景颜色
+     * @param color 
+     */
+    public setBackgroundColor (color: Color) {
+        this.renderer.renderer.setClearColor(color);
+    }
+
+    /**
+     * 设置背景不透明度
+     * @param alpha 
+     */
+    public setBackgroundAlpha (alpha: number) {
+        this.renderer.renderer.setClearAlpha(alpha);
     }
 
     public destroy () {

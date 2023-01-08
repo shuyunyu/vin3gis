@@ -45,4 +45,26 @@ export class Orientation {
         return new Orientation(math.toRadians(eulerAngles.x), math.toRadians(eulerAngles.y), math.toRadians(eulerAngles.z));
     }
 
+    /**
+     * 由数组构建orientation
+     * @param radiansArray 
+     * @param offset 偏移量
+     */
+    public static fromArray (radiansArray: number[], offset: number = 0) {
+        return new Orientation(radiansArray[offset + 0], radiansArray[offset + 1], radiansArray[offset + 2]);
+    }
+
+    /**
+     * 将orientation转换为数组
+     * @param out 
+     * @returns 
+     */
+    public toArray (out?: number[]) {
+        out = out || new Array(3);
+        out[0] = this.yaw;
+        out[1] = this.pitch;
+        out[2] = this.roll;
+        return out;
+    }
+
 }

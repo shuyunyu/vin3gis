@@ -37,6 +37,24 @@ export class Cartographic {
         return new Cartographic(math.toRadians(longitude), math.toRadians(latitude), height);
     }
 
+    /**
+     * 由数组构建cartographic
+     * @param array 
+     * @param offset 偏移量
+     * @returns 
+     */
+    public static fromArray (array: number[], offset: number = 0) {
+        return new Cartographic(array[offset + 0], array[offset + 1], array[offset + 2]);
+    }
+
+    public toArray (out?: number[]) {
+        out = out || new Array(3);
+        out[0] = this.longitude;
+        out[1] = this.latitude;
+        out[2] = this.height;
+        return out;
+    }
+
     public static clone (origin: Cartographic, out?: Cartographic) {
         out = out || new Cartographic();
         out.longitude = origin.longitude;
