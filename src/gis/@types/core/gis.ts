@@ -94,3 +94,8 @@ export type ImageryTileRenderParam = {
     imagery: Imagery;
     opacity: number;
 }
+
+//entity 构造参数
+export type EntityOptions = {
+
+}
