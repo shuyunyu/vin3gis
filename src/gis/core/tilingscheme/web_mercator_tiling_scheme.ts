@@ -161,3 +161,5 @@ export class WebMercatorTilingScheme implements ITilingScheme {
     }
 
 }
+
+export const webMercatorTilingScheme = Object.freeze(new WebMercatorTilingScheme());

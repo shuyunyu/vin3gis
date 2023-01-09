@@ -127,7 +127,7 @@ export class GlobeSurfaceTile {
             //最底下的图层使用loading图片加载
             if (provider.visible) {
                 // tileImagery.processStateMachine(index !== 0);
-                tileImagery.processStateMachine(false);
+                if (tileImagery.imageryProvider.validateTileRectangleInRange(this._tile)) tileImagery.processStateMachine(false);
             }
         });
     }

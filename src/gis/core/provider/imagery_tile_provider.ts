@@ -40,6 +40,8 @@ export interface IImageryTileProvider {
     requestTileImageInWorker: boolean;
     //验证瓦片的缩放等级是否在限制的缩放等级之内
     validateTileLevelIsInRange (level: number): boolean;
+    //验证瓦片的范围是否在限制之内
+    validateTileRectangleInRange (tile: QuadtreeTile): boolean;
     //请求 图片资源
     requestTileImageAsset (x: number, y: number, level: number, priority: number, onComplete: (img: ImageRequestResult, state: RequestTaskStatus) => void): IScheduleRequestTask | undefined;
     //计算瓦片可见性
