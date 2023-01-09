@@ -32,4 +32,6 @@ export interface ImageryTileProviderOptions {
     token?: string;
     //风格
     style?: string;
+    //标识是否在WebWorker中请求瓦片图片  default true
+    requestTileImageInWorker?: boolean;
 }

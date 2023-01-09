@@ -1,5 +1,7 @@
 基于three.js开发的GIS框架。
 
+在线demo: http://124.223.202.45/VGIS-Examples/vin3gis
+
 ## Start 
 ```sh
 npm install

@@ -36,6 +36,8 @@ export interface IImageryTileProvider {
     tilingScheme: ITilingScheme;
     //visibilityChangedEvent
     visibilityChanged: GenericEvent<IImageryTileProvider>;
+    //标识是否在WebWorker中请求瓦片图片
+    requestTileImageInWorker: boolean;
     //验证瓦片的缩放等级是否在限制的缩放等级之内
     validateTileLevelIsInRange (level: number): boolean;
     //请求 图片资源
