@@ -2,8 +2,7 @@ import { GenericEvent } from "../../../core/event/generic_event";
 import { Collection } from "../misc/collection";
 import { Entity } from "./entity";
 
-
-type CollectionChangedData = {
+export type EntityCollectionChangedData = {
     collection: Entity[];
     added: Entity[];
     removed: Entity[];
@@ -22,7 +21,7 @@ export class EntityCollection extends Collection<Entity> {
     private _suspended: boolean = false;
 
     //集合改变事件
-    public readonly collectionChangedEvent: GenericEvent<CollectionChangedData>;
+    public readonly collectionChangedEvent: GenericEvent<EntityCollectionChangedData>;
 
     public constructor (entities?: Entity[]) {
         super(entities);

@@ -1,4 +1,5 @@
 import { Color } from "three";
+import { PointGeometry } from "../../core/datasource/geometry/point_geometry";
 import { ViewPort } from "../../core/misc/view_port";
 import { IImageryTileProvider } from "../../core/provider/imagery_tile_provider";
 import { Imagery } from "../../core/scene/imagery";
@@ -95,7 +96,12 @@ export type ImageryTileRenderParam = {
     opacity: number;
 }
 
+//实体类型
+export enum GeometryType {
+    POINT = "point"
+}
+
 //entity 构造参数
 export type EntityOptions = {
-
+    point?: PointGeometry;
 }
