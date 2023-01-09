@@ -1,5 +1,5 @@
-import { BoxGeometry, BufferAttribute, DoubleSide, FrontSide, Mesh, PlaneGeometry, ShaderMaterial, TextureLoader, Vector3 } from "three";
-import { FrameRenderer, math, XHRCancelToken, XHRResponseType } from "../src";
+import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector3 } from "three";
+import { FrameRenderer, math, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
@@ -9,6 +9,7 @@ import { GridImageryTileProvider } from "../src/gis/core/provider/grid_imagery_t
 import { createScheduler, removeScheduler } from "../src/core/utils/schedule_utils";
 import { BaiduImageryTileProvider } from "../src/gis/core/provider/baidu_imagery_tile_provider";
 import { BD09MercatorProject } from "../src/gis/core/projection/bd09_mercator_projection";
+import { Transform } from "../src/gis/core/transform/transform";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -22,8 +23,8 @@ window.onload = () => {
         //EmptyImageryTileProvider
         //AMapImageryTileProvider
         //TdtImageryTileProvider
-        // imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
-        imageryTileProivder: new BaiduImageryTileProvider({ correction: true }),
+        imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
+        // imageryTileProivder: new BaiduImageryTileProvider({ correction: true }),
         // imageryTileProivder: new OSMImageryTileProvider(),
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
@@ -58,12 +59,59 @@ class GISTest {
 
     public static run (render: FrameRenderer) {
         this.testXHRWorker();
+        // this.testDrawPoint(render);
         // this.testSchedule();
         // this.testShader(render);
         // this.testTileGeometry(render);
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
+    }
+
+    private static testDrawPoint (render: FrameRenderer) {
+        var texture: Texture;
+        var matContext: CanvasRenderingContext2D;
+        var matCanvas: HTMLCanvasElement;
+        function createCanvasMaterial (color: string, size: number) {
+            matCanvas = document.createElement('canvas');
+            matCanvas.width = matCanvas.height = size;
+            matContext = matCanvas.getContext('2d');
+            // create exture object from canvas.
+            texture = new Texture(matCanvas);
+            // Draw a circle
+            drawCircle(color, size);
+            // need to set needsUpdate
+            // texture.needsUpdate = true;
+            // return a texture made from the canvas
+            return texture;
+        }
+
+        function drawCircle (color: string, size: number) {
+            var center = size / 2;
+            matContext.clearRect(0, 0, matCanvas.width, matCanvas.height);
+            matContext.beginPath();
+            matContext.arc(center, center, size / 2, 0, 2 * Math.PI, false);
+            matContext.closePath();
+            matContext.fillStyle = color;
+            matContext.fill();
+            texture.needsUpdate = true;
+        }
+
+        globalThis.drawCircle = drawCircle;
+
+        const vertices = new Float32Array([0, 0, 0]);
+        const geometry = new BufferGeometry();
+        geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+        // const sprite = new TextureLoader().load('./disc.png');
+        const mtl = new PointsMaterial({
+            size: 1 * Transform.THREEJS_UNIT_PER_METERS / 100,
+            sizeAttenuation: false,
+            map: createCanvasMaterial("#FF0000", 256),
+            transparent: true
+        });
+        const pts = new Points(geometry, mtl);
+        pts.renderOrder = 2;
+        render.scene.add(pts);
     }
 
     private static testSchedule () {

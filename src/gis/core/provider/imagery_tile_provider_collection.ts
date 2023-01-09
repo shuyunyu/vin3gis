@@ -1,17 +1,15 @@
 import { GenericEvent } from "../../../core/event/generic_event";
-import { Utils } from "../../../core/utils/utils";
+import { Collection } from "../misc/collection";
 import { IImageryTileProvider } from "./imagery_tile_provider";
 
-export class ImageryTileProviderCollection {
+export class ImageryTileProviderCollection extends Collection<IImageryTileProvider>{
 
-    private _collection: IImageryTileProvider[] = [];
-
-    public readonly providerAdded = new GenericEvent<IImageryTileProvider>();
+    public readonly providerAdded: GenericEvent<IImageryTileProvider>;
 
     //当图层处于集合中的排序改变时触发
-    public readonly providerMoved = new GenericEvent<IImageryTileProvider>();
+    public readonly providerMoved: GenericEvent<IImageryTileProvider>;
 
-    public readonly providerRemoved = new GenericEvent<IImageryTileProvider>();
+    public readonly providerRemoved: GenericEvent<IImageryTileProvider>;
 
     //图层显示或隐藏触发
     public readonly providerShownOrHidden = new GenericEvent<IImageryTileProvider>();
@@ -21,70 +19,20 @@ export class ImageryTileProviderCollection {
     }
 
     constructor (imageryTileProviders?: IImageryTileProvider[]) {
-        if (Utils.defined(imageryTileProviders)) {
-            for (let i = 0; i < imageryTileProviders!.length; i++) {
-                const provider = imageryTileProviders![i];
-                this.add(provider);
-            }
-        }
+        super(imageryTileProviders);
+        this.providerAdded = this.eleAdded;
+        this.providerMoved = this.eleMoved;
+        this.providerRemoved = this.eleRemoved;
     }
 
     public add (provider: IImageryTileProvider, index?: number): boolean {
-        if (!this.contains(provider)) {
-            if (Utils.defined(index) && index! >= 0 && index! < this._collection.length) {
-                this._collection.splice(index!, 0, provider);
-            } else {
-                this._collection.push(provider);
-            }
+        const res = super.add(provider, index);
+        if (res) {
             provider.visibilityChanged.addEventListener(this.onProviderVisibilityChanged, this);
-            this.providerAdded.invoke(provider);
-            return true;
-        } else {
-            return false;
         }
+        return res;
     }
 
-    /**
-     * 将瓦片提供者 放入集合最底下
-     * @param provider 
-     */
-    public lowerToBottom (provider: IImageryTileProvider) {
-        let index = this.indexOf(provider);
-        if (index > -1) {
-            this._collection.splice(index, 1);
-            this._collection.unshift(provider);
-        } else {
-            this._collection.unshift(provider);
-            this.providerAdded.invoke(provider);
-        }
-    }
-
-    /**
-     * 将瓦片提供者 移动到集合最上层
-     * @param provider 
-     */
-    public raiseToTop (provider: IImageryTileProvider) {
-        let index = this.indexOf(provider);
-        if (index > -1) {
-            this._collection.splice(index, 1);
-            this._collection.push(provider);
-        } else {
-            this._collection.push(provider);
-            this.providerAdded.invoke(provider);
-        }
-    }
-
-    public get (index: number): IImageryTileProvider | undefined {
-        return this._collection[index];
-    }
-
-    public contains (provider: IImageryTileProvider) {
-        return this.indexOf(provider) > -1;
-    }
-
-    public indexOf (provider: IImageryTileProvider) {
-        return this._collection.indexOf(provider);
-    }
 
     /**
      * 移除瓦片提供者
@@ -92,33 +40,20 @@ export class ImageryTileProviderCollection {
      * @returns 
      */
     public remove (provider: IImageryTileProvider): boolean {
-        let index = this.indexOf(provider);
-        if (index > -1) {
-            this._collection.splice(index, 1);
-            provider.visibilityChanged.removeEventListener(this.onProviderVisibilityChanged, this);
-            this.providerRemoved.invoke(provider);
-            return true;
-        } else {
-            return false;
-        }
+        const res = super.remove(provider);
+        provider.visibilityChanged.removeEventListener(this.onProviderVisibilityChanged, this);
+        return res;
     }
 
     /**
      * 移除所有瓦片提供者
      */
     public removeAll () {
-        while (this._collection.length) {
-            let provider = this._collection.shift();
-            provider?.visibilityChanged.removeEventListener(this.onProviderVisibilityChanged, this);
-            this.providerRemoved.invoke(provider);
-        }
-    }
-
-    public foreach (callback: (item: IImageryTileProvider, index: number) => any) {
-        for (let i = 0; i < this._collection.length; i++) {
-            const res = callback(this._collection[i], i);
-            if (res === false) break;
-        }
+        const items = [].concat(this._collection) as IImageryTileProvider[];
+        super.removeAll();
+        items.forEach(item => {
+            item.visibilityChanged.removeEventListener(this.onProviderVisibilityChanged, this);
+        });
     }
 
     private onProviderVisibilityChanged (provider: IImageryTileProvider) {
