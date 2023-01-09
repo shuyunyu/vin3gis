@@ -25,7 +25,7 @@ export class UrlTemplateImageryProvider extends BaseImageryTileProvider {
         super(imageryTileProviderOptions);
         imageryTileProviderOptions = Utils.defaultValue(imageryTileProviderOptions, {});
         this._url = Utils.defaultValue(imageryTileProviderOptions!.url, '');
-        this._subdomains = Utils.defaultValue(imageryTileProviderOptions!.subdomain, []);
+        this._subdomains = Utils.defaultValue(imageryTileProviderOptions.subdomains, []);
     }
 
     /**

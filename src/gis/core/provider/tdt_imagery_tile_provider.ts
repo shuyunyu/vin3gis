@@ -23,7 +23,7 @@ export class TdtImageryTileProvider extends UrlTemplateImageryProvider {
         this._style = Utils.defaultValue(imageryTileProviderOptions.style, 'Aerial');
         this._key = Utils.defaultValue(imageryTileProviderOptions.key, '');
         this._url = Utils.defaultValue(imageryTileProviderOptions.url, this.getUrlTemplate(this._style, this._key));
-        this._subdomains = ['0', '1', '2', '3', '4', '5', '6', '7'];
+        this._subdomains = Utils.defaultValue(imageryTileProviderOptions.subdomains, ['0', '1', '2', '3', '4', '5', '6', '7']);
     }
 
     /**
