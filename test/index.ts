@@ -104,12 +104,13 @@ class GISTest {
         geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
         // const sprite = new TextureLoader().load('./disc.png');
         const mtl = new PointsMaterial({
-            size: 1 * Transform.THREEJS_UNIT_PER_METERS,
+            size: 1 * Transform.THREEJS_UNIT_PER_METERS / 100,
             sizeAttenuation: false,
             map: createCanvasMaterial("#FF0000", 256),
             transparent: true
         });
         const pts = new Points(geometry, mtl);
+        pts.renderOrder = 2;
         render.scene.add(pts);
     }
 
