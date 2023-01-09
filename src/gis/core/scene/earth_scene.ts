@@ -2,6 +2,7 @@ import { PerspectiveCamera } from "three";
 import { GenericEvent } from "../../../core/event/generic_event";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { EarthCamera } from "../camera/earth_camera";
+import { EntityCollection } from "../datasource/entity_collection";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
 import { TileNodeRenderer } from "../renderer/tile_node_renderer";
@@ -23,6 +24,8 @@ export class EarthScene {
 
     public readonly imageryProviders: ImageryTileProviderCollection;
 
+    public readonly entities: EntityCollection;
+
     public readonly tilingScheme: ITilingScheme;
 
     public readonly quadtreePrimitive: QuadtreePrimitive;
@@ -39,6 +42,7 @@ export class EarthScene {
         this._renderer.scene.add(this.tileNodeRenderer.root);
         this.imageryProviders = new ImageryTileProviderCollection();
         this.imageryProviders.add(imageryTileProvider);
+        this.entities = new EntityCollection();
         this.quadtreePrimitive = new QuadtreePrimitive(this.imageryProviders.get(0)!, tileCacheSize);
         this.tilingScheme = this.quadtreePrimitive.tileProvider.tilingScheme;
         this.camera = new EarthCamera(this._renderer, this.tilingScheme);
