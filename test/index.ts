@@ -1,6 +1,6 @@
 import { BoxGeometry, BufferAttribute, DoubleSide, FrontSide, Mesh, PlaneGeometry, ShaderMaterial, TextureLoader, Vector3 } from "three";
 import { FrameRenderer, math, XHRCancelToken, XHRResponseType } from "../src";
-import { AMapImageryTileProvider, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, Orientation, ViewPort } from "../src/gis";
+import { AMapImageryTileProvider, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, Orientation, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
@@ -30,6 +30,11 @@ window.onload = () => {
         // imageryTileProivder: new ArcGISImageryTileProvider({
         //     url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
         //     // token: '1d109683f4d84198e37a38c442d68311'
+        // }),
+        // imageryTileProivder: new TdtImageryTileProvider({
+        //     style: "street",
+        //     key: "1d109683f4d84198e37a38c442d68311",
+        //     requestTileImageInWorker: false
         // }),
         // imageryTileProivder: new TencentImageryTileProvider({
         //     style: 'normal',

@@ -6,6 +6,7 @@ import { Utils } from "../../../core/utils/utils";
 import { IScheduleRequestTask, RequestTaskStatus } from "../../../core/xhr/scheduler/@types/request";
 import { ImageRequestResult } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
+import { InternalConfig } from "../internal/internal_config";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { WebMercatorTilingScheme } from "../tilingscheme/web_mercator_tiling_scheme";
@@ -47,6 +48,9 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
 
     public readonly visibilityChanged = new GenericEvent<IImageryTileProvider>;
 
+    //标识是否在WebWorker中请求瓦片图片
+    public requestTileImageInWorker: boolean;
+
     public get visible () {
         return this._visible;
     }
@@ -78,6 +82,7 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
         this.tileHeight = Utils.defaultValue(imageryTileProviderOptions.tileHeight, 256);
         this.tilingScheme = Utils.defaultValue(imageryTileProviderOptions.tilingScheme, new WebMercatorTilingScheme());
         this.rectangle = Utils.defaultValue(imageryTileProviderOptions.rectangle, this.tilingScheme.projection.rectangle);
+        this.requestTileImageInWorker = Utils.defaultValue(imageryTileProviderOptions.requestTileImageInWorker, InternalConfig.REQUEST_RASTER_TILE_IN_WORKER);
         let width = this.tilingScheme.projection.rectangle.width;
         let tilesOfXAtZeroLevel = this.tilingScheme.getNumberOfXTilesAtLevel(0);
         this._levelZeroMaximumGeometricError = width / tilesOfXAtZeroLevel / this.tileWidth;
