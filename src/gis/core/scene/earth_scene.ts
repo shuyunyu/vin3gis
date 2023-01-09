@@ -2,6 +2,7 @@ import { PerspectiveCamera } from "three";
 import { GenericEvent } from "../../../core/event/generic_event";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { EarthCamera } from "../camera/earth_camera";
+import { DataSourceDisplay } from "../datasource/datasource_display";
 import { EntityCollection } from "../datasource/entity_collection";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
@@ -35,6 +36,8 @@ export class EarthScene {
     //瓦片节点渲染器
     public readonly tileNodeRenderer: TileNodeRenderer;
 
+    public readonly dataSourceDisplay: DataSourceDisplay;
+
     constructor (renderer: FrameRenderer, imageryTileProvider: IImageryTileProvider, terrainProvider: ITerrainProvider, tileCacheSize: number) {
         this._renderer = renderer;
         this.tileNodeRenderer = new TileNodeRenderer();
@@ -47,6 +50,7 @@ export class EarthScene {
         this.tilingScheme = this.quadtreePrimitive.tileProvider.tilingScheme;
         this.camera = new EarthCamera(this._renderer, this.tilingScheme);
         this.globleSurfaceManager = new GlobeSurfaceTileManager(this.quadtreePrimitive, terrainProvider, this);
+        this.dataSourceDisplay = new DataSourceDisplay(this.entities);
         this.ready = true;
     }
 
@@ -68,6 +72,7 @@ export class EarthScene {
     }
 
     public renderLateUpdate (delay: number) {
+        this.dataSourceDisplay.lateUpdate(delay);
         this.lateUpdateEvent.invoke(delay);
     }
 
