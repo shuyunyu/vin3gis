@@ -32,8 +32,8 @@ export class BaiduImageryTileProvider extends UrlTemplateImageryProvider {
         super(options);
         this._correction = correction;
         this._style = Utils.defaultValue(options.style, 'street');
-        this._url = this.getUrlTemplate(this._style);
-        this._subdomains = ['0', '1', '2', '3'];
+        this._url = Utils.defaultValue(options.url, this.getUrlTemplate(this._style));
+        this._subdomains = Utils.defaultValue(options.subdomains, ['0', '1', '2', '3']);
     }
 
     public createTileImageryUrl (x: number, y: number, level: number) {

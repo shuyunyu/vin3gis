@@ -25,7 +25,7 @@ export interface ImageryTileProviderOptions {
     //url
     url?: string;
     //subdomain
-    subdomain?: string[];
+    subdomains?: string[];
     //key for tdt
     key?: string;
     //token for arcgis

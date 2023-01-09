@@ -18,8 +18,8 @@ export class AMapImageryTileProvider extends UrlTemplateImageryProvider {
         options = options || {};
         super(options);
         this._style = Utils.defaultValue(options?.style, 'Aerial');
-        this._url = this.getUrlTemplate(this._style);
-        this._subdomains = ['1', '2', '3', '4'];
+        this._url = Utils.defaultValue(options.url, this.getUrlTemplate(this._style));
+        this._subdomains = Utils.defaultValue(options.subdomains, ['1', '2', '3', '4']);
     }
 
     /**
