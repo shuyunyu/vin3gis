@@ -10,12 +10,6 @@ export class RequestTask {
 
     public static DEBUG = true;
 
-    //任务池
-    private static _taskPool: RequestTask[] = [];
-
-    //任务池大小
-    public static MAX_POOL_SIZE = 100;
-
     //单个请求任务完成时的回调
     public static onTaskComplete?: (task: RequestTask) => void;
 
@@ -80,13 +74,7 @@ export class RequestTask {
      * @returns 
      */
     public static cerate (options: RequestTaskOptions) {
-        if (this._taskPool.length) {
-            const rt = this._taskPool.shift();
-            rt.init(options);
-            return rt;
-        } else {
-            return new RequestTask(options);
-        }
+        return new RequestTask(options);
     }
 
     /**
@@ -223,16 +211,13 @@ export class RequestTask {
      */
     private onTaskComplete (callOnComplete: boolean = true) {
         if (callOnComplete) RequestTask.onTaskComplete && RequestTask.onTaskComplete(this);
-        this.recycle();
+        this.destroy();
     }
 
     /**
-     * 回收任务
+     * 销毁任务
      */
-    private recycle () {
-        if (RequestTask._taskPool.length < RequestTask.MAX_POOL_SIZE) {
-            RequestTask._taskPool.push(this);
-        }
+    private destroy () {
         this._cancelFunc = null;
         this._server = null;
         this._url = null;
