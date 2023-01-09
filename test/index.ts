@@ -1,6 +1,6 @@
 import { BoxGeometry, BufferAttribute, DoubleSide, FrontSide, Mesh, PlaneGeometry, ShaderMaterial, TextureLoader, Vector3 } from "three";
 import { FrameRenderer, math, XHRCancelToken, XHRResponseType } from "../src";
-import { AMapImageryTileProvider, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, Orientation, TdtImageryTileProvider, ViewPort } from "../src/gis";
+import { AMapImageryTileProvider, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
@@ -24,6 +24,7 @@ window.onload = () => {
         //TdtImageryTileProvider
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
         imageryTileProivder: new BaiduImageryTileProvider({ correction: true }),
+        // imageryTileProivder: new OSMImageryTileProvider(),
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
         // imageryTileProivder: new EmptyImageryTileProvider(),
