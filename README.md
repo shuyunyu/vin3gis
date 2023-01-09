@@ -2,6 +2,8 @@
 
 在线demo: http://124.223.202.45/VGIS-Examples/vin3gis
 
+![](./examples/vin3gis_demos.jpeg)
+
 ## Start 
 ```sh
 npm install
