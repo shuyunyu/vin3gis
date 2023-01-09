@@ -41,7 +41,7 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
     public readonly tileHeight: number = 256;
     //标识是否已经准备完毕
     public readonly ready: boolean = false;
-    //切片范围
+    //切片范围 可以限定切片的显示
     public readonly rectangle: Rectangle;
     //瓦片方案
     public readonly tilingScheme: ITilingScheme;
@@ -109,6 +109,14 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
      */
     public validateTileLevelIsInRange (level: number): boolean {
         return level >= this.minimumLevel && level <= this.maximumLevel;
+    }
+
+    /**
+     * 验证瓦片的范围是否在限制之内
+     * @param tile 
+     */
+    public validateTileRectangleInRange (tile: QuadtreeTile): boolean {
+        return this.rectangle.contains(tile.rectangle);
     }
 
     /**

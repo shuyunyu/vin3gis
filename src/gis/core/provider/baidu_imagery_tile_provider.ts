@@ -1,4 +1,5 @@
 import { Utils } from "../../../core/utils/utils";
+import { webMercatorProjection } from "../projection/web_mercator_projection";
 import { BD09MercatorTilingScheme } from "../tilingscheme/bd09_mercator_tiling_scheme";
 import { WebMercatorTilingScheme } from "../tilingscheme/web_mercator_tiling_scheme";
 import { ImageryTileProviderOptions } from "./imagery_tile_provider_options";
@@ -23,6 +24,7 @@ export class BaiduImageryTileProvider extends UrlTemplateImageryProvider {
 
     public constructor (options?: BaiduImageryTileProviderOptions) {
         options = options || {};
+        options.rectangle = Utils.defaultValue(options.rectangle, webMercatorProjection.rectangle.clone());
         const correction = Utils.defaultValue(options.correction, false);
         if (correction) {
             options.tilingScheme = new BD09MercatorTilingScheme();

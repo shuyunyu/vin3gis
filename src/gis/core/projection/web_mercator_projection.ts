@@ -95,3 +95,5 @@ export class WebMercatorProjection extends BaseProjection {
     }
 
 }
+
+export const webMercatorProjection = Object.freeze(new WebMercatorProjection());
