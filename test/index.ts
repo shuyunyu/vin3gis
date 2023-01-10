@@ -75,7 +75,11 @@ class GISTest {
         const entity = new Entity({
             point: new PointGeometry({
                 position: Cartographic.fromDegrees(118.256, 24.418, 0),
-                size: 10
+                size: 30,
+                color: new Color("#FF0000"),
+                outline: false,
+                outlineSize: 10,
+                outlineColor: new Color("#00FFFF")
             })
         });
         mapViewer.scene.entities.add(entity);
@@ -117,7 +121,7 @@ class GISTest {
         geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
         // const sprite = new TextureLoader().load('./disc.png');
         const mtl = new PointsMaterial({
-            size: 1 * Transform.THREEJS_UNIT_PER_METERS / 100,
+            size: 10,
             sizeAttenuation: false,
             map: createCanvasMaterial("#FF0000", 256),
             transparent: true

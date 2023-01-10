@@ -25,17 +25,45 @@ export class PointGeometry extends BaseGeometry {
 
     private _position: Cartographic;
 
+    public get position () {
+        return this._position;
+    }
+
     private _size: number;
+
+    public get size () {
+        return this._size;
+    }
 
     private _sizeAttenuation: boolean;
 
+    public get sizeAttenuation () {
+        return this._sizeAttenuation;
+    }
+
     private _color: Color;
+
+    public get color () {
+        return this._color;
+    }
 
     private _outline: boolean;
 
+    public get outline () {
+        return this._outline;
+    }
+
     private _outlineSize: number;
 
+    public get outlineSize () {
+        return this._outlineSize;
+    }
+
     private _outlineColor: Color;
+
+    public get outlineColor () {
+        return this._outlineColor;
+    }
 
     public constructor (options?: PointGeometryOptions) {
         options = options || {};

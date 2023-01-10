@@ -26,6 +26,10 @@ export class Entity {
 
     private _point?: PointGeometry;
 
+    public get point () {
+        return this._point;
+    }
+
     public constructor (options: EntityOptions) {
         this.id = Utils.createGuid();
         this.definitionChangedEvent = new GenericEvent();
