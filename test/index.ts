@@ -10,6 +10,8 @@ import { createScheduler, removeScheduler } from "../src/core/utils/schedule_uti
 import { BaiduImageryTileProvider } from "../src/gis/core/provider/baidu_imagery_tile_provider";
 import { BD09MercatorProject } from "../src/gis/core/projection/bd09_mercator_projection";
 import { Transform } from "../src/gis/core/transform/transform";
+import { Entity } from "../src/gis/core/datasource/entity";
+import { PointGeometry } from "../src/gis/core/datasource/geometry/point_geometry";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -52,13 +54,14 @@ window.onload = () => {
     // mapViewer.scene.imageryProviders.add(new AMapImageryTileProvider({ style: 'note' }));
     // mapViewer.scene.imageryProviders.add(new GridImageryTileProvider());
     global.mapViewer = mapViewer;
-    GISTest.run(mapViewer.renderer);
+    GISTest.run(mapViewer.renderer, mapViewer);
 }
 
 class GISTest {
 
-    public static run (render: FrameRenderer) {
+    public static run (render: FrameRenderer, mapViewer: MapViewer) {
         this.testXHRWorker();
+        // this.testEntity(mapViewer);
         // this.testDrawPoint(render);
         // this.testSchedule();
         // this.testShader(render);
@@ -66,6 +69,16 @@ class GISTest {
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
+    }
+
+    private static testEntity (mapViewer: MapViewer) {
+        const entity = new Entity({
+            point: new PointGeometry({
+                position: Cartographic.fromDegrees(118.256, 24.418, 0),
+                size: 10
+            })
+        });
+        mapViewer.scene.entities.add(entity);
     }
 
     private static testDrawPoint (render: FrameRenderer) {

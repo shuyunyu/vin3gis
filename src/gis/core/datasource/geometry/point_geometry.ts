@@ -1,6 +1,7 @@
 import { Color } from "three";
 import { Utils } from "../../../../core/utils/utils";
 import { Cartographic } from "../../cartographic";
+import { PointGeometryVisualizer } from "../visualizer/point_geometry_visualizer";
 import { BaseGeometry } from "./base_geometry";
 import { GeometryType } from "./geometry";
 
@@ -46,6 +47,7 @@ export class PointGeometry extends BaseGeometry {
         this._outline = Utils.defaultValue(options.outline, false);
         this._outlineSize = Utils.defaultValue(options.outlineSize, 0.1);
         this._outlineColor = Utils.defaultValue(options.outlineColor, new Color());
+        this.visualizer = new PointGeometryVisualizer();
     }
 
     public clone () {

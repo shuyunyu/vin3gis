@@ -103,5 +103,7 @@ export enum GeometryType {
 
 //entity 构造参数
 export type EntityOptions = {
+    //可见性 default true
+    visible?: boolean;
     point?: PointGeometry;
 }

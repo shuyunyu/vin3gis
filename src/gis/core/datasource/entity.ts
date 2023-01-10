@@ -10,11 +10,26 @@ export class Entity {
     //定义改变事件
     public readonly definitionChangedEvent: GenericEvent<Entity>;
 
+    //可见性
+    private _visible: boolean = true;
+
+    public get visible () {
+        return this._visible;
+    }
+
+    public set visible (val: boolean) {
+        if (val !== this._visible) {
+            this._visible = val;
+            this.definitionChangedEvent.emit(this);
+        }
+    }
+
     private _point?: PointGeometry;
 
     public constructor (options: EntityOptions) {
         this.id = Utils.createGuid();
         this.definitionChangedEvent = new GenericEvent();
+        this._visible = Utils.defaultValue(options.visible, true);
         if (options.point) {
             this._point = options.point;
             this._point.entity = this;

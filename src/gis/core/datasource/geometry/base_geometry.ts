@@ -10,7 +10,7 @@ export class BaseGeometry implements IGeometry {
 
     public readonly type: GeometryType;
 
-    public readonly visualizer: IGeometryVisualizer;
+    public visualizer: IGeometryVisualizer;
 
     private _entity?: Entity;
 

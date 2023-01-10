@@ -1,3 +1,4 @@
+import { Object3D } from "three";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Entity } from "../entity";
 
@@ -6,9 +7,9 @@ import { Entity } from "../entity";
  */
 export interface IGeometryVisualizer {
     //显示
-    show: (entity: Entity, tilingScheme: ITilingScheme) => void;
+    show: (entity: Entity, tilingScheme: ITilingScheme, root: Object3D) => void;
     //隐藏
-    hide: (entity: Entity) => void;
+    hide: (entity: Entity, root: Object3D) => void;
     //移除
-    remove: (entity: Entity) => void;
+    remove: (entity: Entity, root: Object3D) => void;
 }
