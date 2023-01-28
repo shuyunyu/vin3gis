@@ -30,14 +30,15 @@ export class DataSourceDisplay {
         const showEntities: Entity[] = [];
         const removeEntities: Entity[] = data.removed;
         const hideEntities: Entity[] = [];
+        const updateEntities: Entity[] = data.changed;
         for (let i = 0; i < data.added.length; i++) {
             const entity = data.added[i];
             if (entity.visible) {
                 showEntities.push(entity);
             }
         }
-        for (let i = 0; i < data.changed.length; i++) {
-            const entity = data.changed[i];
+        for (let i = 0; i < data.visibleChanged.length; i++) {
+            const entity = data.visibleChanged[i];
             if (entity.visible) {
                 showEntities.push(entity);
             } else {
@@ -47,6 +48,7 @@ export class DataSourceDisplay {
         this.entityDisplayControl(showEntities, "show");
         this.entityDisplayControl(hideEntities, "hide");
         this.entityDisplayControl(removeEntities, "remove");
+        this.entityDisplayControl(updateEntities, "update");
     }
 
     /**
@@ -54,7 +56,7 @@ export class DataSourceDisplay {
      * @param entities 
      * @param ctrl 
      */
-    private entityDisplayControl (entities: Entity[], ctrl: "show" | "remove" | "hide") {
+    private entityDisplayControl (entities: Entity[], ctrl: "show" | "remove" | "hide" | "update") {
         for (let i = 0; i < entities.length; i++) {
             const entity = entities[i];
             for (const propKey in entity) {
@@ -67,6 +69,8 @@ export class DataSourceDisplay {
                             propVal.visualizer.remove(entity, this.root);
                         } else if (ctrl === "hide") {
                             propVal.visualizer.hide(entity, this.root);
+                        } else if (ctrl === "update") {
+                            propVal.visualizer.update(entity, this._tilingScheme, this.root);
                         }
                     }
                 }

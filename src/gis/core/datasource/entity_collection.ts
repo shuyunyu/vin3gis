@@ -7,6 +7,7 @@ export type EntityCollectionChangedData = {
     added: Entity[];
     removed: Entity[];
     changed: Entity[];
+    visibleChanged: Entity[];
 }
 
 export class EntityCollection extends Collection<Entity> {
@@ -16,6 +17,8 @@ export class EntityCollection extends Collection<Entity> {
     private _removed: Entity[] = [];
 
     private _changed: Entity[] = [];
+
+    private _visibleChanged: Entity[] = [];
 
     //标识 事件是否挂起
     private _suspended: boolean = false;
@@ -33,6 +36,7 @@ export class EntityCollection extends Collection<Entity> {
         if (res) {
             this.entityEnqueue(this._added, item);
             item.definitionChangedEvent.addEventListener(this.onEntityDefinitionChanged, this);
+            item.visibleChangedEvent.addEventListener(this.onEntityVisibleChanged, this);
             this.invokeEvent();
         }
         return res;
@@ -43,6 +47,7 @@ export class EntityCollection extends Collection<Entity> {
         if (res) {
             this.entityEnqueue(this._removed, item);
             item.definitionChangedEvent.removeEventListener(this.onEntityDefinitionChanged, this);
+            item.visibleChangedEvent.removeEventListener(this.onEntityVisibleChanged, this);
             this.invokeEvent();
         }
         return res;
@@ -68,6 +73,7 @@ export class EntityCollection extends Collection<Entity> {
         entities.forEach(entity => {
             this.entityEnqueue(this._removed, entity);
             entity.definitionChangedEvent.removeEventListener(this.onEntityDefinitionChanged, this);
+            entity.visibleChangedEvent.removeEventListener(this.onEntityVisibleChanged, this);
         });
         if (entities.length) {
             this.invokeEvent();
@@ -134,16 +140,18 @@ export class EntityCollection extends Collection<Entity> {
      * 触发事件
      */
     public invokeEvent () {
-        if (!this._suspended && (this._added.length || this._removed.length || this._changed.length)) {
+        if (!this._suspended && (this._added.length || this._removed.length || this._changed.length || this._visibleChanged.length)) {
             this.collectionChangedEvent.invoke({
                 collection: this._collection,
                 added: this._added,
                 removed: this._removed,
-                changed: this._changed
+                changed: this._changed,
+                visibleChanged: this._visibleChanged
             });
             this.clearEntityQueue(this._added);
             this.clearEntityQueue(this._removed);
             this.clearEntityQueue(this._changed);
+            this.clearEntityQueue(this._visibleChanged);
         }
     }
 
@@ -153,6 +161,15 @@ export class EntityCollection extends Collection<Entity> {
      */
     private onEntityDefinitionChanged (entity: Entity) {
         this.entityEnqueue(this._changed, entity);
+        this.invokeEvent();
+    }
+
+    /**
+     * 实体可见性改变监听
+     * @param entity 
+     */
+    private onEntityVisibleChanged (entity: Entity) {
+        this.entityEnqueue(this._visibleChanged, entity);
         this.invokeEvent();
     }
 

@@ -7,6 +7,9 @@ export class Entity {
 
     public readonly id: string;
 
+    //可见性改变事件
+    public readonly visibleChangedEvent: GenericEvent<Entity>;
+
     //定义改变事件
     public readonly definitionChangedEvent: GenericEvent<Entity>;
 
@@ -20,7 +23,7 @@ export class Entity {
     public set visible (val: boolean) {
         if (val !== this._visible) {
             this._visible = val;
-            this.definitionChangedEvent.emit(this);
+            this.visibleChangedEvent.emit(this);
         }
     }
 
@@ -32,6 +35,7 @@ export class Entity {
 
     public constructor (options: EntityOptions) {
         this.id = Utils.createGuid();
+        this.visibleChangedEvent = new GenericEvent();
         this.definitionChangedEvent = new GenericEvent();
         this._visible = Utils.defaultValue(options.visible, true);
         if (options.point) {
