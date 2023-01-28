@@ -30,4 +30,8 @@ export class BaseGeometry implements IGeometry {
         return null;
     }
 
+    public update () {
+        this.entity?.updateGeometry(this);
+    }
+
 }

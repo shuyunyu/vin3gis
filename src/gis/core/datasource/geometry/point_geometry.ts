@@ -29,10 +29,20 @@ export class PointGeometry extends BaseGeometry {
         return this._position;
     }
 
+    public set position (val: Cartographic) {
+        this._position = val;
+        this.update();
+    }
+
     private _size: number;
 
     public get size () {
         return this._size;
+    }
+
+    public set size (val: number) {
+        this._size = Math.max(0, val);
+        this.update();
     }
 
     private _sizeAttenuation: boolean;
@@ -41,10 +51,20 @@ export class PointGeometry extends BaseGeometry {
         return this._sizeAttenuation;
     }
 
+    public set sizeAttenuation (val: boolean) {
+        this._sizeAttenuation = val;
+        this.update();
+    }
+
     private _color: Color;
 
     public get color () {
         return this._color;
+    }
+
+    public set color (val: Color) {
+        this._color = val;
+        this.update();
     }
 
     private _outline: boolean;
@@ -53,16 +73,31 @@ export class PointGeometry extends BaseGeometry {
         return this._outline;
     }
 
+    public set outline (val: boolean) {
+        this._outline = val;
+        this.update();
+    }
+
     private _outlineSize: number;
 
     public get outlineSize () {
         return this._outlineSize;
     }
 
+    public set outlineSize (val: number) {
+        this._outlineSize = val;
+        this.update();
+    }
+
     private _outlineColor: Color;
 
     public get outlineColor () {
         return this._outlineColor;
+    }
+
+    public set outlineColor (val: Color) {
+        this._outlineColor = val;
+        this.update();
     }
 
     public constructor (options?: PointGeometryOptions) {

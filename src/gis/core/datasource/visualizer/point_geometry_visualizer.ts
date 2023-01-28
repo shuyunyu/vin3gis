@@ -29,7 +29,7 @@ export class PointGeometryVisualizer extends BaseGeometryVisualizer {
         geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
         const mtl = new PointsMaterial({
             size: fullSize,
-            sizeAttenuation: false,
+            sizeAttenuation: point.sizeAttenuation,
             map: texture,
             transparent: true,
             depthTest: false

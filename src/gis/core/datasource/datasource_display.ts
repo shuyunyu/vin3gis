@@ -57,23 +57,32 @@ export class DataSourceDisplay {
      * @param ctrl 
      */
     private entityDisplayControl (entities: Entity[], ctrl: "show" | "remove" | "hide" | "update") {
-        for (let i = 0; i < entities.length; i++) {
-            const entity = entities[i];
-            for (const propKey in entity) {
-                if (Object.prototype.hasOwnProperty.call(entity, propKey)) {
-                    const propVal = entity[propKey];
-                    if (propVal && propVal instanceof BaseGeometry) {
-                        if (ctrl === "show") {
-                            propVal.visualizer.show(entity, this._tilingScheme, this.root);
-                        } else if (ctrl === "remove") {
-                            propVal.visualizer.remove(entity, this.root);
-                        } else if (ctrl === "hide") {
-                            propVal.visualizer.hide(entity, this.root);
-                        } else if (ctrl === "update") {
-                            propVal.visualizer.update(entity, this._tilingScheme, this.root);
+        if (ctrl !== "update") {
+            for (let i = 0; i < entities.length; i++) {
+                const entity = entities[i];
+                for (const propKey in entity) {
+                    if (Object.prototype.hasOwnProperty.call(entity, propKey)) {
+                        const propVal = entity[propKey];
+                        if (propVal && propVal instanceof BaseGeometry) {
+                            if (ctrl === "show") {
+                                propVal.visualizer.show(entity, this._tilingScheme, this.root);
+                            } else if (ctrl === "remove") {
+                                propVal.visualizer.remove(entity, this.root);
+                            } else if (ctrl === "hide") {
+                                propVal.visualizer.hide(entity, this.root);
+                            }
                         }
                     }
                 }
+            }
+        } else {
+            //update geometry
+            for (let i = 0; i < entities.length; i++) {
+                const entity = entities[i];
+                entity.changedGeometryList.forEach((baseGeometry: BaseGeometry) => {
+                    baseGeometry.visualizer.update(entity, this._tilingScheme, this.root);
+                });
+                entity.changedGeometryList.clear();
             }
         }
     }

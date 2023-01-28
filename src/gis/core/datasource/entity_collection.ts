@@ -35,7 +35,7 @@ export class EntityCollection extends Collection<Entity> {
         const res = super.add(item, index);
         if (res) {
             this.entityEnqueue(this._added, item);
-            item.definitionChangedEvent.addEventListener(this.onEntityDefinitionChanged, this);
+            item.geometryChangedEvent.addEventListener(this.onEntityGeometryChanged, this);
             item.visibleChangedEvent.addEventListener(this.onEntityVisibleChanged, this);
             this.invokeEvent();
         }
@@ -46,7 +46,7 @@ export class EntityCollection extends Collection<Entity> {
         const res = super.remove(item);
         if (res) {
             this.entityEnqueue(this._removed, item);
-            item.definitionChangedEvent.removeEventListener(this.onEntityDefinitionChanged, this);
+            item.geometryChangedEvent.removeEventListener(this.onEntityGeometryChanged, this);
             item.visibleChangedEvent.removeEventListener(this.onEntityVisibleChanged, this);
             this.invokeEvent();
         }
@@ -72,7 +72,7 @@ export class EntityCollection extends Collection<Entity> {
         super.removeAll();
         entities.forEach(entity => {
             this.entityEnqueue(this._removed, entity);
-            entity.definitionChangedEvent.removeEventListener(this.onEntityDefinitionChanged, this);
+            entity.geometryChangedEvent.removeEventListener(this.onEntityGeometryChanged, this);
             entity.visibleChangedEvent.removeEventListener(this.onEntityVisibleChanged, this);
         });
         if (entities.length) {
@@ -159,7 +159,7 @@ export class EntityCollection extends Collection<Entity> {
      * 实体定义改变监听
      * @param entity 
      */
-    private onEntityDefinitionChanged (entity: Entity) {
+    private onEntityGeometryChanged (entity: Entity) {
         this.entityEnqueue(this._changed, entity);
         this.invokeEvent();
     }
