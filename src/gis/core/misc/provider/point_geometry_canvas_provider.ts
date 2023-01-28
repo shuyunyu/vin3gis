@@ -23,7 +23,7 @@ class PointGeometryCanvasProvider {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = canvas.height = opt.canvasSize;
-        let size = opt.size;
+        let size = opt.canvasSize;
         if (opt.outline) {
             const totalSize = opt.size + opt.outlineSize;
             const innerFactor = opt.size / totalSize;

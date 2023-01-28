@@ -61,7 +61,7 @@ class GISTest {
 
     public static run (render: FrameRenderer, mapViewer: MapViewer) {
         this.testXHRWorker();
-        // this.testEntity(mapViewer);
+        this.testEntity(mapViewer);
         // this.testDrawPoint(render);
         // this.testSchedule();
         // this.testShader(render);
@@ -77,7 +77,7 @@ class GISTest {
                 position: Cartographic.fromDegrees(118.256, 24.418, 0),
                 size: 30,
                 color: new Color("#FF0000"),
-                outline: false,
+                outline: true,
                 outlineSize: 10,
                 outlineColor: new Color("#00FFFF")
             })

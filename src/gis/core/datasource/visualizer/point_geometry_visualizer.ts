@@ -1,5 +1,6 @@
-import { Object3D, Event, Texture, BufferGeometry, Float32BufferAttribute, PointsMaterial, Points } from "three";
+import { Object3D, Event, Texture, BufferGeometry, Float32BufferAttribute, PointsMaterial, Points, LinearFilter } from "three";
 import { pointGeometryCanvasProvider } from "../../misc/provider/point_geometry_canvas_provider";
+import { GEOMETRY_RENDER_ORDER } from "../../misc/render_order";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
 import { Entity } from "../entity";
@@ -19,6 +20,8 @@ export class PointGeometryVisualizer extends BaseGeometryVisualizer {
             outlineColor: point.outlineColor
         });
         const texture = new Texture(canvas);
+        texture.minFilter = LinearFilter;
+        texture.magFilter = LinearFilter;
         texture.needsUpdate = true;
         const coord = Transform.cartographicToWorldVec3(point.position, tilingScheme);
         const vertices = new Float32Array([coord.x, coord.y, coord.z]);
@@ -28,10 +31,11 @@ export class PointGeometryVisualizer extends BaseGeometryVisualizer {
             size: fullSize,
             sizeAttenuation: false,
             map: texture,
-            transparent: true
+            transparent: true,
+            depthTest: false
         });
         const pts = new Points(geometry, mtl);
-        pts.renderOrder = 2;
+        pts.renderOrder = GEOMETRY_RENDER_ORDER;
         root.add(pts);
     }
 
