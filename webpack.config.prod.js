@@ -75,12 +75,12 @@ module.exports = {
                 use: 'ts-loader',
                 exclude: /node_modules/
             }, {
-                test: /\.css$/, // 正则表达式，表示.css后缀的文件
-                use: ['style-loader', 'css-loader'] // 针对css文件使用的loader，注意有先后顺序，数组项越靠后越先执行
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader']
             }
         ]
     },
-    watch: false, // 监听修改自动打包
+    watch: false,
     devServer: {
         compress: true,
         historyApiFallback: true,
