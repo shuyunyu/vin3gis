@@ -83,6 +83,7 @@ class GISTest {
             })
         });
         mapViewer.scene.entities.add(entity);
+        global.pointEntity = entity;
     }
 
     private static testDrawPoint (render: FrameRenderer) {

@@ -8,7 +8,7 @@ import { BaseGeometryVisualizer } from "./base_geometry_visualizer";
 
 export class PointGeometryVisualizer extends BaseGeometryVisualizer {
 
-    public show (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>): void {
+    protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme): Object3D<Event> {
         const point = entity.point;
         const fullSize = point.outline ? point.size + point.outlineSize : point.size;
         const canvas = pointGeometryCanvasProvider.createCanvas({
@@ -36,15 +36,7 @@ export class PointGeometryVisualizer extends BaseGeometryVisualizer {
         });
         const pts = new Points(geometry, mtl);
         pts.renderOrder = GEOMETRY_RENDER_ORDER;
-        root.add(pts);
-    }
-
-    public hide (entity: Entity, root: Object3D<Event>): void {
-
-    }
-
-    public remove (entity: Entity, root: Object3D<Event>): void {
-
+        return pts;
     }
 
 }
