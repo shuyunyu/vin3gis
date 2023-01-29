@@ -90,7 +90,6 @@ class GISTest {
         });
         mapViewer.scene.entities.add(entity);
         global.pointEntity = entity;
-
         mapViewer.scene.entities.suspendEvents();
         const pointCount = 100;
         for (let i = 0; i < pointCount; i++) {
