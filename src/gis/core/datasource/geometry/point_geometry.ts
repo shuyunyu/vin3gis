@@ -37,7 +37,6 @@ export class PointGeometry extends BasePointGeometry {
         return new PointGeometry({
             position: this.position.clone(),
             size: this.size,
-            sizeAttenuation: this.sizeAttenuation,
             color: this.color.clone(),
             outline: this.outline,
             outlineSize: this.outlineSize,

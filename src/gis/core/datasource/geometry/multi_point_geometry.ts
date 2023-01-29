@@ -36,7 +36,6 @@ export class MultiPointGeometry extends BasePointGeometry {
         return new MultiPointGeometry({
             positions: this.positions.map(pos => pos.clone()),
             size: this.size,
-            sizeAttenuation: this.sizeAttenuation,
             color: this.color.clone(),
             outline: this.outline,
             outlineSize: this.outlineSize,

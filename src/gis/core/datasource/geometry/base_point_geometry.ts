@@ -6,8 +6,6 @@ import { GeometryType } from "./geometry";
 export interface BasePointGeometryOptions {
     //点的尺寸 default 1
     size?: number;
-    //尺寸是否随相机的改变而改变 default false
-    sizeAttenuation?: boolean;
     //点的颜色
     color?: Color;
     //是否显示outline default false
@@ -31,17 +29,6 @@ export class BasePointGeometry extends BaseGeometry {
 
     public set size (val: number) {
         this._size = Math.max(0, val);
-        this.update();
-    }
-
-    private _sizeAttenuation: boolean;
-
-    public get sizeAttenuation () {
-        return this._sizeAttenuation;
-    }
-
-    public set sizeAttenuation (val: boolean) {
-        this._sizeAttenuation = val;
         this.update();
     }
 
@@ -93,7 +80,6 @@ export class BasePointGeometry extends BaseGeometry {
         options = options || {};
         super({ type: type });
         this._size = Utils.defaultValue(options.size, 1);
-        this._sizeAttenuation = Utils.defaultValue(options.sizeAttenuation, false);
         this._color = Utils.defaultValue(options.color, new Color());
         this._outline = Utils.defaultValue(options.outline, false);
         this._outlineSize = Utils.defaultValue(options.outlineSize, 0);

@@ -30,7 +30,7 @@ export class PointGeometryVisualizer extends BaseGeometryVisualizer {
         const geometry = this.createGeometry(entity, tilingScheme);
         const mtl = new PointsMaterial({
             size: fullSize,
-            sizeAttenuation: basePointGeometry.sizeAttenuation,
+            sizeAttenuation: false,
             map: texture,
             transparent: true,
             depthTest: false
