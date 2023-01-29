@@ -6,14 +6,16 @@ import { BillboardGeometryVisualizer } from "../visualizer/billboard_geometry_vi
 import { BaseGeometry } from "./base_geometry";
 import { GeometryType } from "./geometry";
 
-type BillboardImageSource = string | TexImageSource;
+type BillboardImageSource = string | CanvasImageSource;
 
 export type BillboardGeometryOptions = {
     //位置
     position: Cartographic;
     //图片源
     image: BillboardImageSource;
+    //宽度 默认使用图片资源的宽度
     width?: number;
+    //高度 默认使用图片的高度
     height?: number;
 }
 
@@ -50,7 +52,7 @@ export class BillboardGeometry extends BaseGeometry {
         this.updateImage();
     }
 
-    private _texImageSource: TexImageSource;
+    private _texImageSource: CanvasImageSource;
 
     /**
      * 用来构建贴图的图片资源
@@ -85,8 +87,12 @@ export class BillboardGeometry extends BaseGeometry {
         super({ type: GeometryType.BILLBOARD });
         this._ready = false;
         this._position = options.position;
-        this._width = Utils.defaultValue(options.width, 10);
-        this._height = Utils.defaultValue(options.height, 10);
+        if (Utils.defined(options.width)) {
+            this._width = options.width;
+        }
+        if (Utils.defined(options.height)) {
+            this._height = options.height;
+        }
         this.visualizer = new BillboardGeometryVisualizer();
         this.image = options.image;
     }
@@ -102,13 +108,20 @@ export class BillboardGeometry extends BaseGeometry {
                 throttle: false
             }).then(imageEle => {
                 this._texImageSource = imageEle;
+                //设置宽高
+                if (!Utils.defined(this._width)) {
+                    this._width = imageEle.width;
+                }
+                if (!Utils.defined(this._height)) {
+                    this._height = imageEle.height;
+                }
                 this._ready = true;
                 this.update();
             }).catch(err => {
                 Log.error(BillboardGeometry, `load image failed: ${this._image}`);
             });
         } else {
-            this._texImageSource = this._image as TexImageSource;
+            this._texImageSource = this._image as CanvasImageSource;
             this._ready = true;
             this.update();
         }

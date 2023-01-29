@@ -75,22 +75,23 @@ class GISTest {
 
     private static testEntity (mapViewer: MapViewer) {
         // this.testPointEntity(mapViewer);
-        // this.testBillboardEntity(mapViewer);
+        this.testBillboardEntity(mapViewer);
     }
 
     private static testBillboardEntity (mapViewer: MapViewer) {
+        const pos = Cartographic.fromDegrees(118.256, 24.418, 0);
         const entity = new Entity({
             billboard: new BillboardGeometry({
-                position: Cartographic.fromDegrees(118.256, 24.418, 0),
+                position: pos,
                 image: "http://mars3d.cn/img/marker/mark-blue.png",
-                width: 100,
-                height: 100
+                // width: 20,
+                // height: 20
             })
         })
         mapViewer.scene.entities.add(entity);
         const entity1 = new Entity({
             point: new PointGeometry({
-                position: Cartographic.fromDegrees(118.256, 24.418, 0),
+                position: pos,
                 size: 10,
                 color: new Color("#FF0000")
             })
