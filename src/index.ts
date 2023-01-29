@@ -37,6 +37,8 @@ export * from "./core/utils/ray_utils";
 export * from "./core/utils/texture_utils";
 export * from "./core/utils/image_utils";
 export * from "./core/utils/schedule_utils";
+export * from "./core/utils/color_utils";
+export * from "./core/utils/geometry_utils";
 
 export * from "./core/xhr/xhr_request";
 export * from "./core/xhr/scheduler/request_scheduler";

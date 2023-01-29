@@ -1,4 +1,8 @@
 import { Color } from "three";
+import { BillboardGeometry } from "../../core/datasource/geometry/billboard_geometry";
+import { MultiPointGeometry } from "../../core/datasource/geometry/multi_point_geometry";
+import { PointCloudGeometry } from "../../core/datasource/geometry/point_cloud_geometry";
+import { PointGeometry } from "../../core/datasource/geometry/point_geometry";
 import { ViewPort } from "../../core/misc/view_port";
 import { IImageryTileProvider } from "../../core/provider/imagery_tile_provider";
 import { Imagery } from "../../core/scene/imagery";
@@ -93,4 +97,19 @@ export type ImageRequestResult = HTMLImageElement | ImageBitmap | Blob;
 export type ImageryTileRenderParam = {
     imagery: Imagery;
     opacity: number;
+}
+
+//实体类型
+export enum GeometryType {
+    POINT = "point"
+}
+
+//entity 构造参数
+export type EntityOptions = {
+    //可见性 default true
+    visible?: boolean;
+    point?: PointGeometry;
+    multiPoint?: MultiPointGeometry;
+    pointCloud?: PointCloudGeometry;
+    billboard?: BillboardGeometry;
 }

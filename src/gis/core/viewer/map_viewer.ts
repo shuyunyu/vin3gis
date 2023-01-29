@@ -234,6 +234,7 @@ export class MapViewer {
      */
     private renderFrame (delay: number) {
         this.scene.postRender(delay);
+        this.renderLateUpdate(delay);
         if (this._mapStatsMonitor) this._mapStatsMonitor.update();
     }
 

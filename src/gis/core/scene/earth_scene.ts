@@ -2,6 +2,8 @@ import { PerspectiveCamera } from "three";
 import { GenericEvent } from "../../../core/event/generic_event";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { EarthCamera } from "../camera/earth_camera";
+import { DataSourceDisplay } from "../datasource/datasource_display";
+import { EntityCollection } from "../datasource/entity_collection";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
 import { TileNodeRenderer } from "../renderer/tile_node_renderer";
@@ -23,6 +25,8 @@ export class EarthScene {
 
     public readonly imageryProviders: ImageryTileProviderCollection;
 
+    public readonly entities: EntityCollection;
+
     public readonly tilingScheme: ITilingScheme;
 
     public readonly quadtreePrimitive: QuadtreePrimitive;
@@ -32,6 +36,8 @@ export class EarthScene {
     //瓦片节点渲染器
     public readonly tileNodeRenderer: TileNodeRenderer;
 
+    public readonly dataSourceDisplay: DataSourceDisplay;
+
     constructor (renderer: FrameRenderer, imageryTileProvider: IImageryTileProvider, terrainProvider: ITerrainProvider, tileCacheSize: number) {
         this._renderer = renderer;
         this.tileNodeRenderer = new TileNodeRenderer();
@@ -39,10 +45,14 @@ export class EarthScene {
         this._renderer.scene.add(this.tileNodeRenderer.root);
         this.imageryProviders = new ImageryTileProviderCollection();
         this.imageryProviders.add(imageryTileProvider);
+        this.entities = new EntityCollection();
         this.quadtreePrimitive = new QuadtreePrimitive(this.imageryProviders.get(0)!, tileCacheSize);
         this.tilingScheme = this.quadtreePrimitive.tileProvider.tilingScheme;
         this.camera = new EarthCamera(this._renderer, this.tilingScheme);
         this.globleSurfaceManager = new GlobeSurfaceTileManager(this.quadtreePrimitive, terrainProvider, this);
+        this.dataSourceDisplay = new DataSourceDisplay(this.entities, this.tilingScheme);
+        //将DataSource的渲染根节点添加到场景中
+        this._renderer.scene.add(this.dataSourceDisplay.root);
         this.ready = true;
     }
 
@@ -64,6 +74,7 @@ export class EarthScene {
     }
 
     public renderLateUpdate (delay: number) {
+        this.dataSourceDisplay.lateUpdate(delay);
         this.lateUpdateEvent.invoke(delay);
     }
 

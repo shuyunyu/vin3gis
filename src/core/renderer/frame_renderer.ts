@@ -80,6 +80,8 @@ export class FrameRenderer {
         this._camera = camera;
         this._target = target;
         this._target.appendChild(this.domElement);
+        //预先设置好渲染尺寸
+        this.internalUpdateRenderSize();
         this._updateRenderSize = Utils.debounce(this.internalUpdateRenderSize, this, 100);
 
     }
@@ -90,9 +92,10 @@ export class FrameRenderer {
      * @param height 
      */
     private internalUpdateRenderSize () {
+        const width = this._target.clientWidth;
+        const height = this._target.clientHeight;
+        if (this._size.width === width && this._size.height === height) return;
         if (this._camera instanceof PerspectiveCamera) {
-            const width = this._target.clientWidth;
-            const height = this._target.clientHeight;
             this._renderer.setSize(width, height);
             this.updateCameraProps({ aspect: width / height });
             this._size.width = width;

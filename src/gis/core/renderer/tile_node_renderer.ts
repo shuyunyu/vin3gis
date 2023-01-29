@@ -4,6 +4,7 @@ import Tween from "../../../core/tween/Tween";
 import { ImageryTileRenderParam } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
 import { InternalConfig } from "../internal/internal_config";
+import { TILE_NODE_EFFECT_RENDER_ORDER, TILE_NODE_RENDER_ORDER } from "../misc/render_order";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { TileNode } from "./tile_node";
 
@@ -51,7 +52,7 @@ export class TileNodeRenderer {
         let tileNode = new TileNode(tile.id);
         this._tileNodeRecord[tile.id] = tileNode;
         const mesh = tileNode.createTileMesh(tile, baseImagery, overlayImagery);
-        mesh.renderOrder = 0;
+        mesh.renderOrder = TILE_NODE_RENDER_ORDER;
         this.root.add(mesh);
         this._renderTileNodeCount++;
     }
@@ -81,7 +82,7 @@ export class TileNodeRenderer {
         if (!this.selfOrParentInFadeout(tileNode, tile)) {
             const obj = { fadeout: 1.0 };
             //set renderer order
-            tileNode.mesh.renderOrder = 1;
+            tileNode.mesh.renderOrder = TILE_NODE_EFFECT_RENDER_ORDER;
             const tween = new TWEEN.Tween(obj)
                 .to({ fadeout: 0.0 }, 300)
                 .onUpdate(() => {

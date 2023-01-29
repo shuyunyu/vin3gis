@@ -1,6 +1,6 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector3 } from "three";
 import { FrameRenderer, math, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
-import { AMapImageryTileProvider, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
+import { AMapImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
@@ -10,6 +10,10 @@ import { createScheduler, removeScheduler } from "../src/core/utils/schedule_uti
 import { BaiduImageryTileProvider } from "../src/gis/core/provider/baidu_imagery_tile_provider";
 import { BD09MercatorProject } from "../src/gis/core/projection/bd09_mercator_projection";
 import { Transform } from "../src/gis/core/transform/transform";
+import { Entity } from "../src/gis/core/datasource/entity";
+import { PointGeometry } from "../src/gis/core/datasource/geometry/point_geometry";
+import { PointCloudGeometry } from "../src/gis/core/datasource/geometry/point_cloud_geometry";
+import { ColorUtils } from "../src/core/utils/color_utils";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -52,13 +56,14 @@ window.onload = () => {
     // mapViewer.scene.imageryProviders.add(new AMapImageryTileProvider({ style: 'note' }));
     // mapViewer.scene.imageryProviders.add(new GridImageryTileProvider());
     global.mapViewer = mapViewer;
-    GISTest.run(mapViewer.renderer);
+    GISTest.run(mapViewer.renderer, mapViewer);
 }
 
 class GISTest {
 
-    public static run (render: FrameRenderer) {
+    public static run (render: FrameRenderer, mapViewer: MapViewer) {
         this.testXHRWorker();
+        this.testEntity(mapViewer);
         // this.testDrawPoint(render);
         // this.testSchedule();
         // this.testShader(render);
@@ -66,6 +71,98 @@ class GISTest {
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
+    }
+
+    private static testEntity (mapViewer: MapViewer) {
+        // this.testPointEntity(mapViewer);
+        // this.testBillboardEntity(mapViewer);
+    }
+
+    private static testBillboardEntity (mapViewer: MapViewer) {
+        const entity = new Entity({
+            billboard: new BillboardGeometry({
+                position: Cartographic.fromDegrees(118.256, 24.418, 0),
+                image: "http://mars3d.cn/img/marker/mark-blue.png",
+                width: 100,
+                height: 100
+            })
+        })
+        mapViewer.scene.entities.add(entity);
+        const entity1 = new Entity({
+            point: new PointGeometry({
+                position: Cartographic.fromDegrees(118.256, 24.418, 0),
+                size: 10,
+                color: new Color("#FF0000")
+            })
+        });
+        mapViewer.scene.entities.add(entity1);
+    }
+
+    private static testPointEntity (mapViewer: MapViewer) {
+        const entity = new Entity({
+            point: new PointGeometry({
+                position: Cartographic.fromDegrees(118.256, 24.418, 0),
+                size: 30,
+                color: new Color("#FF0000"),
+                outline: true,
+                outlineSize: 10,
+                outlineColor: new Color("#00FFFF")
+            })
+        });
+        mapViewer.scene.entities.add(entity);
+        global.pointEntity = entity;
+        mapViewer.scene.entities.suspendEvents();
+        const pointCount = 100;
+        for (let i = 0; i < pointCount; i++) {
+            const lng = 118.256 + Math.random() * 0.5;
+            const lat = 24.418 + Math.random() * 0.1;
+            const pos = Cartographic.fromDegrees(lng, lat, 0);
+            const entity = new Entity({
+                point: new PointGeometry({
+                    position: pos,
+                    size: 10,
+                    color: new Color("#00FFFF")
+                })
+            });
+            mapViewer.scene.entities.add(entity);
+        }
+
+        //MultiPointGeometry
+        const posArr = [];
+        for (let i = 0; i < pointCount; i++) {
+            const lng = 118.256 - Math.random() * 0.5;
+            const lat = 24.418 - Math.random() * 0.1;
+            const pos = Cartographic.fromDegrees(lng, lat, 0);
+            posArr.push(pos);
+        }
+        mapViewer.scene.entities.add(new Entity({
+            multiPoint: new MultiPointGeometry({
+                positions: posArr,
+                size: 10,
+                color: new Color("#FF0000")
+            })
+        }));
+
+        //PointCloudGeometry
+        const posArray = [];
+        const colorArray = [];
+        const count = 100000;
+        for (let i = 0; i < count; i++) {
+            const lng = 118.256 - Math.random() * 0.5;
+            const lat = 24.228 - Math.random() * 0.1;
+            posArray.push(Cartographic.fromDegrees(lng, lat, 0));
+            colorArray.push(ColorUtils.randomColor());
+        }
+
+        mapViewer.scene.entities.add(new Entity({
+            pointCloud: new PointCloudGeometry({
+                size: 0.05,
+                positions: posArray,
+                colors: colorArray
+            })
+        }))
+
+        mapViewer.scene.entities.resumeEvents();
     }
 
     private static testDrawPoint (render: FrameRenderer) {
@@ -104,7 +201,7 @@ class GISTest {
         geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
         // const sprite = new TextureLoader().load('./disc.png');
         const mtl = new PointsMaterial({
-            size: 1 * Transform.THREEJS_UNIT_PER_METERS / 100,
+            size: 10,
             sizeAttenuation: false,
             map: createCanvasMaterial("#FF0000", 256),
             transparent: true
