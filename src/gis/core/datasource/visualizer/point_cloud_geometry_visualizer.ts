@@ -25,7 +25,7 @@ export class PointCloudGeometryVisualizer extends BaseGeometryVisualizer {
         geometry.setAttribute('color', new Float32BufferAttribute(color, 3));
         const mtl = new PointsMaterial({
             side: pointCloud.size,
-            sizeAttenuation: false,
+            sizeAttenuation: pointCloud.sizeAttenuation,
             transparent: true,
             depthTest: false,
             vertexColors: true

@@ -13,6 +13,8 @@ export type PointCloudGeometryOptions = {
     positions?: Cartographic[];
     //各个点的颜色
     colors?: Color[];
+    //尺寸是否随着相机变化而衰减
+    sizeAttenuation?: boolean;
 }
 
 export class PointCloudGeometry extends BaseGeometry {
@@ -50,10 +52,22 @@ export class PointCloudGeometry extends BaseGeometry {
         this.update();
     }
 
+    private _sizeAttenuation: boolean;
+
+    public get sizeAttenuation () {
+        return this._sizeAttenuation;
+    }
+
+    public set sizeAttenuation (val: boolean) {
+        this._sizeAttenuation = val;
+        this.update();
+    }
+
     public constructor (options?: PointCloudGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.POINT_CLOUD });
         this._size = Utils.defaultValue(options.size, 0.05);
+        this._sizeAttenuation = Utils.defaultValue(options.sizeAttenuation, false);
         this._positions = Utils.defaultValue(options.positions, []);
         this._colors = Utils.defaultValue(options.colors, []);
         this.visualizer = new PointCloudGeometryVisualizer();

@@ -74,7 +74,7 @@ class GISTest {
     }
 
     private static testEntity (mapViewer: MapViewer) {
-        this.testPointEntity(mapViewer);
+        // this.testPointEntity(mapViewer);
     }
 
     private static testPointEntity (mapViewer: MapViewer) {
