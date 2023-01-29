@@ -42,6 +42,7 @@ export class Entity {
         this.id = Utils.createGuid();
         this.visibleChangedEvent = new GenericEvent();
         this.geometryChangedEvent = new GenericEvent();
+        this.changedGeometryList = new UniqueList();
         this._visible = Utils.defaultValue(options.visible, true);
         if (options.point) {
             this._point = options.point;

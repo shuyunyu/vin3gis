@@ -1,11 +1,15 @@
-import { Event, Object3D } from "three";
+import { Object3D } from "three";
+import { SystemDefines } from "../../../../@types/core/system/system";
+import { disposeSystem } from "../../../../core/system/dispose_system";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Entity } from "../entity";
 import { IGeometryVisualizer } from "./geometry_visualizer";
 
 export class BaseGeometryVisualizer implements IGeometryVisualizer {
 
-    private _geometryObject?: Object3D;
+    protected _geometryObject?: Object3D;
+
+    protected _disposableObjects: SystemDefines.Disposable[] = [];
 
     /**
      * 创建集合体对应的Object3D
@@ -28,7 +32,8 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
     }
 
     public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D) {
-
+        this.remove(entity, root);
+        this.show(entity, tilingScheme, root);
     }
 
     public hide (entity: Entity, root: Object3D) {
@@ -41,6 +46,9 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
         if (this._geometryObject) {
             root.remove(this._geometryObject);
             this._geometryObject = null;
+            //dispose obj
+            this._disposableObjects.forEach(obj => disposeSystem.disposeObj(obj));
+            this._disposableObjects.length = 0;
         }
     }
 

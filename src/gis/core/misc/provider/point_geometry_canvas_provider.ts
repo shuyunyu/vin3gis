@@ -21,8 +21,25 @@ class PointGeometryCanvasProvider {
      */
     public createCanvas (opt: PointGeometryCanvasCreateOptions) {
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
+        this.updateCanvas(opt, canvas);
+        // canvas.style.width = canvas.style.height = opt.canvasSize + "px";
+        // canvas.style.position = "absolute";
+        // canvas.style.right = "10px";
+        // canvas.style.bottom = "10px";
+        // canvas.style.zIndex = "100";
+        // document.body.appendChild(canvas);
+        return canvas;
+    }
+
+    /**
+     * 更新构建PointGeometry用的Canvas
+     * @param opt 
+     * @param canvas 
+     */
+    public updateCanvas (opt: PointGeometryCanvasCreateOptions, canvas: HTMLCanvasElement) {
         canvas.width = canvas.height = opt.canvasSize;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(canvas.width, canvas.height, 0, 0);
         let size = opt.size;
         const center = opt.canvasSize / 2;
         if (opt.outline) {
@@ -37,13 +54,6 @@ class PointGeometryCanvasProvider {
         ctx.closePath();
         ctx.fillStyle = ColorUtils.toCSSHexString(opt.color);
         ctx.fill();
-        // canvas.style.width = canvas.style.height = opt.canvasSize + "px";
-        // canvas.style.position = "absolute";
-        // canvas.style.right = "10px";
-        // canvas.style.bottom = "10px";
-        // canvas.style.zIndex = "100";
-        // document.body.appendChild(canvas);
-        return canvas;
     }
 
 }

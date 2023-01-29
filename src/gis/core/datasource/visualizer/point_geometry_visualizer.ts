@@ -34,6 +34,9 @@ export class PointGeometryVisualizer extends BaseGeometryVisualizer {
         });
         const pts = new Points(geometry, mtl);
         pts.renderOrder = GEOMETRY_RENDER_ORDER;
+
+        this._disposableObjects.push(geometry, mtl, texture);
+
         return pts;
     }
 
