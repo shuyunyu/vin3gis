@@ -1,6 +1,6 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector3 } from "three";
 import { FrameRenderer, math, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
-import { AMapImageryTileProvider, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
+import { AMapImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
@@ -75,6 +75,27 @@ class GISTest {
 
     private static testEntity (mapViewer: MapViewer) {
         // this.testPointEntity(mapViewer);
+        // this.testBillboardEntity(mapViewer);
+    }
+
+    private static testBillboardEntity (mapViewer: MapViewer) {
+        const entity = new Entity({
+            billboard: new BillboardGeometry({
+                position: Cartographic.fromDegrees(118.256, 24.418, 0),
+                image: "http://mars3d.cn/img/marker/mark-blue.png",
+                width: 100,
+                height: 100
+            })
+        })
+        mapViewer.scene.entities.add(entity);
+        const entity1 = new Entity({
+            point: new PointGeometry({
+                position: Cartographic.fromDegrees(118.256, 24.418, 0),
+                size: 10,
+                color: new Color("#FF0000")
+            })
+        });
+        mapViewer.scene.entities.add(entity1);
     }
 
     private static testPointEntity (mapViewer: MapViewer) {

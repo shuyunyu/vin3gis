@@ -1,10 +1,14 @@
 import { Object3D } from "three";
 import { SystemDefines } from "../../../../@types/core/system/system";
+import { math } from "../../../../core/math/math";
 import { disposeSystem } from "../../../../core/system/dispose_system";
+import { GEOMETRY_RENDER_ORDER } from "../../misc/render_order";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Entity } from "../entity";
 import { BaseGeometry } from "../geometry/base_geometry";
 import { IGeometryVisualizer } from "./geometry_visualizer";
+
+let geometryRenderOrder = GEOMETRY_RENDER_ORDER;
 
 export class BaseGeometryVisualizer implements IGeometryVisualizer {
 
@@ -14,6 +18,16 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
      * 需要释放资源的对象列表
      */
     protected _disposableObjects: SystemDefines.Disposable[] = [];
+
+    /**
+     * 渲染顺序
+     */
+    private _renderOrder: number;
+
+    public constructor () {
+        geometryRenderOrder += math.EPSILON7;
+        this._renderOrder = geometryRenderOrder;
+    }
 
     /**
      * 获取当前visualizer需要操作的Entity中的Geometry
@@ -38,7 +52,11 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
     public show (entity: Entity, tilingScheme: ITilingScheme, root: Object3D) {
         if (!this._geometryObject) {
             this._geometryObject = this.createGeometryObject(entity, tilingScheme);
-            root.add(this._geometryObject);
+            if (this._geometryObject) {
+                //设置渲染顺序
+                this._geometryObject.renderOrder = this._renderOrder;
+                root.add(this._geometryObject);
+            }
         } else {
             this._geometryObject.visible = true;
         }

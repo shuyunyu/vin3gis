@@ -1,5 +1,4 @@
 import { Object3D, Event, Color, BufferGeometry, Float32BufferAttribute, PointsMaterial, Points } from "three";
-import { GEOMETRY_RENDER_ORDER } from "../../misc/render_order";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
 import { Entity } from "../entity";
@@ -31,7 +30,6 @@ export class PointCloudGeometryVisualizer extends BaseGeometryVisualizer {
             vertexColors: true
         });
         const pts = new Points(geometry, mtl);
-        pts.renderOrder = GEOMETRY_RENDER_ORDER;
 
         this._disposableObjects.push(geometry, mtl);
 

@@ -1,6 +1,5 @@
 import { Object3D, Event, Texture, BufferGeometry, Float32BufferAttribute, PointsMaterial, Points } from "three";
 import { pointGeometryCanvasProvider } from "../../misc/provider/point_geometry_canvas_provider";
-import { GEOMETRY_RENDER_ORDER } from "../../misc/render_order";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
 import { Entity } from "../entity";
@@ -36,7 +35,6 @@ export class PointGeometryVisualizer extends BaseGeometryVisualizer {
             depthTest: false
         });
         const pts = new Points(geometry, mtl);
-        pts.renderOrder = GEOMETRY_RENDER_ORDER;
 
         this._disposableObjects.push(geometry, mtl, texture);
 
