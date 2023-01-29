@@ -6,6 +6,7 @@ import { IGeometryVisualizer } from "../visualizer/geometry_visualizer";
  */
 export enum GeometryType {
     POINT = "point",
+    MULTI_POINT = "multi-point",
     POLYLINE = "polyline",
     POLYGON = "polygon",
     CIRCLE = "circle",

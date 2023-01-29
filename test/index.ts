@@ -1,6 +1,6 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector3 } from "three";
 import { FrameRenderer, math, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
-import { AMapImageryTileProvider, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
+import { AMapImageryTileProvider, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
@@ -104,6 +104,23 @@ class GISTest {
             });
             mapViewer.scene.entities.add(entity);
         }
+
+        //MultiPointGeometry
+        const posArr = [];
+        for (let i = 0; i < pointCount; i++) {
+            const lng = 118.256 - Math.random() * 0.5;
+            const lat = 24.418 - Math.random() * 0.1;
+            const pos = Cartographic.fromDegrees(lng, lat, 0);
+            posArr.push(pos);
+        }
+        mapViewer.scene.entities.add(new Entity({
+            multiPoint: new MultiPointGeometry({
+                positions: posArr,
+                size: 10,
+                color: new Color("#FF0000")
+            })
+        }));
+
         mapViewer.scene.entities.resumeEvents();
     }
 

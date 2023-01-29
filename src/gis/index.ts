@@ -35,6 +35,7 @@ export * from "./core/provider/osm_imagery_tile_provider";
 
 export * from "./core/datasource/entity";
 export * from "./core/datasource/geometry/point_geometry";
+export * from "./core/datasource/geometry/multi_point_geometry";
 
 export * from "./core/viewer/map_viewer";
 export * from "./core/camera/earth_camera";

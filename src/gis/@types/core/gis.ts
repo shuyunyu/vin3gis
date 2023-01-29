@@ -1,4 +1,5 @@
 import { Color } from "three";
+import { MultiPointGeometry } from "../../core/datasource/geometry/multi_point_geometry";
 import { PointGeometry } from "../../core/datasource/geometry/point_geometry";
 import { ViewPort } from "../../core/misc/view_port";
 import { IImageryTileProvider } from "../../core/provider/imagery_tile_provider";
@@ -106,4 +107,5 @@ export type EntityOptions = {
     //可见性 default true
     visible?: boolean;
     point?: PointGeometry;
+    multiPoint?: MultiPointGeometry;
 }

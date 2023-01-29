@@ -4,30 +4,33 @@ import { GEOMETRY_RENDER_ORDER } from "../../misc/render_order";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
 import { Entity } from "../entity";
+import { BaseGeometry } from "../geometry/base_geometry";
+import { BasePointGeometry } from "../geometry/base_point_geometry";
 import { BaseGeometryVisualizer } from "./base_geometry_visualizer";
 
 export class PointGeometryVisualizer extends BaseGeometryVisualizer {
 
+    protected getEntityGeometry (entity: Entity): BaseGeometry {
+        return entity.point;
+    }
+
     protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme): Object3D<Event> {
-        const point = entity.point;
-        const fullSize = point.outline ? point.size + point.outlineSize : point.size;
+        const basePointGeometry = this.getEntityGeometry(entity) as BasePointGeometry;
+        const fullSize = basePointGeometry.outline ? basePointGeometry.size + basePointGeometry.outlineSize : basePointGeometry.size;
         const canvas = pointGeometryCanvasProvider.createCanvas({
             canvasSize: fullSize,
-            size: point.size,
-            color: point.color,
-            outline: point.outline,
-            outlineSize: point.outlineSize,
-            outlineColor: point.outlineColor
+            size: basePointGeometry.size,
+            color: basePointGeometry.color,
+            outline: basePointGeometry.outline,
+            outlineSize: basePointGeometry.outlineSize,
+            outlineColor: basePointGeometry.outlineColor
         });
         const texture = new Texture(canvas);
         texture.needsUpdate = true;
-        const coord = Transform.cartographicToWorldVec3(point.position, tilingScheme);
-        const vertices = new Float32Array([coord.x, coord.y, coord.z]);
-        const geometry = new BufferGeometry();
-        geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+        const geometry = this.createGeometry(entity, tilingScheme);
         const mtl = new PointsMaterial({
             size: fullSize,
-            sizeAttenuation: point.sizeAttenuation,
+            sizeAttenuation: basePointGeometry.sizeAttenuation,
             map: texture,
             transparent: true,
             depthTest: false
@@ -38,6 +41,14 @@ export class PointGeometryVisualizer extends BaseGeometryVisualizer {
         this._disposableObjects.push(geometry, mtl, texture);
 
         return pts;
+    }
+
+    protected createGeometry (entity: Entity, tilingScheme: ITilingScheme) {
+        const coord = Transform.cartographicToWorldVec3(entity.point.position, tilingScheme);
+        const vertices = new Float32Array([coord.x, coord.y, coord.z]);
+        const geometry = new BufferGeometry();
+        geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+        return geometry;
     }
 
 }

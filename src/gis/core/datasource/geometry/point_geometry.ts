@@ -10,6 +10,9 @@ export interface PointGeometryOptions extends BasePointGeometryOptions {
     position?: Cartographic;
 }
 
+/**
+ * 单点几何
+ */
 export class PointGeometry extends BasePointGeometry {
 
     private _position: Cartographic;

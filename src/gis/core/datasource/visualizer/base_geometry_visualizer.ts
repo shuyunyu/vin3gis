@@ -3,6 +3,7 @@ import { SystemDefines } from "../../../../@types/core/system/system";
 import { disposeSystem } from "../../../../core/system/dispose_system";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Entity } from "../entity";
+import { BaseGeometry } from "../geometry/base_geometry";
 import { IGeometryVisualizer } from "./geometry_visualizer";
 
 export class BaseGeometryVisualizer implements IGeometryVisualizer {
@@ -10,6 +11,15 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
     protected _geometryObject?: Object3D;
 
     protected _disposableObjects: SystemDefines.Disposable[] = [];
+
+    /**
+     * 获取当前visualizer需要操作的Entity中的Geometry
+     * - 子类需要重写此方法
+     * @param entity 
+     */
+    protected getEntityGeometry (entity: Entity): BaseGeometry {
+        return null;
+    }
 
     /**
      * 创建集合体对应的Object3D

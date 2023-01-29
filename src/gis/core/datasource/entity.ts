@@ -3,6 +3,7 @@ import { UniqueList } from "../../../core/extend/unique_list";
 import { Utils } from "../../../core/utils/utils";
 import { EntityOptions } from "../../@types/core/gis";
 import { BaseGeometry } from "./geometry/base_geometry";
+import { MultiPointGeometry } from "./geometry/multi_point_geometry";
 import { PointGeometry } from "./geometry/point_geometry";
 
 export class Entity {
@@ -38,6 +39,12 @@ export class Entity {
         return this._point;
     }
 
+    private _multiPoint?: MultiPointGeometry;
+
+    public get multiPoint () {
+        return this._multiPoint;
+    }
+
     public constructor (options: EntityOptions) {
         this.id = Utils.createGuid();
         this.visibleChangedEvent = new GenericEvent();
@@ -47,6 +54,10 @@ export class Entity {
         if (options.point) {
             this._point = options.point;
             this._point.entity = this;
+        }
+        if (options.multiPoint) {
+            this._multiPoint = options.multiPoint;
+            this._multiPoint.entity = this;
         }
     }
 
