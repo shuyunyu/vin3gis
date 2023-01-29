@@ -23,12 +23,7 @@ class PointGeometryCanvasProvider {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = canvas.height = opt.canvasSize;
-        let size = opt.canvasSize;
-        if (opt.outline) {
-            const totalSize = opt.size + opt.outlineSize;
-            const innerFactor = opt.size / totalSize;
-            size = opt.canvasSize * innerFactor;
-        }
+        let size = opt.size;
         const center = opt.canvasSize / 2;
         if (opt.outline) {
             ctx.beginPath();
@@ -42,6 +37,12 @@ class PointGeometryCanvasProvider {
         ctx.closePath();
         ctx.fillStyle = ColorUtils.toCSSHexString(opt.color);
         ctx.fill();
+        // canvas.style.width = canvas.style.height = opt.canvasSize + "px";
+        // canvas.style.position = "absolute";
+        // canvas.style.right = "10px";
+        // canvas.style.bottom = "10px";
+        // canvas.style.zIndex = "100";
+        // document.body.appendChild(canvas);
         return canvas;
     }
 

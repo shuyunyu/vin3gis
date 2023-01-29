@@ -72,6 +72,10 @@ class GISTest {
     }
 
     private static testEntity (mapViewer: MapViewer) {
+        this.testPointEntity(mapViewer);
+    }
+
+    private static testPointEntity (mapViewer: MapViewer) {
         const entity = new Entity({
             point: new PointGeometry({
                 position: Cartographic.fromDegrees(118.256, 24.418, 0),
@@ -84,6 +88,23 @@ class GISTest {
         });
         mapViewer.scene.entities.add(entity);
         global.pointEntity = entity;
+
+        mapViewer.scene.entities.suspendEvents();
+        const pointCount = 100;
+        for (let i = 0; i < pointCount; i++) {
+            const lng = 118.256 + Math.random() * 0.5;
+            const lat = 24.418 + Math.random() * 0.1;
+            const pos = Cartographic.fromDegrees(lng, lat, 0);
+            const entity = new Entity({
+                point: new PointGeometry({
+                    position: pos,
+                    size: 10,
+                    color: new Color("#00FFFF")
+                })
+            });
+            mapViewer.scene.entities.add(entity);
+        }
+        mapViewer.scene.entities.resumeEvents();
     }
 
     private static testDrawPoint (render: FrameRenderer) {
