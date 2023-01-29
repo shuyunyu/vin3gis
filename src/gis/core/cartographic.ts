@@ -12,6 +12,8 @@ export class Cartographic {
 
     public height: number = 0;
 
+    public static readonly ZERO = Object.freeze(new Cartographic(0, 0, 0));
+
     public constructor (longitudeRad: number = 0, latitudeRad: number = 0, height: number = 0) {
         this.longitude = longitudeRad;
         this.latitude = latitudeRad;
