@@ -85,7 +85,8 @@ class GISTest {
                 position: pos,
                 image: "http://mars3d.cn/img/marker/mark-blue.png",
                 // width: 20,
-                // height: 20
+                // height: 20,
+                center: { x: 0.5, y: 0 }
             })
         })
         mapViewer.scene.entities.add(entity);

@@ -1,8 +1,10 @@
+import { ICartesian2Like } from "../../../@types/core/gis";
 
 type BillboardGeometryCanvasOptions = {
     image: CanvasImageSource;
     width: number;
     height: number;
+    center: ICartesian2Like;
 }
 
 /**
@@ -12,10 +14,10 @@ class BillboardGeometryCanvasProvider {
 
     public createCanvas (opt: BillboardGeometryCanvasOptions) {
         const canvas = document.createElement('canvas');
-        const size = Math.max(opt.width, opt.height);
+        const size = Math.max(opt.width, opt.height) * 2;
         canvas.width = canvas.height = size;
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(opt.image, (size - opt.width) / 2, (size - opt.height) / 2, opt.width, opt.height);
+        ctx.drawImage(opt.image, (size - opt.width) * opt.center.x, (size - opt.height) * opt.center.y, opt.width, opt.height);
         return canvas;
     }
 

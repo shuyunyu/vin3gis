@@ -13,7 +13,8 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
         const canvas = billboardGeometryCanvasProvider.createCanvas({
             image: billboard.texImageSource,
             width: billboard.width,
-            height: billboard.height
+            height: billboard.height,
+            center: billboard.center
         });
         const texture = new Texture(canvas);
         texture.needsUpdate = true;

@@ -1,5 +1,8 @@
+import { Vector2 } from "three";
 import { AssetLoader } from "../../../../core/asset/asset_loader";
+import { math } from "../../../../core/math/math";
 import { Utils } from "../../../../core/utils/utils";
+import { ICartesian2Like } from "../../../@types/core/gis";
 import { Log } from "../../../log/log";
 import { Cartographic } from "../../cartographic";
 import { BillboardGeometryVisualizer } from "../visualizer/billboard_geometry_visualizer";
@@ -17,6 +20,8 @@ export type BillboardGeometryOptions = {
     width?: number;
     //高度 默认使用图片的高度
     height?: number;
+    //图片的中心点/锚点 左上角起算 defualt {x:0.5,y:0.5}
+    center?: ICartesian2Like;
 }
 
 export class BillboardGeometry extends BaseGeometry {
@@ -83,6 +88,18 @@ export class BillboardGeometry extends BaseGeometry {
         this.update();
     }
 
+    private _center: ICartesian2Like;
+
+    public get center () {
+        return this._center;
+    }
+
+    public set center (val: ICartesian2Like) {
+        this._center = val;
+        this.clampCenter();
+        this.update();
+    }
+
     public constructor (options: BillboardGeometryOptions) {
         super({ type: GeometryType.BILLBOARD });
         this._ready = false;
@@ -93,8 +110,15 @@ export class BillboardGeometry extends BaseGeometry {
         if (Utils.defined(options.height)) {
             this._height = options.height;
         }
+        this._center = Utils.defaultValue(options.center, new Vector2(0.5, 0.5));
+        this.clampCenter();
         this.visualizer = new BillboardGeometryVisualizer();
         this.image = options.image;
+    }
+
+    private clampCenter () {
+        this._center.x = math.clamp(this._center.x, 0, 1);
+        this._center.y = math.clamp(this._center.y, 0, 1);
     }
 
     /**
