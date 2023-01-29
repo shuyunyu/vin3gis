@@ -4,10 +4,10 @@ import { MultiPointGeometryVisualizer } from "../visualizer/multi_point_geometry
 import { BasePointGeometry, BasePointGeometryOptions } from "./base_point_geometry";
 import { GeometryType } from "./geometry";
 
-export interface MultiPointGeometryOptions extends BasePointGeometryOptions {
+export type MultiPointGeometryOptions = {
     //point的位置
     positions?: Cartographic[];
-}
+} & BasePointGeometryOptions
 
 /**
  * 多点几何

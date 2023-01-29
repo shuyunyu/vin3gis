@@ -13,4 +13,15 @@ export class ColorUtils {
         return "#" + color.getHexString(colorSpace);
     }
 
+    /**
+     * 产生一个随机颜色
+     * @returns 
+     */
+    public static randomColor () {
+        const r = Math.random();
+        const g = Math.random();
+        const b = Math.random();
+        return new Color(r, g, b);
+    }
+
 }

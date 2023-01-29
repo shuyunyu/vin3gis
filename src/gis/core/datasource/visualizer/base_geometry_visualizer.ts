@@ -10,6 +10,9 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
 
     protected _geometryObject?: Object3D;
 
+    /**
+     * 需要释放资源的对象列表
+     */
     protected _disposableObjects: SystemDefines.Disposable[] = [];
 
     /**

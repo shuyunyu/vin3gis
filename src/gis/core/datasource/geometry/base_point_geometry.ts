@@ -3,7 +3,7 @@ import { Utils } from "../../../../core/utils/utils";
 import { BaseGeometry } from "./base_geometry";
 import { GeometryType } from "./geometry";
 
-export interface BasePointGeometryOptions {
+export type BasePointGeometryOptions = {
     //点的尺寸 default 1
     size?: number;
     //点的颜色

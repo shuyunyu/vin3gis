@@ -4,6 +4,7 @@ import { Utils } from "../../../core/utils/utils";
 import { EntityOptions } from "../../@types/core/gis";
 import { BaseGeometry } from "./geometry/base_geometry";
 import { MultiPointGeometry } from "./geometry/multi_point_geometry";
+import { PointCloudGeometry } from "./geometry/point_cloud_geometry";
 import { PointGeometry } from "./geometry/point_geometry";
 
 export class Entity {
@@ -45,6 +46,12 @@ export class Entity {
         return this._multiPoint;
     }
 
+    private _pointCloud?: PointCloudGeometry;
+
+    public get pointClound () {
+        return this._pointCloud;
+    }
+
     public constructor (options: EntityOptions) {
         this.id = Utils.createGuid();
         this.visibleChangedEvent = new GenericEvent();
@@ -58,6 +65,10 @@ export class Entity {
         if (options.multiPoint) {
             this._multiPoint = options.multiPoint;
             this._multiPoint.entity = this;
+        }
+        if (options.pointCloud) {
+            this._pointCloud = options.pointCloud;
+            this._pointCloud.entity = this;
         }
     }
 

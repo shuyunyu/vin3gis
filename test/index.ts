@@ -12,6 +12,8 @@ import { BD09MercatorProject } from "../src/gis/core/projection/bd09_mercator_pr
 import { Transform } from "../src/gis/core/transform/transform";
 import { Entity } from "../src/gis/core/datasource/entity";
 import { PointGeometry } from "../src/gis/core/datasource/geometry/point_geometry";
+import { PointCloudGeometry } from "../src/gis/core/datasource/geometry/point_cloud_geometry";
+import { ColorUtils } from "../src/core/utils/color_utils";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -120,6 +122,25 @@ class GISTest {
                 color: new Color("#FF0000")
             })
         }));
+
+        //PointCloudGeometry
+        const posArray = [];
+        const colorArray = [];
+        const count = 100000;
+        for (let i = 0; i < count; i++) {
+            const lng = 118.256 - Math.random() * 0.5;
+            const lat = 24.228 - Math.random() * 0.1;
+            posArray.push(Cartographic.fromDegrees(lng, lat, 0));
+            colorArray.push(ColorUtils.randomColor());
+        }
+
+        mapViewer.scene.entities.add(new Entity({
+            pointCloud: new PointCloudGeometry({
+                size: 0.05,
+                positions: posArray,
+                colors: colorArray
+            })
+        }))
 
         mapViewer.scene.entities.resumeEvents();
     }
