@@ -24,6 +24,7 @@ export class DataSourceDisplay {
         this._entities.collectionChangedEvent.addEventListener(this.onEntityCollectionChanged, this);
         this._tilingScheme = tilingScheme;
         this._renderer = renderer;
+        this._renderer.resizeEvent.addEventListener(this.onRendererReisze, this);
     }
 
     /**
@@ -60,7 +61,7 @@ export class DataSourceDisplay {
      * @param entities 
      * @param ctrl 
      */
-    private entityDisplayControl (entities: Entity[], ctrl: "show" | "remove" | "hide" | "update") {
+    private entityDisplayControl (entities: Entity[], ctrl: "show" | "remove" | "hide" | "update" | "resize") {
         if (ctrl !== "update") {
             for (let i = 0; i < entities.length; i++) {
                 const entity = entities[i];
@@ -74,6 +75,8 @@ export class DataSourceDisplay {
                                 propVal.visualizer.remove(entity, this.root);
                             } else if (ctrl === "hide") {
                                 propVal.visualizer.hide(entity, this.root);
+                            } else if (ctrl === "resize") {
+                                propVal.visualizer.onRendererSize(this._renderer);
                             }
                         }
                     }
@@ -89,6 +92,16 @@ export class DataSourceDisplay {
                 entity.changedGeometryList.clear();
             }
         }
+    }
+
+    /**
+     * 监听renderer的resize事件
+     * @param renderer 
+     * @returns 
+     */
+    private onRendererReisze (renderer: FrameRenderer) {
+        if (renderer !== this._renderer) return;
+        this.entityDisplayControl(this._entities.toArray(), 'resize');
     }
 
     public lateUpdate (deltaTime: number) {

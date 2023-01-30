@@ -50,6 +50,14 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
         return null;
     }
 
+    /**
+     * 当renderer触发resize时 执行的代码
+     * @param renderer 
+     */
+    public onRendererSize (renderer: FrameRenderer) {
+
+    }
+
     public show (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer) {
         if (!this._geometryObject) {
             this._geometryObject = this.createGeometryObject(entity, tilingScheme, renderer);

@@ -1,5 +1,6 @@
 import { Mesh, Object3D, OrthographicCamera, PerspectiveCamera, Scene, WebGLRenderer, WebGLRendererParameters } from "three";
 import { OrthographicCameraProps, PerspectiveCameraProps } from "../../@types/global/global";
+import { GenericEvent } from "../event/generic_event";
 import { Size } from "../msic/size";
 import { GeometryUtils } from "../utils/geometry_utils";
 import { Object3Utils } from "../utils/object3_utils";
@@ -9,6 +10,9 @@ import { Utils } from "../utils/utils";
  * 帧渲染器
  */
 export class FrameRenderer {
+
+    //渲染器resize执行之后触发的事件
+    public readonly resizeEvent = new GenericEvent<FrameRenderer>();
 
     private _renderer: WebGLRenderer;
 
@@ -81,7 +85,7 @@ export class FrameRenderer {
         this._target = target;
         this._target.appendChild(this.domElement);
         //预先设置好渲染尺寸
-        this.internalUpdateRenderSize();
+        this.internalUpdateRenderSize(false);
         this._updateRenderSize = Utils.debounce(this.internalUpdateRenderSize, this, 100);
 
     }
@@ -91,7 +95,7 @@ export class FrameRenderer {
      * @param width 
      * @param height 
      */
-    private internalUpdateRenderSize () {
+    private internalUpdateRenderSize (emitEvent: boolean = true) {
         const width = this._target.clientWidth;
         const height = this._target.clientHeight;
         if (this._size.width === width && this._size.height === height) return;
@@ -102,6 +106,9 @@ export class FrameRenderer {
             this._size.height = height;
         } else if (this._camera instanceof OrthographicCamera) {
 
+        }
+        if (emitEvent) {
+            this.resizeEvent.emit(this);
         }
     }
 

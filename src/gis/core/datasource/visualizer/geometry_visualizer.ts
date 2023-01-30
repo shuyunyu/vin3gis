@@ -15,4 +15,6 @@ export interface IGeometryVisualizer {
     update: (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer) => void;
     //移除
     remove: (entity: Entity, root: Object3D) => void;
+    //当renderer触发resize时 执行的代码
+    onRendererSize: (renderer: FrameRenderer) => void;
 }
