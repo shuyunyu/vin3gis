@@ -1,4 +1,4 @@
-import { Object3D, Event, Texture, BufferGeometry, Float32BufferAttribute, PointsMaterial, Points } from "three";
+import { Object3D, Event, Texture, LinearFilter, ClampToEdgeWrapping, SpriteMaterial, Sprite } from "three";
 import { billboardGeometryCanvasProvider } from "../../misc/provider/billboard_geometry_canvas_provider";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
@@ -17,23 +17,24 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
             center: billboard.center
         });
         const texture = new Texture(canvas);
+        texture.minFilter = LinearFilter;
+        texture.wrapS = ClampToEdgeWrapping;
+        texture.wrapT = ClampToEdgeWrapping;
         texture.needsUpdate = true;
         const coord = Transform.cartographicToWorldVec3(billboard.position, tilingScheme);
-        const vertices = new Float32Array([coord.x, coord.y, coord.z]);
-        const geometry = new BufferGeometry();
-        geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
-        const mtl = new PointsMaterial({
-            size: canvas.width,
+        const mtl = new SpriteMaterial({
             sizeAttenuation: false,
             map: texture,
             transparent: true,
             depthTest: false
         });
-        const pts = new Points(geometry, mtl);
+        const sprite = new Sprite(mtl);
+        sprite.position.set(coord.x, coord.y, coord.z);
+        sprite.scale.multiplyScalar(0.05 * canvas.width / billboard.width);
 
-        this._disposableObjects.push(geometry, mtl, texture);
+        this._disposableObjects.push(mtl, texture);
 
-        return pts;
+        return sprite;
 
     }
 

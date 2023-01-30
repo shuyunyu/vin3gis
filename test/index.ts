@@ -84,8 +84,8 @@ class GISTest {
             billboard: new BillboardGeometry({
                 position: pos,
                 image: "http://124.223.202.45/VGIS-Examples/images/marker/marker-icon.png",
-                width: 21,
-                height: 45,
+                width: 25,
+                height: 41,
                 center: { x: 0.5, y: 0 }
             })
         })
