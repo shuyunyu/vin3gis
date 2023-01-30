@@ -22,6 +22,8 @@ export type BillboardGeometryOptions = {
     height?: number;
     //图片的中心点/锚点 左上角起算 defualt {x:0.5,y:0.5}
     center?: ICartesian2Like;
+    //图片的旋转角度 弧度单位
+    rotation?: number;
 }
 
 export class BillboardGeometry extends BaseGeometry {
@@ -100,6 +102,17 @@ export class BillboardGeometry extends BaseGeometry {
         this.update();
     }
 
+    private _rotation: number;
+
+    public get rotation () {
+        return this._rotation;
+    }
+
+    public set rotation (val: number) {
+        this._rotation = val;
+        this.update();
+    }
+
     public constructor (options: BillboardGeometryOptions) {
         super({ type: GeometryType.BILLBOARD });
         this._ready = false;
@@ -111,6 +124,7 @@ export class BillboardGeometry extends BaseGeometry {
             this._height = options.height;
         }
         this._center = Utils.defaultValue(options.center, new Vector2(0.5, 0.5));
+        this._rotation = Utils.defaultValue(options.rotation, 0);
         this.clampCenter();
         this.visualizer = new BillboardGeometryVisualizer();
         this.image = options.image;

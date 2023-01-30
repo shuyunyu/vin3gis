@@ -1,4 +1,5 @@
 import { Object3D, Event, Texture, LinearFilter, ClampToEdgeWrapping, SpriteMaterial, Sprite } from "three";
+import { math } from "../../../../core/math/math";
 import { billboardGeometryCanvasProvider } from "../../misc/provider/billboard_geometry_canvas_provider";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
@@ -23,6 +24,7 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
         texture.needsUpdate = true;
         const coord = Transform.cartographicToWorldVec3(billboard.position, tilingScheme);
         const mtl = new SpriteMaterial({
+            rotation: billboard.rotation,
             sizeAttenuation: false,
             map: texture,
             transparent: true,
