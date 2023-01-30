@@ -36,7 +36,7 @@ export class Cartographic {
      * @returns 
      */
     public static fromDegrees (longitude: number, latitude: number, height: number) {
-        return new Cartographic(math.toRadians(longitude), math.toRadians(latitude), height);
+        return new Cartographic(math.toRadian(longitude), math.toRadian(latitude), height);
     }
 
     /**

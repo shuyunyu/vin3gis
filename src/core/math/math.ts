@@ -67,7 +67,7 @@ export class math {
      * @param degrees 
      * @returns 
      */
-    public static toRadians (degrees: number) {
+    public static toRadian (degrees: number) {
         return degrees * this.RADIANS_PER_DEGREE;
     }
 
