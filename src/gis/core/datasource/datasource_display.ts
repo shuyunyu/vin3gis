@@ -1,4 +1,5 @@
 import { Object3D } from "three";
+import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { Entity } from "./entity";
 import { EntityCollection, EntityCollectionChangedData } from "./entity_collection";
@@ -16,10 +17,13 @@ export class DataSourceDisplay {
 
     private _tilingScheme: ITilingScheme
 
-    public constructor (entityCollection: EntityCollection, tilingScheme: ITilingScheme) {
+    private _renderer: FrameRenderer;
+
+    public constructor (entityCollection: EntityCollection, tilingScheme: ITilingScheme, renderer: FrameRenderer) {
         this._entities = entityCollection;
         this._entities.collectionChangedEvent.addEventListener(this.onEntityCollectionChanged, this);
         this._tilingScheme = tilingScheme;
+        this._renderer = renderer;
     }
 
     /**
@@ -65,7 +69,7 @@ export class DataSourceDisplay {
                         const propVal = entity[propKey];
                         if (propVal && propVal instanceof BaseGeometry) {
                             if (ctrl === "show") {
-                                propVal.visualizer.show(entity, this._tilingScheme, this.root);
+                                propVal.visualizer.show(entity, this._tilingScheme, this.root, this._renderer);
                             } else if (ctrl === "remove") {
                                 propVal.visualizer.remove(entity, this.root);
                             } else if (ctrl === "hide") {
@@ -80,7 +84,7 @@ export class DataSourceDisplay {
             for (let i = 0; i < entities.length; i++) {
                 const entity = entities[i];
                 entity.changedGeometryList.forEach((baseGeometry: BaseGeometry) => {
-                    baseGeometry.visualizer.update(entity, this._tilingScheme, this.root);
+                    baseGeometry.visualizer.update(entity, this._tilingScheme, this.root, this._renderer);
                 });
                 entity.changedGeometryList.clear();
             }

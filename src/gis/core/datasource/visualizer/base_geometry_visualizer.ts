@@ -1,6 +1,7 @@
 import { Object3D } from "three";
 import { SystemDefines } from "../../../../@types/core/system/system";
 import { math } from "../../../../core/math/math";
+import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
 import { disposeSystem } from "../../../../core/system/dispose_system";
 import { GEOMETRY_RENDER_ORDER } from "../../misc/render_order";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
@@ -45,13 +46,13 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
      * @param tilingScheme 
      * @returns 
      */
-    protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme): Object3D {
+    protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, renderer: FrameRenderer): Object3D {
         return null;
     }
 
-    public show (entity: Entity, tilingScheme: ITilingScheme, root: Object3D) {
+    public show (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer) {
         if (!this._geometryObject) {
-            this._geometryObject = this.createGeometryObject(entity, tilingScheme);
+            this._geometryObject = this.createGeometryObject(entity, tilingScheme, renderer);
             if (this._geometryObject) {
                 //设置渲染顺序
                 this._geometryObject.renderOrder = this._renderOrder;
@@ -62,9 +63,9 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
         }
     }
 
-    public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D) {
+    public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer) {
         this.remove(entity, root);
-        this.show(entity, tilingScheme, root);
+        this.show(entity, tilingScheme, root, renderer);
     }
 
     public hide (entity: Entity, root: Object3D) {
