@@ -1,8 +1,7 @@
 import { GenericEvent } from "../../../core/event/generic_event";
 import { UniqueList } from "../../../core/extend/unique_list";
 import { Utils } from "../../../core/utils/utils";
-import { EntityOptions } from "../../@types/core/gis";
-import { BaseGeometry } from "./geometry/base_geometry";
+import { EntityGeometryRenderDriver, EntityOptions } from "../../@types/core/gis";
 import { BillboardGeometry } from "./geometry/billboard_geometry";
 import { MultiPointGeometry } from "./geometry/multi_point_geometry";
 import { PointCloudGeometry } from "./geometry/point_cloud_geometry";
@@ -19,10 +18,10 @@ export class Entity {
     public readonly geometryChangedEvent: GenericEvent<Entity>;
 
     //保存所有需要重新渲染的geometry
-    public readonly needRerenderGeometryList: UniqueList<BaseGeometry>;
+    public readonly needRerenderGeometryList: UniqueList<EntityGeometryRenderDriver>;
 
     //保存所有需要更新渲染的geometry
-    public readonly needUpdateGeometryList: UniqueList<BaseGeometry>;
+    public readonly needUpdateGeometryList: UniqueList<EntityGeometryRenderDriver>;
 
     //可见性
     private _visible: boolean = true;
@@ -90,11 +89,11 @@ export class Entity {
     /**
      * 重新渲染geometry
      * - 触发geometry的重新渲染
-     * @param geometry 
+     * @param geometryDriver 
      */
-    public rendererGeometry (geometry: BaseGeometry) {
-        if (geometry.entity === this) {
-            this.needRerenderGeometryList.add(geometry);
+    public rendererGeometry (geometryDriver: EntityGeometryRenderDriver) {
+        if (geometryDriver.geometry.entity === this) {
+            this.needRerenderGeometryList.add(geometryDriver);
             this.geometryChangedEvent.emit(this);
         }
     }
@@ -102,11 +101,11 @@ export class Entity {
     /**
      * 更新geometry
      * - 触发geometry的渲染更新
-     * @param geometry 
+     * @param geometryDriver 
      */
-    public updateGeometry (geometry: BaseGeometry) {
-        if (geometry.entity === this) {
-            this.needUpdateGeometryList.add(geometry);
+    public updateGeometry (geometryDriver: EntityGeometryRenderDriver) {
+        if (geometryDriver.geometry.entity === this) {
+            this.needUpdateGeometryList.add(geometryDriver);
             this.geometryChangedEvent.emit(this);
         }
     }

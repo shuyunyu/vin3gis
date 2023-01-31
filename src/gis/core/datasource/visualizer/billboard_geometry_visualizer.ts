@@ -1,6 +1,7 @@
 import { Object3D, Event, Texture, SpriteMaterial, Sprite, PerspectiveCamera } from "three";
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
+import { GeometryPropertyChangeData } from "../../../@types/core/gis";
 import { billboardGeometryCanvasProvider } from "../../misc/provider/billboard_geometry_canvas_provider";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
@@ -62,7 +63,7 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
         this.update(entity, tilingScheme, root, renderer);
     }
 
-    public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): void {
+    public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer, propertyChangeData?: GeometryPropertyChangeData): void {
         if (!this._sprite) return;
         const coord = Transform.cartographicToWorldVec3(entity.billboard.position, tilingScheme);
         const factor = (2 * Math.tan(math.toRadian((renderer.camera as PerspectiveCamera).fov / 2)));

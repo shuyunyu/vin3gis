@@ -3,6 +3,7 @@ import { SystemDefines } from "../../../../@types/core/system/system";
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
 import { disposeSystem } from "../../../../core/system/dispose_system";
+import { GeometryPropertyChangeData } from "../../../@types/core/gis";
 import { GEOMETRY_RENDER_ORDER } from "../../misc/render_order";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Entity } from "../entity";
@@ -72,13 +73,29 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
         }
     }
 
-    rerender (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer) {
+    /**
+     * 重新渲染
+     * @param entity 
+     * @param tilingScheme 
+     * @param root 
+     * @param renderer 主渲染器
+     * @param propertyChangeData 触发重新渲染的属性变更信息
+     */
+    public rerender (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer, propertyChangeData?: GeometryPropertyChangeData) {
         this.remove(entity, root);
         this.show(entity, tilingScheme, root, renderer);
     }
 
-    public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer) {
-        this.rerender(entity, tilingScheme, root, renderer);
+    /**
+     * 更新渲染
+     * @param entity 
+     * @param tilingScheme 
+     * @param root 
+     * @param renderer 主渲染器
+     * @param propertyChangeData 触发更新的属性变更信息
+     */
+    public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer, propertyChangeData?: GeometryPropertyChangeData) {
+        this.rerender(entity, tilingScheme, root, renderer, propertyChangeData);
     }
 
     public hide (entity: Entity, root: Object3D) {

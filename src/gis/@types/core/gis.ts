@@ -1,4 +1,5 @@
 import { Color } from "three";
+import { BaseGeometry } from "../../core/datasource/geometry/base_geometry";
 import { BillboardGeometry } from "../../core/datasource/geometry/billboard_geometry";
 import { MultiPointGeometry } from "../../core/datasource/geometry/multi_point_geometry";
 import { PointCloudGeometry } from "../../core/datasource/geometry/point_cloud_geometry";
@@ -112,4 +113,17 @@ export type EntityOptions = {
     multiPoint?: MultiPointGeometry;
     pointCloud?: PointCloudGeometry;
     billboard?: BillboardGeometry;
+}
+
+//entity geometry 属性变更属性
+export type GeometryPropertyChangeData = {//驱动的属性
+    name: string;//属性名称
+    preVal: any;//前一个值
+    nextVal: any;//后一个值
+}
+
+//entity geometry 渲染的驱动者
+export type EntityGeometryRenderDriver = {
+    geometry: BaseGeometry;//驱动的目标geometry
+    property?: GeometryPropertyChangeData;
 }

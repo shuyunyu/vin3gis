@@ -1,3 +1,4 @@
+import { GeometryPropertyChangeData } from "../../../@types/core/gis";
 import { Entity } from "../entity";
 import { IGeometryVisualizer } from "../visualizer/geometry_visualizer";
 import { GeometryType, IGeometry } from "./geometry";
@@ -33,8 +34,11 @@ export class BaseGeometry implements IGeometry {
     /**
      * 重新渲染该Geometry
      */
-    public render () {
-        this.entity?.rendererGeometry(this);
+    public render (propertyData?: GeometryPropertyChangeData) {
+        this.entity?.rendererGeometry({
+            geometry: this,
+            property: propertyData
+        });
     }
 
     /**
@@ -44,7 +48,11 @@ export class BaseGeometry implements IGeometry {
      * @param nextVal 
      */
     public rerenderByProp (propKey: string, preVal: any, nextVal: any) {
-        this.render();
+        this.render({
+            name: propKey,
+            preVal: preVal,
+            nextVal: nextVal
+        });
     }
 
     /**
@@ -54,7 +62,14 @@ export class BaseGeometry implements IGeometry {
      * @param nextVal 
      */
     public updateByProp (propKey: string, preVal: any, nextVal: any) {
-        this.entity?.updateGeometry(this);
+        this.entity?.updateGeometry({
+            geometry: this,
+            property: {
+                name: propKey,
+                preVal: preVal,
+                nextVal: nextVal
+            }
+        });
     }
 
 }

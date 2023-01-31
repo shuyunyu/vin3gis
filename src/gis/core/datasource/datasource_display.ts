@@ -1,5 +1,6 @@
 import { Object3D } from "three";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
+import { EntityGeometryRenderDriver } from "../../@types/core/gis";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { Entity } from "./entity";
 import { EntityCollection, EntityCollectionChangedData } from "./entity_collection";
@@ -87,13 +88,13 @@ export class DataSourceDisplay {
             for (let i = 0; i < entities.length; i++) {
                 const entity = entities[i];
                 //rerender
-                entity.needRerenderGeometryList.forEach((baseGeometry: BaseGeometry) => {
-                    baseGeometry.visualizer.rerender(entity, this._tilingScheme, this.root, this._renderer);
+                entity.needRerenderGeometryList.forEach((geometryDriver: EntityGeometryRenderDriver) => {
+                    geometryDriver.geometry.visualizer.rerender(entity, this._tilingScheme, this.root, this._renderer, geometryDriver.property);
                 });
                 entity.needRerenderGeometryList.clear();
                 //update
-                entity.needUpdateGeometryList.forEach((baseGeometry: BaseGeometry) => {
-                    baseGeometry.visualizer.update(entity, this._tilingScheme, this.root, this._renderer);
+                entity.needUpdateGeometryList.forEach((geometryDriver: EntityGeometryRenderDriver) => {
+                    geometryDriver.geometry.visualizer.update(entity, this._tilingScheme, this.root, this._renderer, geometryDriver.property);
                 });
                 entity.needUpdateGeometryList.clear();
             }
