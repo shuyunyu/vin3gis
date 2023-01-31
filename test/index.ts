@@ -100,6 +100,7 @@ class GISTest {
             })
         });
         mapViewer.scene.entities.add(entity1);
+        globalThis.billboardEntity = entity;
     }
 
     private static testPointEntity (mapViewer: MapViewer) {
