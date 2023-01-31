@@ -158,7 +158,8 @@ export class BillboardGeometry extends BaseGeometry {
         if (Utils.isString(this._image)) {
             AssetLoader.loadImage({
                 url: this._image as string,
-                throttle: false
+                throttle: false,
+                throttleServer: false
             }).then(imageEle => {
                 this._texImageSource = imageEle;
                 //设置宽高
@@ -169,21 +170,21 @@ export class BillboardGeometry extends BaseGeometry {
                     this._height = imageEle.height;
                 }
                 this._ready = true;
-                this.rerender();
+                this.render();
             }).catch(err => {
                 Log.error(BillboardGeometry, `load image failed: ${this._image}`);
             });
         } else {
             this._texImageSource = this._image as CanvasImageSource;
             this._ready = true;
-            this.rerender();
+            this.render();
         }
     }
 
     //触发渲染更新
-    public rerender (): void {
+    public render (): void {
         if (this._ready) {
-            super.rerender();
+            super.render();
         }
     }
 
