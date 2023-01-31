@@ -1,4 +1,5 @@
 import { Utils } from "../../../../core/utils/utils";
+import { GeometryRerenderProperty } from "../../../decorator/decorator";
 import { Cartographic } from "../../cartographic";
 import { MultiPointGeometryVisualizer } from "../visualizer/multi_point_geometry_visualizer";
 import { BasePointGeometry, BasePointGeometryOptions } from "./base_point_geometry";
@@ -20,9 +21,9 @@ export class MultiPointGeometry extends BasePointGeometry {
         return this._positions;
     }
 
+    @GeometryRerenderProperty()
     public set positions (val: Cartographic[] | null) {
         this._positions = val || [];
-        this.update();
     }
 
     public constructor (options?: MultiPointGeometryOptions) {

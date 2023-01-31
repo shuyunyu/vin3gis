@@ -1,5 +1,6 @@
 import { Color } from "three";
 import { Utils } from "../../../../core/utils/utils";
+import { GeometryRerenderProperty } from "../../../decorator/decorator";
 import { Cartographic } from "../../cartographic";
 import { PointCloudGeometryVisualizer } from "../visualizer/point_cloud_geometry_visualizer";
 import { BaseGeometry } from "./base_geometry";
@@ -25,9 +26,9 @@ export class PointCloudGeometry extends BaseGeometry {
         return this._size;
     }
 
+    @GeometryRerenderProperty()
     public set size (val: number) {
         this._size = Math.max(0, val);
-        this.update();
     }
 
     private _positions: Cartographic[];
@@ -36,9 +37,9 @@ export class PointCloudGeometry extends BaseGeometry {
         return this._positions;
     }
 
+    @GeometryRerenderProperty()
     public set positions (val: Cartographic[]) {
         this._positions = val;
-        this.update();
     }
 
     private _colors: Color[];
@@ -47,9 +48,9 @@ export class PointCloudGeometry extends BaseGeometry {
         return this._colors;
     }
 
+    @GeometryRerenderProperty()
     private set colors (val: Color[]) {
         this._colors = val;
-        this.update();
     }
 
     private _sizeAttenuation: boolean;
@@ -58,9 +59,9 @@ export class PointCloudGeometry extends BaseGeometry {
         return this._sizeAttenuation;
     }
 
+    @GeometryRerenderProperty()
     public set sizeAttenuation (val: boolean) {
         this._sizeAttenuation = val;
-        this.update();
     }
 
     public constructor (options?: PointCloudGeometryOptions) {

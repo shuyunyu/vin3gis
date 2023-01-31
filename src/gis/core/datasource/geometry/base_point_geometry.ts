@@ -1,5 +1,6 @@
 import { Color } from "three";
 import { Utils } from "../../../../core/utils/utils";
+import { GeometryRerenderProperty } from "../../../decorator/decorator";
 import { BaseGeometry } from "./base_geometry";
 import { GeometryType } from "./geometry";
 
@@ -27,9 +28,9 @@ export class BasePointGeometry extends BaseGeometry {
         return this._size;
     }
 
+    @GeometryRerenderProperty()
     public set size (val: number) {
         this._size = Math.max(0, val);
-        this.update();
     }
 
     private _color: Color;
@@ -38,9 +39,9 @@ export class BasePointGeometry extends BaseGeometry {
         return this._color;
     }
 
+    @GeometryRerenderProperty()
     public set color (val: Color) {
         this._color = val;
-        this.update();
     }
 
     private _outline: boolean;
@@ -49,9 +50,9 @@ export class BasePointGeometry extends BaseGeometry {
         return this._outline;
     }
 
+    @GeometryRerenderProperty()
     public set outline (val: boolean) {
         this._outline = val;
-        this.update();
     }
 
     private _outlineSize: number;
@@ -60,9 +61,9 @@ export class BasePointGeometry extends BaseGeometry {
         return this._outlineSize;
     }
 
+    @GeometryRerenderProperty()
     public set outlineSize (val: number) {
         this._outlineSize = Math.max(0, val);
-        this.update();
     }
 
     private _outlineColor: Color;
@@ -71,9 +72,9 @@ export class BasePointGeometry extends BaseGeometry {
         return this._outlineColor;
     }
 
+    @GeometryRerenderProperty()
     public set outlineColor (val: Color) {
         this._outlineColor = val;
-        this.update();
     }
 
     public constructor (type: GeometryType, options?: BasePointGeometryOptions) {

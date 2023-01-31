@@ -1,5 +1,6 @@
 import { Color } from "three";
 import { Utils } from "../../../../core/utils/utils";
+import { GeometryRerenderProperty } from "../../../decorator/decorator";
 import { Cartographic } from "../../cartographic";
 import { PointGeometryVisualizer } from "../visualizer/point_geometry_visualizer";
 import { BasePointGeometry, BasePointGeometryOptions } from "./base_point_geometry";
@@ -21,9 +22,9 @@ export class PointGeometry extends BasePointGeometry {
         return this._position;
     }
 
+    @GeometryRerenderProperty()
     public set position (val: Cartographic) {
         this._position = val;
-        this.update();
     }
 
     public constructor (options?: PointGeometryOptions) {
