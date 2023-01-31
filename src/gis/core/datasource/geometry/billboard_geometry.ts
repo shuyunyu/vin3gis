@@ -158,7 +158,8 @@ export class BillboardGeometry extends BaseGeometry {
         if (Utils.isString(this._image)) {
             AssetLoader.loadImage({
                 url: this._image as string,
-                throttle: false
+                throttle: false,
+                throttleServer: false
             }).then(imageEle => {
                 this._texImageSource = imageEle;
                 //设置宽高

@@ -1,5 +1,5 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector3 } from "three";
-import { FrameRenderer, math, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
+import { FrameRenderer, ImageClipper, math, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
@@ -64,6 +64,7 @@ class GISTest {
     public static run (render: FrameRenderer, mapViewer: MapViewer) {
         this.testXHRWorker();
         this.testEntity(mapViewer);
+        // this.testImageClipper();
         // this.testDrawPoint(render);
         // this.testSchedule();
         // this.testShader(render);
@@ -168,6 +169,30 @@ class GISTest {
         }))
 
         mapViewer.scene.entities.resumeEvents();
+    }
+
+    private static testImageClipper () {
+        const image = "http://124.223.202.45/VGIS-Examples/images/marker/markers.png";
+        const imageClipper = new ImageClipper(image);
+        imageClipper.init().then(() => {
+            imageClipper.clip(42, 0, 21, 32).then(image => {
+                const canvas = document.createElement('canvas');
+                canvas.width = image.width;
+                canvas.height = image.height;
+                canvas.style.width = canvas.width + "px";
+                canvas.style.height = canvas.height + "px";
+                canvas.style.position = "absolute";
+                canvas.style.right = "10px";
+                canvas.style.bottom = "10px";
+                canvas.style.zIndex = "100";
+                canvas.style.border = "1px solid";
+                document.body.appendChild(canvas);
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(image, 0, 0);
+
+            });
+        });
     }
 
     private static testDrawPoint (render: FrameRenderer) {
