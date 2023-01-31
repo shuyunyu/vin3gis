@@ -3,6 +3,7 @@ import { AssetLoader } from "../../../../core/asset/asset_loader";
 import { math } from "../../../../core/math/math";
 import { Utils } from "../../../../core/utils/utils";
 import { ICartesian2Like } from "../../../@types/core/gis";
+import { GeometryRerenderProperty, GeometryUpdateProperty } from "../../../decorator/decorator";
 import { Log } from "../../../log/log";
 import { Cartographic } from "../../cartographic";
 import { BillboardGeometryVisualizer } from "../visualizer/billboard_geometry_visualizer";
@@ -45,9 +46,9 @@ export class BillboardGeometry extends BaseGeometry {
         return this._position;
     }
 
+    @GeometryUpdateProperty()
     private set position (val: Cartographic) {
         this._position = val;
-        this.update();
     }
 
     private _image: BillboardImageSource;
@@ -76,9 +77,9 @@ export class BillboardGeometry extends BaseGeometry {
         return this._width;
     }
 
+    @GeometryRerenderProperty()
     public set width (val: number) {
         this._width = val;
-        this.update();
     }
 
     private _height: number;
@@ -87,9 +88,9 @@ export class BillboardGeometry extends BaseGeometry {
         return this._height;
     }
 
+    @GeometryRerenderProperty()
     public set height (val: number) {
         this._height = val;
-        this.update();
     }
 
     private _center: ICartesian2Like;
@@ -98,10 +99,10 @@ export class BillboardGeometry extends BaseGeometry {
         return this._center;
     }
 
+    @GeometryRerenderProperty()
     public set center (val: ICartesian2Like) {
         this._center = val;
         this.clampCenter();
-        this.update();
     }
 
     private _rotation: number;
@@ -110,9 +111,9 @@ export class BillboardGeometry extends BaseGeometry {
         return this._rotation;
     }
 
+    @GeometryUpdateProperty()
     public set rotation (val: number) {
         this._rotation = val;
-        this.update();
     }
 
     private _scale: number;
@@ -121,9 +122,9 @@ export class BillboardGeometry extends BaseGeometry {
         return this._scale;
     }
 
+    @GeometryUpdateProperty()
     public set scale (val: number) {
         this._scale = Math.max(0, val);
-        this.update();
     }
 
     public constructor (options: BillboardGeometryOptions) {
@@ -168,21 +169,21 @@ export class BillboardGeometry extends BaseGeometry {
                     this._height = imageEle.height;
                 }
                 this._ready = true;
-                this.update();
+                this.rerender();
             }).catch(err => {
                 Log.error(BillboardGeometry, `load image failed: ${this._image}`);
             });
         } else {
             this._texImageSource = this._image as CanvasImageSource;
             this._ready = true;
-            this.update();
+            this.rerender();
         }
     }
 
     //触发渲染更新
-    public update (): void {
+    public rerender (): void {
         if (this._ready) {
-            super.update();
+            super.rerender();
         }
     }
 

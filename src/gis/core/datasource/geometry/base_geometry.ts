@@ -31,13 +31,20 @@ export class BaseGeometry implements IGeometry {
     }
 
     /**
-     * 通过属性可视化该Geomtry
+     * 重新渲染该Geometry
+     */
+    public rerender () {
+        this.entity?.rendererGeometry(this);
+    }
+
+    /**
+     * 通过属性渲染该Geomtry
      * @param propKey 
      * @param preVal 
      * @param nextVal 
      */
     public rerenderByProp (propKey: string, preVal: any, nextVal: any) {
-        this.entity?.rendererGeometry(this);
+        this.rerender();
     }
 
     /**

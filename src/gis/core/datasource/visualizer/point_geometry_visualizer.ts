@@ -14,7 +14,7 @@ export class PointGeometryVisualizer extends BaseGeometryVisualizer {
         return entity.point;
     }
 
-    protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, renderer: FrameRenderer): Object3D<Event> {
+    protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer): Object3D<Event> {
         const basePointGeometry = this.getEntityGeometry(entity) as BasePointGeometry;
         const fullSize = basePointGeometry.outline ? basePointGeometry.size + basePointGeometry.outlineSize : basePointGeometry.size;
         const canvas = pointGeometryCanvasProvider.createCanvas({

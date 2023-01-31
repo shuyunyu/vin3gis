@@ -13,7 +13,7 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
 
     private _canvas?: HTMLCanvasElement;
 
-    protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, renderer: FrameRenderer): Object3D<Event> {
+    protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer): Object3D<Event> {
         const billboard = entity.billboard;
         if (!billboard.ready) return null;
         const canvas = billboardGeometryCanvasProvider.createCanvas({
@@ -27,7 +27,7 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
 
         const texture = new Texture(canvas);
         texture.needsUpdate = true;
-        const coord = Transform.cartographicToWorldVec3(billboard.position, tilingScheme);
+
         const mtl = new SpriteMaterial({
             rotation: billboard.rotation,
             sizeAttenuation: false,
@@ -38,8 +38,8 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
         const sprite = new Sprite(mtl);
 
         this._sprite = sprite;
-        sprite.position.set(coord.x, coord.y, coord.z);
-        this.onRendererSize(entity, renderer);
+
+        this.update(entity, tilingScheme, root, renderer);
 
         this._disposableObjects.push(mtl, texture);
 
@@ -58,14 +58,26 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
      * @param renderer 
      * @returns 
      */
-    public onRendererSize (entity: Entity, renderer: FrameRenderer) {
+    public onRendererSize (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer) {
+        this.update(entity, tilingScheme, root, renderer);
+    }
+
+    public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): void {
         if (!this._sprite) return;
+        const coord = Transform.cartographicToWorldVec3(entity.billboard.position, tilingScheme);
         const factor = (2 * Math.tan(math.toRadian((renderer.camera as PerspectiveCamera).fov / 2)));
         const xScale = this._canvas.width * factor / renderer.size.height;
         const yScale = this._canvas.height * factor / renderer.size.height;
         const scale = entity.billboard.scale;
+        //set scale
         this._sprite.scale.set(xScale * scale, yScale * scale, 1);
+        //set position
+        this._sprite.position.set(coord.x, coord.y, coord.z);
+        //set rotation
+        this._sprite.material.rotation = entity.billboard.rotation;
+        this._sprite.material.needsUpdate = true;
         this._sprite.updateMatrixWorld();
+
     }
 
 }

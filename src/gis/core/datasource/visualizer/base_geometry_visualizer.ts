@@ -46,7 +46,7 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
      * @param tilingScheme 
      * @returns 
      */
-    protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, renderer: FrameRenderer): Object3D {
+    protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer): Object3D {
         return null;
     }
 
@@ -55,13 +55,13 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
      * @param entity
      * @param renderer 
      */
-    public onRendererSize (entity: Entity, renderer: FrameRenderer) {
+    public onRendererSize (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer) {
 
     }
 
     public show (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer) {
         if (!this._geometryObject) {
-            this._geometryObject = this.createGeometryObject(entity, tilingScheme, renderer);
+            this._geometryObject = this.createGeometryObject(entity, tilingScheme, root, renderer);
             if (this._geometryObject) {
                 //设置渲染顺序
                 this._geometryObject.renderOrder = this._renderOrder;
@@ -78,8 +78,7 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
     }
 
     public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer) {
-        this.remove(entity, root);
-        this.show(entity, tilingScheme, root, renderer);
+        this.rerender(entity, tilingScheme, root, renderer);
     }
 
     public hide (entity: Entity, root: Object3D) {
