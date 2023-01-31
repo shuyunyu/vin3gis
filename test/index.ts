@@ -27,12 +27,12 @@ window.onload = () => {
         //EmptyImageryTileProvider
         //AMapImageryTileProvider
         //TdtImageryTileProvider
-        imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
+        // imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
         // imageryTileProivder: new BaiduImageryTileProvider({ correction: true }),
         // imageryTileProivder: new OSMImageryTileProvider(),
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
-        // imageryTileProivder: new EmptyImageryTileProvider(),
+        imageryTileProivder: new EmptyImageryTileProvider(),
         // imageryTileProivder: new ArcGISImageryTileProvider({
         //     url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
         //     // token: '1d109683f4d84198e37a38c442d68311'
@@ -75,27 +75,32 @@ class GISTest {
 
     private static testEntity (mapViewer: MapViewer) {
         // this.testPointEntity(mapViewer);
-        // this.testBillboardEntity(mapViewer);
+        this.testBillboardEntity(mapViewer);
     }
 
     private static testBillboardEntity (mapViewer: MapViewer) {
+        const pos = Cartographic.fromDegrees(118.256, 24.418, 0);
         const entity = new Entity({
             billboard: new BillboardGeometry({
-                position: Cartographic.fromDegrees(118.256, 24.418, 0),
-                image: "http://mars3d.cn/img/marker/mark-blue.png",
-                width: 100,
-                height: 100
+                position: pos,
+                image: "http://124.223.202.45/VGIS-Examples/images/marker/marker-icon.png",
+                width: 25,
+                height: 41,
+                rotation: math.toRadian(0),
+                scale: 1,
+                center: { x: 0.5, y: 0 }
             })
         })
         mapViewer.scene.entities.add(entity);
         const entity1 = new Entity({
             point: new PointGeometry({
-                position: Cartographic.fromDegrees(118.256, 24.418, 0),
+                position: pos,
                 size: 10,
                 color: new Color("#FF0000")
             })
         });
         mapViewer.scene.entities.add(entity1);
+        globalThis.billboardEntity = entity;
     }
 
     private static testPointEntity (mapViewer: MapViewer) {

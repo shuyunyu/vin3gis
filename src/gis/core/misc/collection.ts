@@ -128,4 +128,11 @@ export class Collection<T> {
         }
     }
 
+    public toArray (out?: T[]) {
+        out = out || [];
+        out.length = 0;
+        out.push(...this._collection);
+        return out;
+    }
+
 }

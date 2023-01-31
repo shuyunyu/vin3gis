@@ -50,7 +50,7 @@ export class EarthScene {
         this.tilingScheme = this.quadtreePrimitive.tileProvider.tilingScheme;
         this.camera = new EarthCamera(this._renderer, this.tilingScheme);
         this.globleSurfaceManager = new GlobeSurfaceTileManager(this.quadtreePrimitive, terrainProvider, this);
-        this.dataSourceDisplay = new DataSourceDisplay(this.entities, this.tilingScheme);
+        this.dataSourceDisplay = new DataSourceDisplay(this.entities, this.tilingScheme, renderer);
         //将DataSource的渲染根节点添加到场景中
         this._renderer.scene.add(this.dataSourceDisplay.root);
         this.ready = true;

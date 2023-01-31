@@ -201,8 +201,8 @@ export class BD09MercatorProject extends BaseProjection {
         let coord = CoordinateTransform.bd09togcj02(result.lng, result.lat)
         coord = CoordinateTransform.gcj02towgs84(result[0], result[1])
         out = out || new Cartographic();
-        out.longitude = math.toRadians(result[0]);
-        out.latitude = math.toRadians(result[1]);
+        out.longitude = math.toRadian(result[0]);
+        out.latitude = math.toRadian(result[1]);
         out.height = cartesian3.z;
         return out;
     }
@@ -215,14 +215,14 @@ export class BD09MercatorProject extends BaseProjection {
         if (!point1) {
             return 0
         }
-        let x1 = this.toRadians(point1['lng'])
-        let y1 = this.toRadians(point1['lat'])
+        let x1 = this.toRadian(point1['lng'])
+        let y1 = this.toRadian(point1['lat'])
         point2 = this.convertMC2LL(point2)
         if (!point2) {
             return 0
         }
-        let x2 = this.toRadians(point2['lng'])
-        let y2 = this.toRadians(point2['lat'])
+        let x2 = this.toRadian(point2['lng'])
+        let y2 = this.toRadian(point2['lat'])
         return this.getDistance(x1, x2, y1, y2)
     }
 
@@ -240,10 +240,10 @@ export class BD09MercatorProject extends BaseProjection {
         point1['lat'] = this.getRange(point1['lat'], -74, 74)
         point2['lng'] = this.getLoop(point2['lng'], -180, 180)
         point2['lat'] = this.getRange(point2['lat'], -74, 74)
-        let x1 = this.toRadians(point1['lng'])
-        let y1 = this.toRadians(point1['lat'])
-        let x2 = this.toRadians(point2['lng'])
-        let y2 = this.toRadians(point2['lat'])
+        let x1 = this.toRadian(point1['lng'])
+        let y1 = this.toRadian(point1['lat'])
+        let x2 = this.toRadian(point2['lng'])
+        let y2 = this.toRadian(point2['lat'])
         return this.getDistance(x1, x2, y1, y2)
     }
 
@@ -408,7 +408,7 @@ export class BD09MercatorProject extends BaseProjection {
      * @param deg
      * @returns {number}
      */
-    toRadians (deg) {
+    toRadian (deg) {
         return (Math.PI * deg) / 180
     }
 

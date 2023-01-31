@@ -36,8 +36,8 @@ export class InteractionSystem extends System {
             mouseButtons: {
                 MIDDLE: undefined
             },
-            minPolarAngle: math.toRadians(0),
-            maxPolarAngle: math.toRadians(89.8)
+            minPolarAngle: math.toRadian(0),
+            maxPolarAngle: math.toRadian(89.8)
         }
     }
 

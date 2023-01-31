@@ -30,8 +30,35 @@ export class BaseGeometry implements IGeometry {
         return null;
     }
 
-    public update () {
+    /**
+     * 重新渲染该Geometry
+     */
+    public rerender () {
+        this.entity?.rendererGeometry(this);
+    }
+
+    /**
+     * 通过属性渲染该Geomtry
+     * @param propKey 
+     * @param preVal 
+     * @param nextVal 
+     */
+    public rerenderByProp (propKey: string, preVal: any, nextVal: any) {
+        this.rerender();
+    }
+
+    /**
+     * 通过属性更新该Geometry
+     * @param propKey 
+     * @param preVal 
+     * @param nextVal 
+     */
+    public updateByProp (propKey: string, preVal: any, nextVal: any) {
         this.entity?.updateGeometry(this);
+    }
+
+    public update () {
+        this.entity?.rendererGeometry(this);
     }
 
 }

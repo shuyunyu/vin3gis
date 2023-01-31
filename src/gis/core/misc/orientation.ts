@@ -42,7 +42,7 @@ export class Orientation {
      * @returns 
      */
     public static fromDegreeEulerAngles (eulerAngles: ICartesian3Like) {
-        return new Orientation(math.toRadians(eulerAngles.x), math.toRadians(eulerAngles.y), math.toRadians(eulerAngles.z));
+        return new Orientation(math.toRadian(eulerAngles.x), math.toRadian(eulerAngles.y), math.toRadian(eulerAngles.z));
     }
 
     /**

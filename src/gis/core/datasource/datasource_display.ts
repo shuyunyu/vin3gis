@@ -1,4 +1,5 @@
 import { Object3D } from "three";
+import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { Entity } from "./entity";
 import { EntityCollection, EntityCollectionChangedData } from "./entity_collection";
@@ -16,10 +17,14 @@ export class DataSourceDisplay {
 
     private _tilingScheme: ITilingScheme
 
-    public constructor (entityCollection: EntityCollection, tilingScheme: ITilingScheme) {
+    private _renderer: FrameRenderer;
+
+    public constructor (entityCollection: EntityCollection, tilingScheme: ITilingScheme, renderer: FrameRenderer) {
         this._entities = entityCollection;
         this._entities.collectionChangedEvent.addEventListener(this.onEntityCollectionChanged, this);
         this._tilingScheme = tilingScheme;
+        this._renderer = renderer;
+        this._renderer.resizeEvent.addEventListener(this.onRendererReisze, this);
     }
 
     /**
@@ -56,7 +61,7 @@ export class DataSourceDisplay {
      * @param entities 
      * @param ctrl 
      */
-    private entityDisplayControl (entities: Entity[], ctrl: "show" | "remove" | "hide" | "update") {
+    private entityDisplayControl (entities: Entity[], ctrl: "show" | "remove" | "hide" | "update" | "resize") {
         if (ctrl !== "update") {
             for (let i = 0; i < entities.length; i++) {
                 const entity = entities[i];
@@ -65,11 +70,13 @@ export class DataSourceDisplay {
                         const propVal = entity[propKey];
                         if (propVal && propVal instanceof BaseGeometry) {
                             if (ctrl === "show") {
-                                propVal.visualizer.show(entity, this._tilingScheme, this.root);
+                                propVal.visualizer.show(entity, this._tilingScheme, this.root, this._renderer);
                             } else if (ctrl === "remove") {
                                 propVal.visualizer.remove(entity, this.root);
                             } else if (ctrl === "hide") {
                                 propVal.visualizer.hide(entity, this.root);
+                            } else if (ctrl === "resize") {
+                                propVal.visualizer.onRendererSize(entity, this._tilingScheme, this.root, this._renderer);
                             }
                         }
                     }
@@ -79,12 +86,28 @@ export class DataSourceDisplay {
             //update geometry
             for (let i = 0; i < entities.length; i++) {
                 const entity = entities[i];
-                entity.changedGeometryList.forEach((baseGeometry: BaseGeometry) => {
-                    baseGeometry.visualizer.update(entity, this._tilingScheme, this.root);
+                //rerender
+                entity.needRerenderGeometryList.forEach((baseGeometry: BaseGeometry) => {
+                    baseGeometry.visualizer.rerender(entity, this._tilingScheme, this.root, this._renderer);
                 });
-                entity.changedGeometryList.clear();
+                entity.needRerenderGeometryList.clear();
+                //update
+                entity.needUpdateGeometryList.forEach((baseGeometry: BaseGeometry) => {
+                    baseGeometry.visualizer.update(entity, this._tilingScheme, this.root, this._renderer);
+                });
+                entity.needUpdateGeometryList.clear();
             }
         }
+    }
+
+    /**
+     * 监听renderer的resize事件
+     * @param renderer 
+     * @returns 
+     */
+    private onRendererReisze (renderer: FrameRenderer) {
+        if (renderer !== this._renderer) return;
+        this.entityDisplayControl(this._entities.toArray(), 'resize');
     }
 
     public lateUpdate (deltaTime: number) {

@@ -1,4 +1,5 @@
 import { Object3D, Event, Texture, BufferGeometry, Float32BufferAttribute, PointsMaterial, Points } from "three";
+import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
 import { pointGeometryCanvasProvider } from "../../misc/provider/point_geometry_canvas_provider";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
@@ -13,7 +14,7 @@ export class PointGeometryVisualizer extends BaseGeometryVisualizer {
         return entity.point;
     }
 
-    protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme): Object3D<Event> {
+    protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer): Object3D<Event> {
         const basePointGeometry = this.getEntityGeometry(entity) as BasePointGeometry;
         const fullSize = basePointGeometry.outline ? basePointGeometry.size + basePointGeometry.outlineSize : basePointGeometry.size;
         const canvas = pointGeometryCanvasProvider.createCanvas({
