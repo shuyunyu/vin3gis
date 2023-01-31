@@ -1,4 +1,4 @@
-import { Object3D } from "three";
+import { Event, Object3D } from "three";
 import { SystemDefines } from "../../../../@types/core/system/system";
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
@@ -70,6 +70,11 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
         } else {
             this._geometryObject.visible = true;
         }
+    }
+
+    rerender (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer) {
+        this.remove(entity, root);
+        this.show(entity, tilingScheme, root, renderer);
     }
 
     public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer) {

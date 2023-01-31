@@ -37,7 +37,7 @@ export class BaseGeometry implements IGeometry {
      * @param nextVal 
      */
     public rerenderByProp (propKey: string, preVal: any, nextVal: any) {
-
+        this.entity?.rendererGeometry(this);
     }
 
     /**
@@ -47,11 +47,11 @@ export class BaseGeometry implements IGeometry {
      * @param nextVal 
      */
     public updateByProp (propKey: string, preVal: any, nextVal: any) {
-
+        this.entity?.updateGeometry(this);
     }
 
     public update () {
-        this.entity?.updateGeometry(this);
+        this.entity?.rendererGeometry(this);
     }
 
 }

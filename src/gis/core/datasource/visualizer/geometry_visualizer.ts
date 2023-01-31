@@ -11,7 +11,9 @@ export interface IGeometryVisualizer {
     show: (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer) => void;
     //隐藏
     hide: (entity: Entity, root: Object3D) => void;
-    //更新 都某些属性改变时  需要更新渲染
+    //重新渲染 某些属性改变时 需要重新渲染
+    rerender (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer);
+    //更新 某些属性改变时  需要更新渲染
     update: (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer) => void;
     //移除
     remove: (entity: Entity, root: Object3D) => void;

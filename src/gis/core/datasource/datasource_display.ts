@@ -86,10 +86,16 @@ export class DataSourceDisplay {
             //update geometry
             for (let i = 0; i < entities.length; i++) {
                 const entity = entities[i];
-                entity.changedGeometryList.forEach((baseGeometry: BaseGeometry) => {
+                //rerender
+                entity.needRerenderGeometryList.forEach((baseGeometry: BaseGeometry) => {
+                    baseGeometry.visualizer.rerender(entity, this._tilingScheme, this.root, this._renderer);
+                });
+                entity.needRerenderGeometryList.clear();
+                //update
+                entity.needUpdateGeometryList.forEach((baseGeometry: BaseGeometry) => {
                     baseGeometry.visualizer.update(entity, this._tilingScheme, this.root, this._renderer);
                 });
-                entity.changedGeometryList.clear();
+                entity.needUpdateGeometryList.clear();
             }
         }
     }

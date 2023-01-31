@@ -18,8 +18,11 @@ export class Entity {
     //定义geometry改变事件
     public readonly geometryChangedEvent: GenericEvent<Entity>;
 
-    //保存所有修改了的geometry
-    public readonly changedGeometryList: UniqueList<BaseGeometry>;
+    //保存所有需要重新渲染的geometry
+    public readonly needRerenderGeometryList: UniqueList<BaseGeometry>;
+
+    //保存所有需要更新渲染的geometry
+    public readonly needUpdateGeometryList: UniqueList<BaseGeometry>;
 
     //可见性
     private _visible: boolean = true;
@@ -63,7 +66,8 @@ export class Entity {
         this.id = Utils.createGuid();
         this.visibleChangedEvent = new GenericEvent();
         this.geometryChangedEvent = new GenericEvent();
-        this.changedGeometryList = new UniqueList();
+        this.needRerenderGeometryList = new UniqueList();
+        this.needUpdateGeometryList = new UniqueList();
         this._visible = Utils.defaultValue(options.visible, true);
         if (options.point) {
             this._point = options.point;
@@ -84,13 +88,25 @@ export class Entity {
     }
 
     /**
+     * 重新渲染geometry
+     * - 触发geometry的重新渲染
+     * @param geometry 
+     */
+    public rendererGeometry (geometry: BaseGeometry) {
+        if (geometry.entity === this) {
+            this.needRerenderGeometryList.add(geometry);
+            this.geometryChangedEvent.emit(this);
+        }
+    }
+
+    /**
      * 更新geometry
-     * - 触发geomtry的渲染更新
+     * - 触发geometry的渲染更新
      * @param geometry 
      */
     public updateGeometry (geometry: BaseGeometry) {
         if (geometry.entity === this) {
-            this.changedGeometryList.add(geometry);
+            this.needUpdateGeometryList.add(geometry);
             this.geometryChangedEvent.emit(this);
         }
     }
