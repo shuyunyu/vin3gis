@@ -52,9 +52,10 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
 
     /**
      * 当renderer触发resize时 执行的代码
+     * @param entity
      * @param renderer 
      */
-    public onRendererSize (renderer: FrameRenderer) {
+    public onRendererSize (entity: Entity, renderer: FrameRenderer) {
 
     }
 

@@ -39,7 +39,7 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
 
         this._sprite = sprite;
         sprite.position.set(coord.x, coord.y, coord.z);
-        this.onRendererSize(renderer);
+        this.onRendererSize(entity, renderer);
 
         this._disposableObjects.push(mtl, texture);
 
@@ -58,12 +58,13 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
      * @param renderer 
      * @returns 
      */
-    public onRendererSize (renderer: FrameRenderer) {
+    public onRendererSize (entity: Entity, renderer: FrameRenderer) {
         if (!this._sprite) return;
         const factor = (2 * Math.tan(math.toRadian((renderer.camera as PerspectiveCamera).fov / 2)));
         const xScale = this._canvas.width * factor / renderer.size.height;
         const yScale = this._canvas.height * factor / renderer.size.height;
-        this._sprite.scale.set(xScale, yScale, 1);
+        const scale = entity.billboard.scale;
+        this._sprite.scale.set(xScale * scale, yScale * scale, 1);
         this._sprite.updateMatrixWorld();
     }
 

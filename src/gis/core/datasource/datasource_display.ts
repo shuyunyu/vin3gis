@@ -76,7 +76,7 @@ export class DataSourceDisplay {
                             } else if (ctrl === "hide") {
                                 propVal.visualizer.hide(entity, this.root);
                             } else if (ctrl === "resize") {
-                                propVal.visualizer.onRendererSize(this._renderer);
+                                propVal.visualizer.onRendererSize(entity, this._renderer);
                             }
                         }
                     }
