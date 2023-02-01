@@ -109,8 +109,8 @@ export class RequestTask {
         const _this = this;
 
         function loadCallback () {
-            img.removeEventListener('load', loadCallback);
-            img.removeEventListener('error', errorCallback);
+            img.onload = null;
+            img.onerror = null;
             if (_this._isValid) {
                 _this._options.onComplete({
                     image: img,
@@ -130,8 +130,8 @@ export class RequestTask {
         }
 
         function errorCallback () {
-            img.removeEventListener('load', loadCallback);
-            img.removeEventListener('error', errorCallback);
+            img.onload = null;
+            img.onerror = null;
             _this._options.onComplete({
                 status: RequestTaskStatus.ERROR,
                 taskType: _this._taskType
@@ -139,8 +139,8 @@ export class RequestTask {
             _this.onTaskComplete();
         }
 
-        img.addEventListener('load', loadCallback);
-        img.addEventListener('error', errorCallback);
+        img.onload = loadCallback;
+        img.onerror = errorCallback;
         img.src = this._url;
     }
 
