@@ -162,13 +162,7 @@ export class BillboardGeometry extends BaseGeometry {
                 throttleServer: false
             }).then(imageEle => {
                 this._texImageSource = imageEle;
-                //设置宽高
-                if (!Utils.defined(this._width)) {
-                    this._width = imageEle.width;
-                }
-                if (!Utils.defined(this._height)) {
-                    this._height = imageEle.height;
-                }
+                this.updateWidthAndHeightProp(imageEle);
                 this._ready = true;
                 this.render();
             }).catch(err => {
@@ -176,8 +170,23 @@ export class BillboardGeometry extends BaseGeometry {
             });
         } else {
             this._texImageSource = this._image as CanvasImageSource;
+            this.updateWidthAndHeightProp(this._texImageSource);
             this._ready = true;
             this.render();
+        }
+    }
+
+    /**
+     * 更新属性中的width和height数据
+     * @param imageEle 
+     */
+    private updateWidthAndHeightProp (imageEle: CanvasImageSource) {
+        //设置宽高
+        if (!Utils.defined(this._width)) {
+            this._width = Number(imageEle.width);
+        }
+        if (!Utils.defined(this._height)) {
+            this._height = Number(imageEle.height);
         }
     }
 
