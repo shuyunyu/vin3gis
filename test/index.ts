@@ -1,5 +1,5 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector3 } from "three";
-import { FrameRenderer, ImageClipper, math, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
+import { FrameRenderer, math, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
@@ -14,6 +14,7 @@ import { Entity } from "../src/gis/core/datasource/entity";
 import { PointGeometry } from "../src/gis/core/datasource/geometry/point_geometry";
 import { PointCloudGeometry } from "../src/gis/core/datasource/geometry/point_cloud_geometry";
 import { ColorUtils } from "../src/core/utils/color_utils";
+import { ImageClipper } from "../src/gis/core/misc/image_clipper";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);

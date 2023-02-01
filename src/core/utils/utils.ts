@@ -189,4 +189,9 @@ export class Utils {
         return left.position.equals(right.position) && left.rotation.equals(right.rotation!) && left.scale.equals(right.scale);
     }
 
+    public static createElementNS (name: string) {
+        return document.createElementNS('http://www.w3.org/1999/xhtml', name);
+
+    }
+
 }

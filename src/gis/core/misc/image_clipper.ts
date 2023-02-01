@@ -1,6 +1,6 @@
-import { SystemDefines } from "../../@types/core/system/system";
-import { AssetLoader } from "../asset/asset_loader";
-import { Utils } from "../utils/utils";
+import { SystemDefines } from "../../../@types/core/system/system";
+import { AssetLoader } from "../../../core/asset/asset_loader";
+import { Utils } from "../../../core/utils/utils";
 
 /**
  * 处理图片裁剪的类

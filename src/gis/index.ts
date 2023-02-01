@@ -14,6 +14,7 @@ export * from "./core/ellipsoid/ellipsoid";
 export * from "./core/geometry/rectangle";
 
 export * from "./core/misc/crs/coordinate_transform";
+export * from "./core/misc/image_clipper";
 
 export * from "./core/projection/base_projection";
 export * from "./core/projection/web_mercator_projection";
