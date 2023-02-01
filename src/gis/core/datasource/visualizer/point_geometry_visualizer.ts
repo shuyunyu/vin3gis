@@ -1,4 +1,4 @@
-import { Object3D, Event, Texture, BufferGeometry, Float32BufferAttribute, PointsMaterial, Points, SpriteMaterial, Sprite, PerspectiveCamera } from "three";
+import { Object3D, Event, Texture, SpriteMaterial, Sprite, PerspectiveCamera } from "three";
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
 import { GeometryPropertyChangeData } from "../../../@types/core/gis";
