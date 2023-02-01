@@ -142,6 +142,10 @@ export class RequestTask {
         img.onload = loadCallback;
         img.onerror = errorCallback;
         img.src = this._url;
+        //如果图片是从缓存中加载的 不会触发onload事件
+        if (img.complete) {
+            loadCallback();
+        }
     }
 
     /**
