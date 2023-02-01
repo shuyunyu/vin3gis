@@ -1,5 +1,7 @@
-import { Object3D, Event, Texture, BufferGeometry, Float32BufferAttribute, PointsMaterial, Points } from "three";
+import { Object3D, Event, Texture, BufferGeometry, Float32BufferAttribute, PointsMaterial, Points, SpriteMaterial, Sprite, PerspectiveCamera } from "three";
+import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
+import { GeometryPropertyChangeData } from "../../../@types/core/gis";
 import { pointGeometryCanvasProvider } from "../../misc/provider/point_geometry_canvas_provider";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
@@ -9,6 +11,11 @@ import { BasePointGeometry } from "../geometry/base_point_geometry";
 import { BaseGeometryVisualizer } from "./base_geometry_visualizer";
 
 export class PointGeometryVisualizer extends BaseGeometryVisualizer {
+
+    private _sprite?: Sprite;
+
+    private _canvas?: HTMLCanvasElement;
+
 
     protected getEntityGeometry (entity: Entity): BaseGeometry {
         return entity.point;
@@ -25,29 +32,52 @@ export class PointGeometryVisualizer extends BaseGeometryVisualizer {
             outlineSize: basePointGeometry.outlineSize,
             outlineColor: basePointGeometry.outlineColor
         });
+        this._canvas = canvas;
         const texture = new Texture(canvas);
         texture.needsUpdate = true;
-        const geometry = this.createGeometry(entity, tilingScheme);
-        const mtl = new PointsMaterial({
-            size: fullSize,
+        const mtl = new SpriteMaterial({
             sizeAttenuation: false,
             map: texture,
             transparent: true,
             depthTest: false
         });
-        const pts = new Points(geometry, mtl);
+        const sprite = new Sprite(mtl);
+        this._sprite = sprite;
+        this.update(entity, tilingScheme, root, renderer);
 
-        this._disposableObjects.push(geometry, mtl, texture);
+        this._disposableObjects.push(mtl, texture);
 
-        return pts;
+        return sprite;
     }
 
-    protected createGeometry (entity: Entity, tilingScheme: ITilingScheme) {
+    public remove (entity: Entity, root: Object3D<Event>): void {
+        super.remove(entity, root);
+        this._sprite = null;
+        this._canvas = null;
+    }
+
+    /**
+     * resize时 重新设置一下缩放
+     * @param renderer 
+     * @returns 
+     */
+    public onRendererSize (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer) {
+        this.update(entity, tilingScheme, root, renderer);
+    }
+
+    public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer, propertyChangeData?: GeometryPropertyChangeData): void {
+        if (!this._sprite) return;
         const coord = Transform.cartographicToWorldVec3(entity.point.position, tilingScheme);
-        const vertices = new Float32Array([coord.x, coord.y, coord.z]);
-        const geometry = new BufferGeometry();
-        geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
-        return geometry;
+        const factor = (2 * Math.tan(math.toRadian((renderer.camera as PerspectiveCamera).fov / 2)));
+        const xScale = this._canvas.width * factor / renderer.size.height;
+        const yScale = this._canvas.height * factor / renderer.size.height;
+        //set scale
+        this._sprite.scale.set(xScale, yScale, 1);
+        //set position
+        this._sprite.position.set(coord.x, coord.y, coord.z);
+        this._sprite.material.needsUpdate = true;
+        this._sprite.updateMatrixWorld();
+
     }
 
 }
