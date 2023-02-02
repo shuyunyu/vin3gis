@@ -1,4 +1,5 @@
 import { Color } from "three";
+import { BaseBillboardGeometry } from "../../core/datasource/geometry/base_billboard_geometry";
 import { BaseGeometry } from "../../core/datasource/geometry/base_geometry";
 import { BillboardGeometry } from "../../core/datasource/geometry/billboard_geometry";
 import { MultiPointGeometry } from "../../core/datasource/geometry/multi_point_geometry";
@@ -112,7 +113,7 @@ export type EntityOptions = {
     point?: PointGeometry;
     multiPoint?: MultiPointGeometry;
     pointCloud?: PointCloudGeometry;
-    billboard?: BillboardGeometry;
+    billboard?: BaseBillboardGeometry;
 }
 
 //entity geometry 属性变更属性

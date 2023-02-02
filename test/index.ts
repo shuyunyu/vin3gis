@@ -15,6 +15,7 @@ import { PointGeometry } from "../src/gis/core/datasource/geometry/point_geometr
 import { PointCloudGeometry } from "../src/gis/core/datasource/geometry/point_cloud_geometry";
 import { ColorUtils } from "../src/core/utils/color_utils";
 import { ImageClipper } from "../src/gis/core/misc/image_clipper";
+import { MultiBillboardGeometry } from "../src/gis/core/datasource/geometry/multi_billboard_geometry";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -77,15 +78,18 @@ class GISTest {
 
     private static testEntity (mapViewer: MapViewer) {
         // this.testPointEntity(mapViewer);
-        this.testBillboardEntity(mapViewer);
+        // this.testBillboardEntity(mapViewer);
     }
 
     private static testBillboardEntity (mapViewer: MapViewer) {
-        const pos = Cartographic.fromDegrees(118.256, 24.418, 0);
+        const lng = 118.256;
+        const lat = 24.418;
+        const pos = Cartographic.fromDegrees(lng, lat, 0);
+        const imageSrc = "http://124.223.202.45/VGIS-Examples/images/marker/marker-icon.png";
         const entity = new Entity({
             billboard: new BillboardGeometry({
                 position: pos,
-                image: "http://124.223.202.45/VGIS-Examples/images/marker/marker-icon.png",
+                image: imageSrc,
                 width: 25,
                 height: 41,
                 rotation: math.toRadian(0),
@@ -103,6 +107,34 @@ class GISTest {
         });
         mapViewer.scene.entities.add(entity1);
         globalThis.billboardEntity = entity;
+
+
+        //test MultiBillboard
+
+        // const positions = [];
+        // const rotations = [];
+        // const scales = [];
+        // const count = 1000;
+        // const d = 2;
+        // for (let i = 0; i < count; i++) {
+        //     const factor = Math.random() > 0.5 ? 1 : -1;
+        //     const cLng = lng + Math.random() * d * factor;
+        //     const cLat = lat + Math.random() * d * 0.1 * factor;
+        //     positions.push(Cartographic.fromDegrees(cLng, cLat, 0));
+        //     // rotations.push(math.toRadian(Math.random() * 90));
+        //     scales.push(Math.max(0.7, Math.random()));
+        // }
+
+        // mapViewer.scene.entities.add(new Entity({
+        //     billboard: new MultiBillboardGeometry({
+        //         image: imageSrc,
+        //         center: { x: 0.5, y: 0 },
+        //         positions: positions,
+        //         rotations: rotations,
+        //         scales: scales
+        //     })
+        // }));
+
     }
 
     private static testPointEntity (mapViewer: MapViewer) {
