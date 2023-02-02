@@ -13,6 +13,7 @@ export enum GeometryType {
     CIRCLE = "circle",
     LABEL = "label",
     BILLBOARD = "billboard",
+    MULTI_BILLBOARD = "multi-billboard",
     MODEL = "model"
 }
 

@@ -67,11 +67,11 @@ export class BillboardGeometry extends BaseBillboardGeometry {
 
     public clone () {
         return new BillboardGeometry({
-            position: this.position.clone(),
             image: this.image,
             width: this.width,
             height: this.height,
             center: this.center,
+            position: this.position.clone(),
             rotation: this.rotation,
             scale: this.scale
         });
