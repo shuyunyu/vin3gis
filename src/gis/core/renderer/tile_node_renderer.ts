@@ -49,6 +49,10 @@ export class TileNodeRenderer {
         this.unrender(tile);
         //必须有一个才渲染
         if (!baseImagery && !overlayImagery) return;
+        const hasBaseImagery = baseImagery && baseImagery.imagery;
+        const hasOverlayImagery = overlayImagery && overlayImagery.imagery;
+        //至少有一张图片才执行渲染
+        if (!hasBaseImagery && !hasOverlayImagery) return;
         let tileNode = new TileNode(tile.id);
         this._tileNodeRecord[tile.id] = tileNode;
         const mesh = tileNode.createTileMesh(tile, baseImagery, overlayImagery);
