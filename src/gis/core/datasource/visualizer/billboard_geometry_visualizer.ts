@@ -6,6 +6,7 @@ import { billboardGeometryCanvasProvider } from "../../misc/provider/billboard_g
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
 import { Entity } from "../entity";
+import { BillboardSingleRenderData } from "../geometry/base_billboard_geometry";
 import { BaseGeometryVisualizer } from "./base_geometry_visualizer";
 
 let bufferGeometry: BufferGeometry;
@@ -14,7 +15,7 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
 
     private _mesh?: InstancedMesh;
 
-    private _canvas?: HTMLCanvasElement;
+    private _texSourceImage: TexImageSource;
 
     private getBufferGeometry () {
         if (bufferGeometry) return bufferGeometry;
@@ -34,19 +35,46 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
         return bufferGeometry;
     }
 
-    protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer): Object3D<Event> {
+    /**
+     * 获取贴图数据源
+     * @param entity 
+     * @returns 
+     */
+    protected getTexImageSource (entity: Entity) {
         const billboard = entity.billboard;
-        if (!billboard.ready) return null;
         const canvas = billboardGeometryCanvasProvider.createCanvas({
             image: billboard.texImageSource,
             width: billboard.width,
             height: billboard.height,
             center: billboard.center
         });
+        return canvas;
+    }
 
-        this._canvas = canvas;
+    /**
+     * 校验准备状态
+     * @param entity 
+     * @returns 
+     */
+    protected checkReady (entity: Entity) {
+        return entity.billboard.ready;
+    }
 
-        const texture = new Texture(canvas);
+    /**
+     * 获取实例数量
+     * @param entity 
+     * @returns 
+     */
+    protected getInstanceCount (entity: Entity) {
+        return entity.billboard.instanceCount;
+    }
+
+    protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer): Object3D<Event> {
+        if (!this.checkReady(entity)) return null;
+
+        this._texSourceImage = this.getTexImageSource(entity);
+
+        const texture = new Texture(this._texSourceImage);
         texture.needsUpdate = true;
 
         const mtl = new SpriteMaterial({
@@ -80,7 +108,7 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
             }
         });
         const geometry = this.getBufferGeometry();
-        const mesh = new InstancedMesh(geometry, mtl, billboard.instanceCount);
+        const mesh = new InstancedMesh(geometry, mtl, this.getInstanceCount(entity));
         //@ts-ignore
         mesh.center = new Vector2(0.5, 0.5);
         this._mesh = mesh;
@@ -96,7 +124,7 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
     public remove (entity: Entity, root: Object3D<Event>): void {
         super.remove(entity, root);
         this._mesh = null;
-        this._canvas = null;
+        this._texSourceImage = null;
     }
 
     /**
@@ -108,22 +136,31 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
         this.update(entity, tilingScheme, root, renderer);
     }
 
+    /**
+     * 获取渲染数据
+     * @param entity 
+     * @returns 
+     */
+    protected getRenderData (entity: Entity): BillboardSingleRenderData[] {
+        return entity.billboard.getRenderData();
+    }
+
     public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer, propertyChangeData?: GeometryPropertyChangeData): void {
         if (!this._mesh) return;
 
-        const billboardRenderData = entity.billboard.getRenderData();
+        const factor = (2 * Math.tan(math.toRadian((renderer.camera as PerspectiveCamera).fov / 2)));
+        const xScale = this._texSourceImage.width * factor / renderer.size.height;
+        const yScale = this._texSourceImage.height * factor / renderer.size.height;
+
+        const billboardRenderData = this.getRenderData(entity);
         for (let i = 0; i < billboardRenderData.length; i++) {
             const renderData = billboardRenderData[i];
             const coord = Transform.cartographicToWorldVec3(renderData.position, tilingScheme);
-            const factor = (2 * Math.tan(math.toRadian((renderer.camera as PerspectiveCamera).fov / 2)));
-            const xScale = this._canvas.width * factor / renderer.size.height;
-            const yScale = this._canvas.height * factor / renderer.size.height;
             const scale = renderData.scale;
             const matrix = new Matrix4();
             matrix.setPosition(coord.x, coord.y, coord.z).scale(new Vector3(xScale * scale, yScale * scale, renderData.rotation));
             this._mesh.setMatrixAt(i, matrix);
         }
-
 
         this._mesh.instanceMatrix.needsUpdate = true;
     }

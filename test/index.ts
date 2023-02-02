@@ -78,7 +78,7 @@ class GISTest {
 
     private static testEntity (mapViewer: MapViewer) {
         // this.testPointEntity(mapViewer);
-        this.testBillboardEntity(mapViewer);
+        // this.testBillboardEntity(mapViewer);
     }
 
     private static testBillboardEntity (mapViewer: MapViewer) {
@@ -98,39 +98,42 @@ class GISTest {
             })
         })
         mapViewer.scene.entities.add(entity);
-        // const entity1 = new Entity({
-        //     point: new PointGeometry({
-        //         position: pos,
-        //         size: 10,
-        //         color: new Color("#FF0000")
-        //     })
-        // });
-        // mapViewer.scene.entities.add(entity1);
+        const entity1 = new Entity({
+            point: new PointGeometry({
+                position: pos,
+                size: 10,
+                color: new Color("#FF0000")
+            })
+        });
+        mapViewer.scene.entities.add(entity1);
         globalThis.billboardEntity = entity;
 
-        const positions = [];
-        const rotations = [];
-        const scales = [];
-        const count = 1000;
-        const d = 2;
-        for (let i = 0; i < count; i++) {
-            const factor = Math.random() > 0.5 ? 1 : -1;
-            const cLng = lng + Math.random() * d * factor;
-            const cLat = lat + Math.random() * d * 0.1 * factor;
-            positions.push(Cartographic.fromDegrees(cLng, cLat, 0));
-            // rotations.push(math.toRadian(Math.random() * 90));
-            scales.push(Math.max(0.7, Math.random()));
-        }
 
-        mapViewer.scene.entities.add(new Entity({
-            billboard: new MultiBillboardGeometry({
-                image: imageSrc,
-                center: { x: 0.5, y: 0 },
-                positions: positions,
-                rotations: rotations,
-                scales: scales
-            })
-        }));
+        //test MultiBillboard
+
+        // const positions = [];
+        // const rotations = [];
+        // const scales = [];
+        // const count = 1000;
+        // const d = 2;
+        // for (let i = 0; i < count; i++) {
+        //     const factor = Math.random() > 0.5 ? 1 : -1;
+        //     const cLng = lng + Math.random() * d * factor;
+        //     const cLat = lat + Math.random() * d * 0.1 * factor;
+        //     positions.push(Cartographic.fromDegrees(cLng, cLat, 0));
+        //     // rotations.push(math.toRadian(Math.random() * 90));
+        //     scales.push(Math.max(0.7, Math.random()));
+        // }
+
+        // mapViewer.scene.entities.add(new Entity({
+        //     billboard: new MultiBillboardGeometry({
+        //         image: imageSrc,
+        //         center: { x: 0.5, y: 0 },
+        //         positions: positions,
+        //         rotations: rotations,
+        //         scales: scales
+        //     })
+        // }));
 
     }
 
