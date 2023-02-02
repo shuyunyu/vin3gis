@@ -88,20 +88,20 @@ class GISTest {
                 image: "http://124.223.202.45/VGIS-Examples/images/marker/marker-icon.png",
                 width: 25,
                 height: 41,
-                rotation: math.toRadian(0),
+                rotation: math.toRadian(45),
                 scale: 1,
                 center: { x: 0.5, y: 0 }
             })
         })
         mapViewer.scene.entities.add(entity);
-        const entity1 = new Entity({
-            point: new PointGeometry({
-                position: pos,
-                size: 10,
-                color: new Color("#FF0000")
-            })
-        });
-        mapViewer.scene.entities.add(entity1);
+        // const entity1 = new Entity({
+        //     point: new PointGeometry({
+        //         position: pos,
+        //         size: 10,
+        //         color: new Color("#FF0000")
+        //     })
+        // });
+        // mapViewer.scene.entities.add(entity1);
         globalThis.billboardEntity = entity;
     }
 
