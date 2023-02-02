@@ -2,7 +2,7 @@ import { Utils } from "../../../../core/utils/utils";
 import { GeometryUpdateProperty } from "../../../decorator/decorator";
 import { Cartographic } from "../../cartographic";
 import { BillboardGeometryVisualizer } from "../visualizer/billboard_geometry_visualizer";
-import { BaseBillboardGeometry, BaseBillboardGeometryOptions } from "./base_billboard_geometry";
+import { BaseBillboardGeometry, BaseBillboardGeometryOptions, BillboardSingleRenderData } from "./base_billboard_geometry";
 import { GeometryType } from "./geometry";
 
 export type BillboardGeometryOptions = {
@@ -54,8 +54,16 @@ export class BillboardGeometry extends BaseBillboardGeometry {
         this._position = options.position;
         this._rotation = Utils.defaultValue(options.rotation, 0);
         this._scale = Utils.defaultValue(options.scale, 1);
+        this._instanceCount = 1;
     }
 
+    public getRenderData (): BillboardSingleRenderData[] {
+        return [{
+            position: this.position,
+            rotation: this.rotation,
+            scale: this.scale
+        }];
+    }
 
     public clone () {
         return new BillboardGeometry({

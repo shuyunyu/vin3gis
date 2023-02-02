@@ -80,7 +80,7 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
             }
         });
         const geometry = this.getBufferGeometry();
-        const mesh = new InstancedMesh(geometry, mtl, 1);
+        const mesh = new InstancedMesh(geometry, mtl, billboard.instanceCount);
         //@ts-ignore
         mesh.center = new Vector2(0.5, 0.5);
         this._mesh = mesh;
@@ -110,22 +110,21 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
 
     public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer, propertyChangeData?: GeometryPropertyChangeData): void {
         if (!this._mesh) return;
-        const coord = Transform.cartographicToWorldVec3(entity.billboard.position, tilingScheme);
-        const factor = (2 * Math.tan(math.toRadian((renderer.camera as PerspectiveCamera).fov / 2)));
-        const xScale = this._canvas.width * factor / renderer.size.height;
-        const yScale = this._canvas.height * factor / renderer.size.height;
-        const scale = entity.billboard.scale;
-        //set scale
-        // this._mesh.scale.set(xScale * scale, yScale * scale, 1);
-        //set position
-        // this._mesh.position.set(coord.x, coord.y, coord.z);
-        //set rotation
-        // this._sprite.material.rotation = entity.billboard.rotation;
-        // this._sprite.material.needsUpdate = true;
-        // this._sprite.updateMatrixWorld();
-        const matrix = new Matrix4();
-        matrix.setPosition(coord.x, coord.y, coord.z).scale(new Vector3(xScale * scale, yScale * scale, entity.billboard.rotation));
-        this._mesh.setMatrixAt(0, matrix);
+
+        const billboardRenderData = entity.billboard.getRenderData();
+        for (let i = 0; i < billboardRenderData.length; i++) {
+            const renderData = billboardRenderData[i];
+            const coord = Transform.cartographicToWorldVec3(renderData.position, tilingScheme);
+            const factor = (2 * Math.tan(math.toRadian((renderer.camera as PerspectiveCamera).fov / 2)));
+            const xScale = this._canvas.width * factor / renderer.size.height;
+            const yScale = this._canvas.height * factor / renderer.size.height;
+            const scale = renderData.scale;
+            const matrix = new Matrix4();
+            matrix.setPosition(coord.x, coord.y, coord.z).scale(new Vector3(xScale * scale, yScale * scale, renderData.rotation));
+            this._mesh.setMatrixAt(i, matrix);
+        }
+
+
         this._mesh.instanceMatrix.needsUpdate = true;
     }
 

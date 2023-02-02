@@ -5,6 +5,7 @@ import { Utils } from "../../../../core/utils/utils";
 import { ICartesian2Like } from "../../../@types/core/gis";
 import { GeometryRerenderProperty } from "../../../decorator/decorator";
 import { Log } from "../../../log/log";
+import { Cartographic } from "../../cartographic";
 import { BaseGeometryVisualizer } from "../visualizer/base_geometry_visualizer";
 import { BaseGeometry } from "./base_geometry";
 import { GeometryType } from "./geometry";
@@ -20,6 +21,13 @@ export type BaseBillboardGeometryOptions = {
     height?: number;
     //图片的中心点/锚点 左上角起算 defualt {x:0.5,y:0.5}
     center?: ICartesian2Like;
+}
+
+//渲染单个billboard需要用到的数据
+export type BillboardSingleRenderData = {
+    position: Cartographic;
+    rotation: number;
+    scale: number;
 }
 
 export class BaseBillboardGeometry extends BaseGeometry {
@@ -87,6 +95,12 @@ export class BaseBillboardGeometry extends BaseGeometry {
         this.clampCenter();
     }
 
+    protected _instanceCount: number;
+
+    //实例个数 子类需要设置此值
+    public get instanceCount () {
+        return this._instanceCount;
+    }
 
     public constructor (options: BaseBillboardGeometryOptions, type: GeometryType, visualizer: BaseGeometryVisualizer) {
         super({ type: type });
@@ -101,6 +115,15 @@ export class BaseBillboardGeometry extends BaseGeometry {
         this.clampCenter();
         this.visualizer = visualizer;
         this.image = options.image;
+    }
+
+    /**
+     * 获取用于渲染billboard的数据
+     * - 子类需要重写此方法
+     * @returns 
+     */
+    public getRenderData (): BillboardSingleRenderData[] {
+        return [];
     }
 
     private clampCenter () {

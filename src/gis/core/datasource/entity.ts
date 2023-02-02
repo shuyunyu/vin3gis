@@ -2,7 +2,7 @@ import { GenericEvent } from "../../../core/event/generic_event";
 import { UniqueList } from "../../../core/extend/unique_list";
 import { Utils } from "../../../core/utils/utils";
 import { EntityGeometryRenderDriver, EntityOptions } from "../../@types/core/gis";
-import { BillboardGeometry } from "./geometry/billboard_geometry";
+import { BaseBillboardGeometry } from "./geometry/base_billboard_geometry";
 import { MultiPointGeometry } from "./geometry/multi_point_geometry";
 import { PointCloudGeometry } from "./geometry/point_cloud_geometry";
 import { PointGeometry } from "./geometry/point_geometry";
@@ -55,7 +55,7 @@ export class Entity {
         return this._pointCloud;
     }
 
-    private _billboard?: BillboardGeometry;
+    private _billboard?: BaseBillboardGeometry;
 
     public get billboard () {
         return this._billboard;
