@@ -61,7 +61,9 @@ export class BillboardGeometry extends BaseBillboardGeometry {
         return [{
             position: this.position,
             rotation: this.rotation,
-            scale: this.scale
+            scale: this.scale,
+            width: this.width,
+            height: this.height
         }];
     }
 

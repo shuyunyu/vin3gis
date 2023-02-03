@@ -6,9 +6,11 @@ import { BaseBillboardGeometry, BaseBillboardGeometryOptions, BillboardSingleRen
 import { GeometryType } from "./geometry";
 
 export type MultiBillboardGeometryOptions = {
-    positions: Cartographic[];
-    rotations?: number[];
-    scales?: number[];
+    positions: Cartographic[];//位置数组
+    rotations?: number[];//每个billboard的旋转值
+    scales?: number[];//每个billboard的整体缩放值
+    widths?: number[];//每个billboard的渲染宽度 px
+    heights?: number[];//每个billboard的渲染高度 px
 } & BaseBillboardGeometryOptions
 
 export class MultiBillboardGeometry extends BaseBillboardGeometry {
@@ -47,12 +49,36 @@ export class MultiBillboardGeometry extends BaseBillboardGeometry {
         this._scales = val;
     }
 
+    private _widths: number[];
+
+    public get widths () {
+        return this._widths;
+    }
+
+    @GeometryUpdateProperty()
+    public set widths (val: number[]) {
+        this._widths = val;
+    }
+
+    private _heights: number[];
+
+    public get heights () {
+        return this._heights;
+    }
+
+    @GeometryUpdateProperty()
+    public set heights (val: number[]) {
+        this._heights = val;
+    }
+
     public constructor (options: MultiBillboardGeometryOptions) {
         super(options, GeometryType.MULTI_BILLBOARD, new BillboardGeometryVisualizer());
         this._positions = options.positions;
         this._instanceCount = this._positions.length;
         this._rotations = Utils.defaultValue(options.rotations, []);
         this._scales = Utils.defaultValue(options.scales, []);
+        this._widths = Utils.defaultValue(options.widths, []);
+        this._heights = Utils.defaultValue(options.heights, []);
     }
 
     public getRenderData () {
@@ -60,7 +86,9 @@ export class MultiBillboardGeometry extends BaseBillboardGeometry {
             const res: BillboardSingleRenderData = {
                 position: position,
                 rotation: this.rotations[index] || 0,
-                scale: this.scales[index] || 1
+                scale: this.scales[index] || 1,
+                width: this.widths[index],
+                height: this.heights[index]
             }
             return res;
         });
