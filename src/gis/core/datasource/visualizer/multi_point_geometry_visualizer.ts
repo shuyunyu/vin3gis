@@ -14,14 +14,7 @@ export class MultiPointGeometryVisualizer extends PointGeometryVisualizer {
     }
 
     protected getRenderData (entity: Entity): BillboardSingleRenderData[] {
-        return entity.multiPoint.positions.map(position => {
-            const renderData: BillboardSingleRenderData = {
-                position: position,
-                rotation: 0,
-                scale: 1
-            };
-            return renderData;
-        });
+        return entity.multiPoint.getRenderData();
     }
 
 }

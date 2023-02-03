@@ -39,12 +39,7 @@ export class PointGeometryVisualizer extends BillboardGeometryVisualizer {
     }
 
     protected getRenderData (entity: Entity): BillboardSingleRenderData[] {
-        const renderData: BillboardSingleRenderData = {
-            position: entity.point.position,
-            rotation: 0,
-            scale: 1
-        }
-        return [renderData];
+        return entity.point.getRenderData();
     }
 
 }

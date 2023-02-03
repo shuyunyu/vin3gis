@@ -66,7 +66,7 @@ class GISTest {
 
     public static run (render: FrameRenderer, mapViewer: MapViewer) {
         this.testXHRWorker();
-        // this.testEntity(mapViewer);
+        this.testEntity(mapViewer);
         this.textDrawText();
         // this.testImageClipper();
         // this.testDrawPoint(render);
@@ -95,8 +95,8 @@ class GISTest {
     }
 
     private static testEntity (mapViewer: MapViewer) {
-        // this.testPointEntity(mapViewer);
-        this.testBillboardEntity(mapViewer);
+        this.testPointEntity(mapViewer);
+        // this.testBillboardEntity(mapViewer);
     }
 
     private static testBillboardEntity (mapViewer: MapViewer) {
@@ -170,32 +170,35 @@ class GISTest {
         global.pointEntity = entity;
         mapViewer.scene.entities.suspendEvents();
         const pointCount = 100;
-        for (let i = 0; i < pointCount; i++) {
-            const lng = 118.256 + Math.random() * 0.5;
-            const lat = 24.418 + Math.random() * 0.1;
-            const pos = Cartographic.fromDegrees(lng, lat, 0);
-            const entity = new Entity({
-                point: new PointGeometry({
-                    position: pos,
-                    size: 10,
-                    color: new Color("#00FFFF")
-                })
-            });
-            mapViewer.scene.entities.add(entity);
-        }
+        // for (let i = 0; i < pointCount; i++) {
+        //     const lng = 118.256 + Math.random() * 0.5;
+        //     const lat = 24.418 + Math.random() * 0.1;
+        //     const pos = Cartographic.fromDegrees(lng, lat, 0);
+        //     const entity = new Entity({
+        //         point: new PointGeometry({
+        //             position: pos,
+        //             size: 10,
+        //             color: new Color("#00FFFF")
+        //         })
+        //     });
+        //     mapViewer.scene.entities.add(entity);
+        // }
 
         //MultiPointGeometry
         const posArr = [];
+        const scales = [];
         for (let i = 0; i < pointCount; i++) {
             const lng = 118.256 - Math.random() * 0.5;
             const lat = 24.418 - Math.random() * 0.1;
             const pos = Cartographic.fromDegrees(lng, lat, 0);
             posArr.push(pos);
+            scales.push(Math.max(0.5, Math.random()))
         }
         mapViewer.scene.entities.add(new Entity({
             multiPoint: new MultiPointGeometry({
                 positions: posArr,
-                size: 10,
+                scales: scales,
+                size: 20,
                 color: new Color("#FF0000")
             })
         }));
