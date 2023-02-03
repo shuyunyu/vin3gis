@@ -1,3 +1,4 @@
+import { ICartesian2Like } from "../../../@types/core/gis";
 import { pointGeometryCanvasProvider } from "../../misc/provider/point_geometry_canvas_provider";
 import { Entity } from "../entity";
 import { BillboardSingleRenderData } from "../geometry/base_billboard_geometry";
@@ -9,6 +10,10 @@ export class PointGeometryVisualizer extends BillboardGeometryVisualizer {
 
     protected getEntityGeometry (entity: Entity): BaseGeometry {
         return entity.point;
+    }
+
+    protected getImageAnchor (entity: Entity): ICartesian2Like {
+        return { x: 0.5, y: 0.5 };
     }
 
     protected checkReady (entity: Entity): boolean {

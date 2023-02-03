@@ -1,15 +1,13 @@
 import { Object3D, Event, Texture, SpriteMaterial, PerspectiveCamera, InstancedMesh, BufferGeometry, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, Vector3, Vector2, Shader, WebGLRenderer } from "three";
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
-import { GeometryPropertyChangeData } from "../../../@types/core/gis";
-import { billboardGeometryCanvasProvider } from "../../misc/provider/billboard_geometry_canvas_provider";
+import { Utils } from "../../../../core/utils/utils";
+import { GeometryPropertyChangeData, ICartesian2Like } from "../../../@types/core/gis";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
 import { Entity } from "../entity";
 import { BillboardSingleRenderData } from "../geometry/base_billboard_geometry";
 import { BaseGeometryVisualizer } from "./base_geometry_visualizer";
-
-let bufferGeometry: BufferGeometry;
 
 export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
 
@@ -17,14 +15,14 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
 
     private _texSourceImage: TexImageSource;
 
-    private getBufferGeometry () {
-        if (bufferGeometry) return bufferGeometry;
-        bufferGeometry = new BufferGeometry();
+    private getBufferGeometry (entity: Entity) {
+        const anchor = this.getImageAnchor(entity);
+        const bufferGeometry = new BufferGeometry();
         const float32Array = new Float32Array([
-            - 0.5, - 0.5, 0, 0, 0,
-            0.5, - 0.5, 0, 1, 0,
-            0.5, 0.5, 0, 1, 1,
-            - 0.5, 0.5, 0, 0, 1
+            -1 + anchor.x, -anchor.y, 0, 0, 0,
+            anchor.x, -anchor.y, 0, 1, 0,
+            anchor.x, 1 - anchor.y, 0, 1, 1,
+            -1 + anchor.x, 1 - anchor.y, 0, 0, 1
         ]);
 
         const interleavedBuffer = new InterleavedBuffer(float32Array, 5);
@@ -36,19 +34,22 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
     }
 
     /**
+     * 获取图片的锚点
+     * - 子类需要重写此方法
+     * @param entity 
+     */
+    protected getImageAnchor (entity: Entity): ICartesian2Like {
+        return entity.billboard.center;
+    }
+
+    /**
      * 获取贴图数据源
      * @param entity 
      * @returns 
      */
     protected getTexImageSource (entity: Entity) {
         const billboard = entity.billboard;
-        const canvas = billboardGeometryCanvasProvider.createCanvas({
-            image: billboard.texImageSource,
-            width: billboard.width,
-            height: billboard.height,
-            center: billboard.center
-        });
-        return canvas;
+        return billboard.texImageSource as TexImageSource;
     }
 
     /**
@@ -107,7 +108,7 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
                     `);
             }
         });
-        const geometry = this.getBufferGeometry();
+        const geometry = this.getBufferGeometry(entity);
         const mesh = new InstancedMesh(geometry, mtl, this.getInstanceCount(entity));
         //@ts-ignore
         mesh.center = new Vector2(0.5, 0.5);
@@ -115,7 +116,7 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
 
         this.update(entity, tilingScheme, root, renderer);
 
-        this._disposableObjects.push(mesh, mtl, texture);
+        this._disposableObjects.push(mesh, mtl, texture, geometry);
 
         return mesh;
 
@@ -157,8 +158,13 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
             const renderData = billboardRenderData[i];
             const coord = Transform.cartographicToWorldVec3(renderData.position, tilingScheme);
             const scale = renderData.scale;
+
+            //将宽高属性设置到scale上来达到效果
+            const wScale = Utils.defined(renderData.width) ? renderData.width / this._texSourceImage.width : 1;
+            const hScale = Utils.defined(renderData.height) ? renderData.height / this._texSourceImage.height : 1;
+
             const matrix = new Matrix4();
-            matrix.setPosition(coord.x, coord.y, coord.z).scale(new Vector3(xScale * scale, yScale * scale, renderData.rotation));
+            matrix.setPosition(coord.x, coord.y, coord.z).scale(new Vector3(xScale * scale * wScale, yScale * scale * hScale, renderData.rotation));
             this._mesh.setMatrixAt(i, matrix);
         }
 
