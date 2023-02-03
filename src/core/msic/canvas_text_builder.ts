@@ -14,6 +14,7 @@ export type CanvasTextOptions = {
     backgroundColor?: string;
     horizontalPadding?: number;
     verticalPadding?: number;
+    outputSquare?: boolean; //是否输出正方形
 }
 
 const fontHeightCache: Record<string, number> = {}
@@ -25,6 +26,9 @@ export class CanvasTextBuilder {
 
     public static buildTextCanvas (text: string, options?: CanvasTextOptions) {
         options = options || {};
+
+        const outputSquare = Utils.defaultValue(options.outputSquare, true);
+
         const font = options.font || '18px Arial';
         const fillStyle = options.fillStyle || '#000000';
 
@@ -51,8 +55,13 @@ export class CanvasTextBuilder {
         const textWidth = Math.max.apply(null, lines.map(line => ctx.measureText(line).width));
         const textHeight = fontHeight + fontHeight * lineHeight * (lines.length - 1);
 
-        const canvasWidth = Math.max(2, MathUtils.ceilPowerOfTwo(textWidth + (2 * horizontalPadding)));
-        const canvasHeight = Math.max(2, MathUtils.ceilPowerOfTwo(textHeight + (2 * verticalPadding)));
+        let canvasWidth = Math.max(2, MathUtils.ceilPowerOfTwo(textWidth + (2 * horizontalPadding)));
+        let canvasHeight = Math.max(2, MathUtils.ceilPowerOfTwo(textHeight + (2 * verticalPadding)));
+
+        if (outputSquare) {
+            const max = Math.max(canvasWidth, canvasHeight);
+            canvasWidth = canvasHeight = max;
+        }
 
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;

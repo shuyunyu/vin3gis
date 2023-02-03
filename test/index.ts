@@ -91,7 +91,6 @@ class GISTest {
         canvas.style.bottom = "10px";
         canvas.style.zIndex = "100";
         document.body.appendChild(canvas);
-        document.body.appendChild(canvas);
     }
 
     private static testEntity (mapViewer: MapViewer) {
