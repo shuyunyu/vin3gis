@@ -16,6 +16,7 @@ import { PointCloudGeometry } from "../src/gis/core/datasource/geometry/point_cl
 import { ColorUtils } from "../src/core/utils/color_utils";
 import { ImageClipper } from "../src/gis/core/misc/image_clipper";
 import { MultiBillboardGeometry } from "../src/gis/core/datasource/geometry/multi_billboard_geometry";
+import { CanvasTextBuilder } from "../src/core/msic/canvas_text_builder";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -65,7 +66,8 @@ class GISTest {
 
     public static run (render: FrameRenderer, mapViewer: MapViewer) {
         this.testXHRWorker();
-        this.testEntity(mapViewer);
+        // this.testEntity(mapViewer);
+        this.textDrawText();
         // this.testImageClipper();
         // this.testDrawPoint(render);
         // this.testSchedule();
@@ -74,6 +76,22 @@ class GISTest {
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
+    }
+
+    private static textDrawText () {
+        const canvas = CanvasTextBuilder.buildTextCanvas('hello world!\nhello', {
+            backgroundColor: '#FF000022',
+            lineHeight: 1
+        }).canvas;
+        canvas.style.border = "1px solid";
+        canvas.style.width = canvas.width + "px";
+        canvas.style.height = canvas.height + "px";
+        canvas.style.position = "absolute";
+        canvas.style.right = "10px";
+        canvas.style.bottom = "10px";
+        canvas.style.zIndex = "100";
+        document.body.appendChild(canvas);
+        document.body.appendChild(canvas);
     }
 
     private static testEntity (mapViewer: MapViewer) {
