@@ -102,7 +102,9 @@ export class MultiBillboardGeometry extends BaseBillboardGeometry {
             center: this.center,
             positions: this.positions.map(p => p.clone()),
             rotations: this.rotations,
-            scales: this.scales
+            scales: this.scales,
+            widths: this.widths,
+            heights: this.heights
         })
     }
 
