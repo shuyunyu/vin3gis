@@ -30,6 +30,7 @@ export type BillboardSingleRenderData = {
     scale: number;
     width?: number;//渲染图片的宽度
     height?: number;//渲染图片的高度
+    uvRange?: { xmin: number, xmax: number, ymin: number, ymax: number };//uv坐标范围
 }
 
 export class BaseBillboardGeometry extends BaseGeometry {

@@ -94,8 +94,8 @@ class GISTest {
     }
 
     private static testEntity (mapViewer: MapViewer) {
-        this.testPointEntity(mapViewer);
-        // this.testBillboardEntity(mapViewer);
+        // this.testPointEntity(mapViewer);
+        this.testBillboardEntity(mapViewer);
     }
 
     private static testBillboardEntity (mapViewer: MapViewer) {

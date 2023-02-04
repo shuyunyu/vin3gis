@@ -1,4 +1,4 @@
-import { Object3D, Event, Texture, SpriteMaterial, PerspectiveCamera, InstancedMesh, BufferGeometry, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, Vector3, Vector2, Shader, WebGLRenderer } from "three";
+import { Object3D, Event, Texture, SpriteMaterial, PerspectiveCamera, InstancedMesh, BufferGeometry, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, Vector3, Vector2, Shader, WebGLRenderer, Color } from "three";
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
 import { Utils } from "../../../../core/utils/utils";
@@ -31,6 +31,16 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
         bufferGeometry.setAttribute('position', new InterleavedBufferAttribute(interleavedBuffer, 3, 0, false));
         bufferGeometry.setAttribute('uv', new InterleavedBufferAttribute(interleavedBuffer, 2, 3, false));
         return bufferGeometry;
+    }
+
+    /**
+     * 是否使用动态uv
+     * - 子类需要重写此方法
+     * - 如果使用动态uv 那么会使用instanceColor的rgb代表uv.xmin,uv.xmax,uv.ymin,rotation代表uv.ymax,因为rotation数据被占用，所以无法动态修改rotation
+     * @returns 
+     */
+    protected useDynamicUV () {
+        return false;
     }
 
     /**
@@ -90,12 +100,39 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
                     `curModelMatrix`)
                     .replace(/\( rotation \)/g, '( curRotation )')
                     .replace(
+                        `#include <uv_vertex>`,
+                        `
+                        #include <uv_vertex>
+
+                        #ifdef USE_INSTANCING_COLOR
+
+                            if (vUv.x == 0.0) {
+                                vUv.x = instanceColor.x;
+                            }
+                            if (vUv.x == 1.0) {
+                                vUv.x = instanceColor.y;
+                            }
+                            if (vUv.y == 0.0) {
+                                vUv.y = instanceColor.z;
+                            }
+                            if (vUv.y == 1.0) {
+                                vUv.y = instanceMatrix[2].z;
+                            }
+                        #endif
+                        `)
+                    .replace(
                         `vec4 mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );`,
                         `#ifdef USE_INSTANCING
                             vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0 );
                             mat4 curModelMatrix = modelMatrix * instanceMatrix;
 
                             float curRotation = curModelMatrix[2].z;
+
+                            #ifdef USE_INSTANCING_COLOR
+
+                               curRotation = 0.0;
+
+                            #endif
 
                          #endif
                          #ifndef USE_INSTANCING
@@ -154,6 +191,9 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
         const yScale = this._texSourceImage.height * factor / renderer.size.height;
 
         const billboardRenderData = this.getRenderData(entity);
+
+        const useDynamicUv = this.useDynamicUV();
+
         for (let i = 0; i < billboardRenderData.length; i++) {
             const renderData = billboardRenderData[i];
             const coord = Transform.cartographicToWorldVec3(renderData.position, tilingScheme);
@@ -164,8 +204,14 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
             const hScale = Utils.defined(renderData.height) ? renderData.height / this._texSourceImage.height : 1;
 
             const matrix = new Matrix4();
-            matrix.setPosition(coord.x, coord.y, coord.z).scale(new Vector3(xScale * scale * wScale, yScale * scale * hScale, renderData.rotation));
+            matrix.setPosition(coord.x, coord.y, coord.z).scale(new Vector3(xScale * scale * wScale, yScale * scale * hScale, useDynamicUv ? renderData.uvRange.ymax : renderData.rotation));
             this._mesh.setMatrixAt(i, matrix);
+
+            if (useDynamicUv) {
+                this._mesh.setColorAt(i, new Color(renderData.uvRange.xmin, renderData.uvRange.xmax, renderData.uvRange.ymin));
+                this._mesh.instanceColor.needsUpdate = true;
+            }
+
         }
 
         this._mesh.instanceMatrix.needsUpdate = true;
