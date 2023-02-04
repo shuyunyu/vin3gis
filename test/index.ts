@@ -1,5 +1,5 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector3 } from "three";
-import { FrameRenderer, math, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
+import { FrameRenderer, math, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
@@ -68,6 +68,7 @@ class GISTest {
         this.testXHRWorker();
         this.testEntity(mapViewer);
         this.textDrawText();
+        // this.testTiledTexture();
         // this.testImageClipper();
         // this.testDrawPoint(render);
         // this.testSchedule();
@@ -506,6 +507,33 @@ class GISTest {
 
         //     }
         // }, this);
+    }
+
+    private static testTiledTexture () {
+        const tiledTexture = new TiledTexture(1024, 256);
+        const canvas = tiledTexture.canvas;
+        canvas.style.border = "1px solid";
+        canvas.style.width = canvas.width + "px";
+        canvas.style.height = canvas.height + "px";
+        canvas.style.position = "absolute";
+        canvas.style.right = "10px";
+        canvas.style.top = "10px";
+        canvas.style.zIndex = "100";
+        document.body.appendChild(canvas);
+
+        const res1 = CanvasTextBuilder.buildTextCanvas('hello world!\nhello', {
+            backgroundColor: '#FF000022',
+            lineHeight: 1
+        });
+        console.log(tiledTexture.tileImage(res1.canvas));
+
+        const res2 = CanvasTextBuilder.buildTextCanvas(`Canvas.style.position = "absolute";`, {
+            lineHeight: 1,
+            backgroundColor: '#FF000022',
+        });
+        console.log(tiledTexture.tileImage(res2.canvas));
+
+        global.tiledTexture = tiledTexture;
     }
 
 }

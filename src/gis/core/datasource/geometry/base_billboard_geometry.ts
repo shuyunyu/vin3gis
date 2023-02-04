@@ -1,4 +1,5 @@
 import { Vector2 } from "three";
+import { RectangleRange } from "../../../../@types/global/global";
 import { AssetLoader } from "../../../../core/asset/asset_loader";
 import { math } from "../../../../core/math/math";
 import { Utils } from "../../../../core/utils/utils";
@@ -30,7 +31,7 @@ export type BillboardSingleRenderData = {
     scale: number;
     width?: number;//渲染图片的宽度
     height?: number;//渲染图片的高度
-    uvRange?: { xmin: number, xmax: number, ymin: number, ymax: number };//uv坐标范围
+    uvRange?: RectangleRange;//uv坐标范围
 }
 
 export class BaseBillboardGeometry extends BaseGeometry {
