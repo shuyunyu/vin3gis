@@ -17,6 +17,12 @@ export type CanvasTextOptions = {
     outputSquare?: boolean; //是否输出正方形
 }
 
+export type CanvasTextBuildResult = {
+    canvas: HTMLCanvasElement;
+    textWidth: number;
+    textHeight: number;
+}
+
 const fontHeightCache: Record<string, number> = {}
 
 /**
@@ -24,7 +30,7 @@ const fontHeightCache: Record<string, number> = {}
  */
 export class CanvasTextBuilder {
 
-    public static buildTextCanvas (text: string, options?: CanvasTextOptions) {
+    public static buildTextCanvas (text: string, options?: CanvasTextOptions): CanvasTextBuildResult {
         options = options || {};
 
         const outputSquare = Utils.defaultValue(options.outputSquare, true);
@@ -36,7 +42,7 @@ export class CanvasTextBuilder {
         const shadowBlur = options.shadowBlur || 0;
         const shadowOffsetX = options.shadowOffsetX || 0;
         const shadowOffsetY = options.shadowOffsetY || 0;
-        const lineHeight = options.lineHeight || 1;
+        const lineHeight = options.lineHeight || 1.2;
 
         const backgroundColor = options.backgroundColor || 'transparent';
         const horizontalPadding = options.horizontalPadding || 0;

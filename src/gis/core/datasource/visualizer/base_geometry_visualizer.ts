@@ -64,9 +64,12 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
         if (!this._geometryObject) {
             this._geometryObject = this.createGeometryObject(entity, tilingScheme, root, renderer);
             if (this._geometryObject) {
-                //设置渲染顺序
-                this._geometryObject.renderOrder = this._renderOrder;
-                root.add(this._geometryObject);
+                //校验是否已经挂载了
+                if (this._geometryObject.parent !== root) {
+                    //设置渲染顺序
+                    this._geometryObject.renderOrder = this._renderOrder;
+                    root.add(this._geometryObject);
+                }
             }
         } else {
             this._geometryObject.visible = true;
@@ -104,9 +107,17 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
         }
     }
 
+    /**
+     * 是否应该在移除Geometry的时候移除Object
+     * @returns 
+     */
+    protected shouldRemoveObjectOnRemoveGeometry () {
+        return true;
+    }
+
     public remove (entity: Entity, root: Object3D) {
         if (this._geometryObject) {
-            root.remove(this._geometryObject);
+            if (this.shouldRemoveObjectOnRemoveGeometry()) root.remove(this._geometryObject);
             this._geometryObject = null;
             //dispose obj
             this._disposableObjects.forEach(obj => disposeSystem.disposeObj(obj));

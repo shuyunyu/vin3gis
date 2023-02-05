@@ -37,6 +37,10 @@ export class TiledTexture implements SystemDefines.Disposable {
 
     private _tiles: CanvasImageSource[];
 
+    public get tilesCount () {
+        return this._tiles.length;
+    }
+
     /**
      * 标识 该贴图是否是空的
      */
@@ -49,8 +53,8 @@ export class TiledTexture implements SystemDefines.Disposable {
      * 标识 该贴图的瓦片位置是否已经铺满了
      */
     public get isFull () {
-        const emptyTile = this._tiles.find(t => !t);
-        return !emptyTile;
+        const emptyTileIndex = this._tiles.findIndex(t => !t);
+        return emptyTileIndex === -1;
     }
 
     /**

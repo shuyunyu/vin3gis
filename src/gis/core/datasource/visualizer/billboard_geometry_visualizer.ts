@@ -3,6 +3,7 @@ import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
 import { Utils } from "../../../../core/utils/utils";
 import { GeometryPropertyChangeData, ICartesian2Like } from "../../../@types/core/gis";
+import { SpriteShaderExt } from "../../extend/sprite_shader_ext";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
 import { Entity } from "../entity";
@@ -95,54 +96,7 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
             depthTest: false,
             //@ts-ignore
             onBeforeCompile: (shader: Shader, renderer: WebGLRenderer) => {
-                shader.vertexShader = shader.vertexShader.replace(
-                    /modelMatrix/g,
-                    `curModelMatrix`)
-                    .replace(/\( rotation \)/g, '( curRotation )')
-                    .replace(
-                        `#include <uv_vertex>`,
-                        `
-                        #include <uv_vertex>
-
-                        #ifdef USE_INSTANCING_COLOR
-
-                            if (vUv.x == 0.0) {
-                                vUv.x = instanceColor.x;
-                            }
-                            if (vUv.x == 1.0) {
-                                vUv.x = instanceColor.y;
-                            }
-                            if (vUv.y == 0.0) {
-                                vUv.y = instanceColor.z;
-                            }
-                            if (vUv.y == 1.0) {
-                                vUv.y = instanceMatrix[2].z;
-                            }
-                        #endif
-                        `)
-                    .replace(
-                        `vec4 mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );`,
-                        `#ifdef USE_INSTANCING
-                            vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0 );
-                            mat4 curModelMatrix = modelMatrix * instanceMatrix;
-
-                            float curRotation = curModelMatrix[2].z;
-
-                            #ifdef USE_INSTANCING_COLOR
-
-                               curRotation = 0.0;
-
-                            #endif
-
-                         #endif
-                         #ifndef USE_INSTANCING
-                            vec4 mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );
-                            mat4 curModelMatrix = modelMatrix;
-
-                            float curRotation = rotation;
-
-                         #endif
-                    `);
+                shader.vertexShader = SpriteShaderExt.extShader(shader);
             }
         });
         const geometry = this.getBufferGeometry(entity);

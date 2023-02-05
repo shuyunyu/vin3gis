@@ -3,6 +3,7 @@ import { UniqueList } from "../../../core/extend/unique_list";
 import { Utils } from "../../../core/utils/utils";
 import { EntityGeometryRenderDriver, EntityOptions } from "../../@types/core/gis";
 import { BaseBillboardGeometry } from "./geometry/base_billboard_geometry";
+import { LabelGeometry } from "./geometry/label_geometry";
 import { MultiPointGeometry } from "./geometry/multi_point_geometry";
 import { PointCloudGeometry } from "./geometry/point_cloud_geometry";
 import { PointGeometry } from "./geometry/point_geometry";
@@ -61,6 +62,12 @@ export class Entity {
         return this._billboard;
     }
 
+    private _label?: LabelGeometry;
+
+    public get label () {
+        return this._label;
+    }
+
     public constructor (options: EntityOptions) {
         this.id = Utils.createGuid();
         this.visibleChangedEvent = new GenericEvent();
@@ -83,6 +90,10 @@ export class Entity {
         if (options.billboard) {
             this._billboard = options.billboard;
             this._billboard.entity = this;
+        }
+        if (options.label) {
+            this._label = options.label;
+            this._label.entity = this;
         }
     }
 

@@ -17,6 +17,7 @@ import { ColorUtils } from "../src/core/utils/color_utils";
 import { ImageClipper } from "../src/gis/core/misc/image_clipper";
 import { MultiBillboardGeometry } from "../src/gis/core/datasource/geometry/multi_billboard_geometry";
 import { CanvasTextBuilder } from "../src/core/msic/canvas_text_builder";
+import { LabelGeometry } from "../src/gis/core/datasource/geometry/label_geometry";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -97,6 +98,51 @@ class GISTest {
     private static testEntity (mapViewer: MapViewer) {
         // this.testPointEntity(mapViewer);
         this.testBillboardEntity(mapViewer);
+        this.testTextGeometry(mapViewer);
+    }
+
+    private static testTextGeometry (mapViewer: MapViewer) {
+        const lng = 118.256;
+        const lat = 24.418;
+        const pos = Cartographic.fromDegrees(lng, lat, 0);
+        const entity = new Entity({
+            label: new LabelGeometry({
+                position: pos,
+                text: "Vin3GIS001"
+            })
+        });
+        mapViewer.scene.entities.add(entity);
+
+        const pos1 = Cartographic.fromDegrees(lng, lat + 0.1, 0);
+        const entity1 = new Entity({
+            point: new PointGeometry({
+                position: pos1,
+                size: 10,
+                color: new Color("#FF0000")
+            }),
+            label: new LabelGeometry({
+                position: pos1,
+                text: "Vin3GIS002",
+            })
+        });
+
+        mapViewer.scene.entities.add(entity1);
+
+        const pos2 = Cartographic.fromDegrees(lng, lat - 0.1, 0);
+        const entity2 = new Entity({
+            point: new PointGeometry({
+                position: pos2,
+                size: 10,
+                color: new Color("#FF0000")
+            }),
+            label: new LabelGeometry({
+                position: pos2,
+                text: "Vin3GIS003",
+            })
+        });
+
+        mapViewer.scene.entities.add(entity2);
+
     }
 
     private static testBillboardEntity (mapViewer: MapViewer) {
