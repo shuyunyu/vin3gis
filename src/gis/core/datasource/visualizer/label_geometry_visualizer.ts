@@ -1,5 +1,6 @@
 import { RectangleRange } from "../../../../@types/global/global";
 import { Size } from "../../../../core/msic/size";
+import { Cartographic } from "../../cartographic";
 import { Entity } from "../entity";
 import { BaseGeometry } from "../geometry/base_geometry";
 import { SpriteAtlasGeometryVisualizer } from "./sprite_atlas_geometry_visualizer";
@@ -29,6 +30,10 @@ export class LabelGeometryVisualizer extends SpriteAtlasGeometryVisualizer {
         uvRange.xmax = uvRange.xmin + wD;
         uvRange.ymin = uvRange.ymax - wH;
         return uvRange;
+    }
+
+    protected getSpritePosition (entity: Entity): Cartographic {
+        return entity.label.position;
     }
 
 }

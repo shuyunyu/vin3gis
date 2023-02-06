@@ -45,7 +45,7 @@ export class InternalConfig {
     public static SPRITE_TEXTURE_ATLAS_SIZE = 1024;
 
     //sprite贴图集最小瓦片贴图尺寸
-    public static SPRITE_TEXTURE_ATLAS_MIN_TILE_SIZE = 16;
+    public static SPRITE_TEXTURE_ATLAS_MIN_TILE_SIZE = 8;
 
     //sprite贴图集最大瓦片贴图尺寸
     public static SPRITE_TEXTURE_ATLAS_MAX_TILE_SIZE = 512;

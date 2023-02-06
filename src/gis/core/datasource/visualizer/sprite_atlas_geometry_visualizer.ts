@@ -2,6 +2,7 @@ import { Event, Object3D, Vector2 } from "three";
 import { RectangleRange } from "../../../../@types/global/global";
 import { Size } from "../../../../core/msic/size";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
+import { Cartographic } from "../../cartographic";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { SpriteTextureAtlas } from "../atlas/sprite_texture_atlas";
 import { spriteTextureAtlasManager } from "../atlas/sprite_texture_atlas_manager";
@@ -32,11 +33,15 @@ export class SpriteAtlasGeometryVisualizer extends BaseGeometryVisualizer {
         return uvRange;
     }
 
+    protected getSpritePosition (entity: Entity): Cartographic {
+        return null;
+    }
+
     protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): Object3D<Event> {
         const texImageSource = this.getTexImageSource(entity);
         const atlas = spriteTextureAtlasManager.getAltas(texImageSource.width);
         const spriteId = atlas.showSprite({
-            position: entity.label.position,
+            position: this.getSpritePosition(entity),
             tilingScheme: tilingScheme,
             renderer: renderer,
             spriteImage: texImageSource,
