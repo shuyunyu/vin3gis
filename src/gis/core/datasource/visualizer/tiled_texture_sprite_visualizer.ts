@@ -4,6 +4,7 @@ import { math } from "../../../../core/math/math";
 import { Size } from "../../../../core/msic/size";
 import { TiledTexture, TiledTextureResult } from "../../../../core/msic/tiled_texture";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
+import { disposeSystem } from "../../../../core/system/dispose_system";
 import { Utils } from "../../../../core/utils/utils";
 import { Cartographic } from "../../cartographic";
 import { SpriteShaderExt } from "../../extend/sprite_shader_ext";
@@ -97,10 +98,10 @@ export class TiledTextureSpriteVisualizer {
      * 隐藏sprite
      * @param spriteId 
      */
-    public hideSprite (spriteId: string) {
+    public setSpriteVisible (spriteId: string, visible: boolean) {
         const renderedSpriteData = this._renderedSpriteDataList.find(s => s.renderedSprite.id === spriteId);
         if (!renderedSpriteData) return;
-        renderedSpriteData.visible = false;
+        renderedSpriteData.visible = visible;
         this.renderSprites([renderedSpriteData]);
     }
 
@@ -109,7 +110,21 @@ export class TiledTextureSpriteVisualizer {
      * @param spriteId 
      */
     public removeSprite (spriteId: string) {
-
+        const index = this._renderedSpriteDataList.findIndex(s => s.renderedSprite.id === spriteId);
+        if (index === -1) return;
+        this.setSpriteVisible(spriteId, false);
+        const renderedSpriteData = this._renderedSpriteDataList.splice(index, 1)[0];
+        const spriteIndex = renderedSpriteData.renderedSprite.spriteIndex;
+        const sprite = this._sprites[spriteIndex];
+        sprite.tiledTexture.disposeTileImage(renderedSpriteData.renderedSprite.tiledTextureResult.tileIndex);
+        //如果当前使用的sprite是空的了 那么释放他对应的资源
+        if (sprite.tiledTexture.isEmpty) {
+            this._sprites.splice(spriteIndex, 1);
+            if (sprite.mesh.parent) {
+                sprite.mesh.removeFromParent();
+            }
+            [sprite.geometry, sprite.material, sprite.mesh, sprite.tiledTexture].forEach(item => disposeSystem.disposeObj(item));
+        }
     }
 
     /**

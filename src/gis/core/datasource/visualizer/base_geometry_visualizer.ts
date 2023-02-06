@@ -60,7 +60,12 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
 
     }
 
+    protected beforeShow (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer) {
+
+    }
+
     public show (entity: Entity, tilingScheme: ITilingScheme, root: Object3D, renderer: FrameRenderer) {
+        this.beforeShow(entity, tilingScheme, root, renderer);
         if (!this._geometryObject) {
             this._geometryObject = this.createGeometryObject(entity, tilingScheme, root, renderer);
             if (this._geometryObject) {

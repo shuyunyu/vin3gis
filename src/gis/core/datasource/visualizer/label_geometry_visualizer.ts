@@ -18,6 +18,12 @@ export class LabelGeometryVisualizer extends BaseGeometryVisualizer {
         return entity.label;
     }
 
+    protected beforeShow (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): void {
+        if (this._spriteId) {
+            tiledTextureSpriteVisualizer.setSpriteVisible(this._spriteId, true);
+        }
+    }
+
     protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): Object3D<Event> {
         const label = entity.label;
         const spriteId = tiledTextureSpriteVisualizer.showSprite({
@@ -29,8 +35,10 @@ export class LabelGeometryVisualizer extends BaseGeometryVisualizer {
             //根据文本宽高重新计算一下uvRange
             recaclUvRange (uvRange: RectangleRange, tileTextureSize: number, tileSize: number) {
                 const d = tileSize / tileTextureSize;
-                const wD = label.textWidth / tileSize * d;
-                const wH = label.textHeight / tileSize * d;
+                const imageTextWidthScale = label.textWidth / label.texImageSource.width;
+                const imageTextHeightScale = label.textHeight / label.texImageSource.width;
+                const wD = imageTextWidthScale * d;
+                const wH = imageTextHeightScale * d;
                 uvRange.xmax = uvRange.xmin + wD;
                 uvRange.ymin = uvRange.ymax - wH;
                 return uvRange;
@@ -52,7 +60,7 @@ export class LabelGeometryVisualizer extends BaseGeometryVisualizer {
 
     public hide (entity: Entity, root: Object3D<Event>): void {
         if (this._spriteId) {
-            tiledTextureSpriteVisualizer.hideSprite(this._spriteId);
+            tiledTextureSpriteVisualizer.setSpriteVisible(this._spriteId, false);
         }
     }
 

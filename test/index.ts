@@ -108,7 +108,7 @@ class GISTest {
         const entity = new Entity({
             label: new LabelGeometry({
                 position: pos,
-                text: "Vin3GIS001"
+                text: "Vin3GIS001Vin3GIS001\nVin3GIS001"
             })
         });
         mapViewer.scene.entities.add(entity);
@@ -143,6 +143,8 @@ class GISTest {
 
         mapViewer.scene.entities.add(entity2);
 
+        globalThis.mapViewer = mapViewer;
+        globalThis.textEntity = entity;
     }
 
     private static testBillboardEntity (mapViewer: MapViewer) {
