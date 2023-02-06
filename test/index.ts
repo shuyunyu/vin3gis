@@ -81,7 +81,7 @@ class GISTest {
     }
 
     private static textDrawText () {
-        const canvas = CanvasTextBuilder.buildTextCanvas('hello world!\nhello', {
+        const canvas = CanvasTextBuilder.buildTextCanvas('Vin3GIS001Vin3GIS001\nVin3GIS001', {
             backgroundColor: '#FF000022',
             lineHeight: 1
         }).canvas;
@@ -108,7 +108,13 @@ class GISTest {
         const entity = new Entity({
             label: new LabelGeometry({
                 position: pos,
-                text: "Vin3GIS001Vin3GIS001\nVin3GIS001"
+                text: "Vin3GIS001Vin3GIS001\nVin3GIS001",
+                fontSize: 18,
+                fontColor: new Color("#FF0000"),
+                shadowColor: new Color("#00FFFF"),
+                shadowOffsetX: 1,
+                shadowOffsetY: 1,
+                shadowBlur: 1
             })
         });
         mapViewer.scene.entities.add(entity);

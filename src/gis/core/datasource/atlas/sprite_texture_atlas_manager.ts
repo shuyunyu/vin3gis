@@ -31,7 +31,7 @@ class SpriteTextureAtlasManager {
             if (size > max) {
                 Log.warn(SpriteTextureAtlasManager, `sprite size is too big. max: ${max}, size: ${size}`);
             }
-            return this._atlasList[1];
+            return this._atlasList[this._atlasList.length - 1];
         }
         return this._atlasList.find(a => a.tileSize === size);
     }
