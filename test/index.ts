@@ -68,7 +68,7 @@ class GISTest {
     public static run (render: FrameRenderer, mapViewer: MapViewer) {
         this.testXHRWorker();
         this.testEntity(mapViewer);
-        this.textDrawText();
+        // this.textDrawText();
         // this.testTiledTexture();
         // this.testImageClipper();
         // this.testDrawPoint(render);
@@ -137,7 +137,7 @@ class GISTest {
             }),
             label: new LabelGeometry({
                 position: pos2,
-                text: "003",
+                text: "Vin3GIS003",
             })
         });
 

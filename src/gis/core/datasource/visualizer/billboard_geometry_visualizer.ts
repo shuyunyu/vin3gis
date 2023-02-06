@@ -104,7 +104,11 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
         //@ts-ignore
         mesh.center = new Vector2(0.5, 0.5);
         this._mesh = mesh;
-
+        for (let i = 0; i < mesh.count; i++) {
+            const matrix = new Matrix4();
+            matrix.scale(new Vector3(0, 0, 0));
+            mesh.setMatrixAt(i, matrix);
+        }
         this.update(entity, tilingScheme, root, renderer);
 
         this._disposableObjects.push(mesh, mtl, texture, geometry);
