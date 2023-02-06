@@ -41,6 +41,12 @@ export class InternalConfig {
     //是否在webWorker中加载瓦片贴图
     public static REQUEST_RASTER_TILE_IN_WORKER = true;
 
+    //文本贴图集尺寸
+    public static TEXT_TILED_TEXTURE_ATLAS_SIZE = 1024;
+
+    //文本贴图集瓦片尺寸
+    public static TEXT_TILED_TEXTURE_ATLAS_TILE_SIZE = 128;
+
     /**
      * 校验相机的pitch是否有效
      * @param pitch 

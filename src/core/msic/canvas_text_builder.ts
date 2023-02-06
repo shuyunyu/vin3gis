@@ -15,6 +15,7 @@ export type CanvasTextOptions = {
     horizontalPadding?: number;
     verticalPadding?: number;
     outputSquare?: boolean; //是否输出正方形
+    specSquareSize?: number;//指定的尺寸
 }
 
 export type CanvasTextBuildResult = {
@@ -65,7 +66,10 @@ export class CanvasTextBuilder {
         let canvasHeight = Math.max(2, MathUtils.ceilPowerOfTwo(textHeight + (2 * verticalPadding)));
 
         if (outputSquare) {
-            const max = Math.max(canvasWidth, canvasHeight);
+            let max = Math.max(canvasWidth, canvasHeight);
+            if (Utils.defined(options.specSquareSize)) {
+                max = Math.max(max, options.specSquareSize);
+            }
             canvasWidth = canvasHeight = max;
         }
 

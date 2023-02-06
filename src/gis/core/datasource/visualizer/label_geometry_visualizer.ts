@@ -2,13 +2,14 @@ import { Object3D, Event, Vector2 } from "three";
 import { RectangleRange } from "../../../../@types/global/global";
 import { Size } from "../../../../core/msic/size";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
+import { InternalConfig } from "../../internal/internal_config";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Entity } from "../entity";
 import { BaseGeometry } from "../geometry/base_geometry";
 import { BaseGeometryVisualizer } from "./base_geometry_visualizer";
 import { TiledTextureSpriteVisualizer } from "./tiled_texture_sprite_visualizer";
 
-const tiledTextureSpriteVisualizer = new TiledTextureSpriteVisualizer(1024, 128);
+const tiledTextureSpriteVisualizer = new TiledTextureSpriteVisualizer(InternalConfig.TEXT_TILED_TEXTURE_ATLAS_SIZE, InternalConfig.TEXT_TILED_TEXTURE_ATLAS_TILE_SIZE);
 
 export class LabelGeometryVisualizer extends BaseGeometryVisualizer {
 

@@ -137,7 +137,7 @@ class GISTest {
             }),
             label: new LabelGeometry({
                 position: pos2,
-                text: "Vin3GIS003",
+                text: "003",
             })
         });
 
