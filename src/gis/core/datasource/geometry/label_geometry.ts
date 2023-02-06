@@ -2,7 +2,6 @@ import { Color } from "three";
 import { CanvasTextBuilder, CanvasTextBuildResult } from "../../../../core/msic/canvas_text_builder";
 import { GeometryRerenderProperty, GeometryUpdateProperty } from "../../../decorator/decorator";
 import { Cartographic } from "../../cartographic";
-import { InternalConfig } from "../../internal/internal_config";
 import { LabelGeometryVisualizer } from "../visualizer/label_geometry_visualizer";
 import { BaseGeometry } from "./base_geometry";
 import { GeometryType } from "./geometry";
@@ -86,8 +85,7 @@ export class LabelGeometry extends BaseGeometry {
 
     private drawText () {
         this._canvasTextBuildResult = CanvasTextBuilder.buildTextCanvas(this._text, {
-            outputSquare: true,
-            specSquareSize: InternalConfig.TEXT_TILED_TEXTURE_ATLAS_TILE_SIZE
+            outputSquare: true
         });
     }
 
