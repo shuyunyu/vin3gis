@@ -21,18 +21,44 @@ export class SpriteAtlasGeometryVisualizer extends BaseGeometryVisualizer {
         }
     }
 
+    /**
+     * 获取贴图图片源
+     * - 子类需重写此方法
+     * @param entity 
+     * @returns 
+     */
     protected getTexImageSource (entity: Entity): HTMLCanvasElement {
         return null;
     }
 
+    /**
+     * 获取最终显示的内容的尺寸
+     * - 子类需重写此方法
+     * @param entity 
+     * @returns 
+     */
     protected getSpecSize (entity: Entity): Size {
         return null;
     }
 
+    /**
+     * 重写计算显示内容的UV范围
+     * @param entity 
+     * @param uvRange 
+     * @param tileTextureSize 
+     * @param tileSize 
+     * @returns 
+     */
     protected recalcUvRange (entity: Entity, uvRange: RectangleRange, tileTextureSize: number, tileSize: number): RectangleRange {
         return uvRange;
     }
 
+    /**
+     * 获取Sprite最终显示的位置
+     * - 子类需重写此方法
+     * @param entity 
+     * @returns 
+     */
     protected getSpritePosition (entity: Entity): Cartographic {
         return null;
     }
