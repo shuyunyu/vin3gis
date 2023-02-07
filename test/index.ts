@@ -114,7 +114,9 @@ class GISTest {
                 shadowColor: new Color("#00FFFF"),
                 shadowOffsetX: 1,
                 shadowOffsetY: 1,
-                shadowBlur: 1
+                shadowBlur: 1,
+                // rotation: math.toRadian(45),
+                // anchor: { x: 0.5, y: 0 }
             })
         });
         mapViewer.scene.entities.add(entity);

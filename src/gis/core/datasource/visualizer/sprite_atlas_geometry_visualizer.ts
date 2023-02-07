@@ -2,6 +2,7 @@ import { Event, Object3D, Vector2 } from "three";
 import { RectangleRange } from "../../../../@types/global/global";
 import { Size } from "../../../../core/msic/size";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
+import { ICartesian2Like } from "../../../@types/core/gis";
 import { Cartographic } from "../../cartographic";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { SpriteTextureAtlas } from "../atlas/sprite_texture_atlas";
@@ -77,8 +78,8 @@ export class SpriteAtlasGeometryVisualizer extends BaseGeometryVisualizer {
      * @param entity 
      * @returns 
      */
-    protected getSpriteAnchor (entity: Entity) {
-        return new Vector2(0.5, 0.5);
+    protected getSpriteAnchor (entity: Entity): ICartesian2Like {
+        return { x: 0.5, y: 0.5 };
     }
 
     protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): Object3D<Event> {

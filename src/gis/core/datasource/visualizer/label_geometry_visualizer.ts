@@ -1,5 +1,6 @@
 import { RectangleRange } from "../../../../@types/global/global";
 import { Size } from "../../../../core/msic/size";
+import { ICartesian2Like } from "../../../@types/core/gis";
 import { Cartographic } from "../../cartographic";
 import { Entity } from "../entity";
 import { BaseGeometry } from "../geometry/base_geometry";
@@ -18,6 +19,14 @@ export class LabelGeometryVisualizer extends SpriteAtlasGeometryVisualizer {
     protected getSpecSize (entity: Entity): Size {
         const label = entity.label;
         return new Size(label.textWidth, label.textHeight);
+    }
+
+    protected getSpriteRotation (entity: Entity): number {
+        return entity.label.rotation;
+    }
+
+    protected getSpriteAnchor (entity: Entity): ICartesian2Like {
+        return entity.label.anchor;
     }
 
     protected recalcUvRange (entity: Entity, uvRange: RectangleRange, tileTextureSize: number, tileSize: number): RectangleRange {

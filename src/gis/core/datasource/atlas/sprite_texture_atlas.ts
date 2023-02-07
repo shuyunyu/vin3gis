@@ -6,6 +6,7 @@ import { TiledTexture, TiledTextureResult } from "../../../../core/msic/tiled_te
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
 import { disposeSystem } from "../../../../core/system/dispose_system";
 import { Utils } from "../../../../core/utils/utils";
+import { ICartesian2Like } from "../../../@types/core/gis";
 import { Cartographic } from "../../cartographic";
 import { SpriteShaderExt } from "../../extend/sprite_shader_ext";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
@@ -36,7 +37,7 @@ type RenderSpriteOptions = {
     tilingScheme: ITilingScheme;
     renderer: FrameRenderer;
     rotation: number;
-    anchor: Vector2;
+    anchor: ICartesian2Like;
     //指定的渲染尺寸
     specSize?: Size;
     //重新计算uv范围

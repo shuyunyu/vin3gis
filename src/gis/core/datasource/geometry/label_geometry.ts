@@ -1,16 +1,14 @@
-import { Color } from "three";
+import { Color, Vector2 } from "three";
 import { CanvasTextBuilder, CanvasTextBuildResult } from "../../../../core/msic/canvas_text_builder";
 import { ColorUtils } from "../../../../core/utils/color_utils";
 import { Utils } from "../../../../core/utils/utils";
+import { ICartesian2Like } from "../../../@types/core/gis";
 import { GeometryRerenderProperty, GeometryUpdateProperty } from "../../../decorator/decorator";
 import { Cartographic } from "../../cartographic";
 import { LabelGeometryVisualizer } from "../visualizer/label_geometry_visualizer";
 import { BaseGeometry } from "./base_geometry";
 import { GeometryType } from "./geometry";
 
-export enum LabelTextAlign {
-    CENTER = "center"
-}
 
 export type LabelGeometryOptions = {
     position: Cartographic;
@@ -18,7 +16,6 @@ export type LabelGeometryOptions = {
     fontSize?: number;
     fontFamily?: string;
     fontColor?: string | Color;
-    align?: LabelTextAlign;
     shadowColor?: string | Color;
     shadowBlur?: number;
     shadowOffsetX?: number;
@@ -27,6 +24,8 @@ export type LabelGeometryOptions = {
     verticalPadding?: number;
     backgroundColor?: string | Color;
     lineHeight?: number;
+    anchor?: ICartesian2Like;
+    rotation?: number;
 }
 
 export class LabelGeometry extends BaseGeometry {
@@ -90,17 +89,6 @@ export class LabelGeometry extends BaseGeometry {
         this.drawText();
     }
 
-    private _align: LabelTextAlign;
-
-    public get align () {
-        return this._align;
-    }
-
-    @GeometryUpdateProperty()
-    public set align (val: LabelTextAlign) {
-        this._align = val;
-        this.drawText();
-    }
 
     private _shadowColor: string | Color;
 
@@ -198,6 +186,29 @@ export class LabelGeometry extends BaseGeometry {
         this.drawText();
     }
 
+    private _anchor: ICartesian2Like;
+
+    public get anchor () {
+        return this._anchor;
+    }
+
+    @GeometryUpdateProperty()
+    public set anchor (val: ICartesian2Like) {
+        this._anchor = val;
+        this.drawText();
+    }
+
+    private _rotation: number;
+
+    public get rotation () {
+        return this._rotation;
+    }
+
+    @GeometryUpdateProperty()
+    public set rotation (val: number) {
+        this._rotation = val;
+    }
+
     private _canvasTextBuildResult: CanvasTextBuildResult;
 
     /**
@@ -228,7 +239,6 @@ export class LabelGeometry extends BaseGeometry {
         this._fontSize = Utils.defaultValue(options.fontSize, 18);
         this._fontFamily = Utils.defaultValue(options.fontFamily, "Arial");
         this._fontColor = Utils.defaultValue(options.fontColor, "#000000");
-        this._align = Utils.defaultValue(options.align, LabelTextAlign.CENTER);
         this._shadowColor = Utils.defaultValue(options.shadowColor, 'rgba(0, 0, 0, 0)');
         this._shadowBlur = Utils.defaultValue(options.shadowBlur, 0);
         this._shadowOffsetX = Utils.defaultValue(options.shadowOffsetX, 0);
@@ -237,6 +247,8 @@ export class LabelGeometry extends BaseGeometry {
         this._verticalPadding = Utils.defaultValue(options.verticalPadding, 0);
         this._backgroundColor = Utils.defaultValue(options.backgroundColor, "transparent");
         this._lineHeight = Utils.defaultValue(options.lineHeight, 1.2);
+        this._anchor = Utils.defaultValue(options.anchor, new Vector2(0.5, 0.5));
+        this._rotation = Utils.defaultValue(options.rotation, 0);
         this.visualizer = new LabelGeometryVisualizer();
         this.drawText();
     }
