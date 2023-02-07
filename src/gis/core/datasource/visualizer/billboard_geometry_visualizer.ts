@@ -1,4 +1,4 @@
-import { Object3D, Event, Texture, SpriteMaterial, PerspectiveCamera, InstancedMesh, BufferGeometry, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, Vector3, Vector2, Shader, WebGLRenderer, Color } from "three";
+import { Object3D, Event, Texture, SpriteMaterial, PerspectiveCamera, InstancedMesh, BufferGeometry, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, Vector3, Vector2, Shader, WebGLRenderer } from "three";
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
 import { Utils } from "../../../../core/utils/utils";
@@ -16,32 +16,20 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
 
     private _texSourceImage: TexImageSource;
 
-    private getBufferGeometry (entity: Entity) {
-        const anchor = this.getImageAnchor(entity);
+    private getBufferGeometry () {
         const bufferGeometry = new BufferGeometry();
         const float32Array = new Float32Array([
-            -1 + anchor.x, -anchor.y, 0, 0, 0,
-            anchor.x, -anchor.y, 0, 1, 0,
-            anchor.x, 1 - anchor.y, 0, 1, 1,
-            -1 + anchor.x, 1 - anchor.y, 0, 0, 1
+            - 0.5, - 0.5, 0, 0, 0,
+            0.5, - 0.5, 0, 1, 0,
+            0.5, 0.5, 0, 1, 1,
+            - 0.5, 0.5, 0, 0, 1
         ]);
-
         const interleavedBuffer = new InterleavedBuffer(float32Array, 5);
 
         bufferGeometry.setIndex([0, 1, 2, 0, 2, 3]);
         bufferGeometry.setAttribute('position', new InterleavedBufferAttribute(interleavedBuffer, 3, 0, false));
         bufferGeometry.setAttribute('uv', new InterleavedBufferAttribute(interleavedBuffer, 2, 3, false));
         return bufferGeometry;
-    }
-
-    /**
-     * 是否使用动态uv
-     * - 子类需要重写此方法
-     * - 如果使用动态uv 那么会使用instanceColor的rgb代表uv.xmin,uv.xmax,uv.ymin,rotation代表uv.ymax,因为rotation数据被占用，所以无法动态修改rotation
-     * @returns 
-     */
-    protected useDynamicUV () {
-        return false;
     }
 
     /**
@@ -99,7 +87,7 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
                 shader.vertexShader = SpriteShaderExt.extShader(shader);
             }
         });
-        const geometry = this.getBufferGeometry(entity);
+        const geometry = this.getBufferGeometry();
         const mesh = new InstancedMesh(geometry, mtl, this.getInstanceCount(entity));
         //@ts-ignore
         mesh.center = new Vector2(0.5, 0.5);
@@ -150,8 +138,6 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
 
         const billboardRenderData = this.getRenderData(entity);
 
-        const useDynamicUv = this.useDynamicUV();
-
         for (let i = 0; i < billboardRenderData.length; i++) {
             const renderData = billboardRenderData[i];
             const coord = Transform.cartographicToWorldVec3(renderData.position, tilingScheme);
@@ -161,14 +147,15 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
             const wScale = Utils.defined(renderData.width) ? renderData.width / this._texSourceImage.width : 1;
             const hScale = Utils.defined(renderData.height) ? renderData.height / this._texSourceImage.height : 1;
 
-            const matrix = new Matrix4();
-            matrix.setPosition(coord.x, coord.y, coord.z).scale(new Vector3(xScale * scale * wScale, yScale * scale * hScale, useDynamicUv ? renderData.uvRange.ymax : renderData.rotation));
-            this._mesh.setMatrixAt(i, matrix);
 
-            if (useDynamicUv) {
-                this._mesh.setColorAt(i, new Color(renderData.uvRange.xmin, renderData.uvRange.xmax, renderData.uvRange.ymin));
-                this._mesh.instanceColor.needsUpdate = true;
-            }
+            const matrix = SpriteShaderExt.createInstanceMatrix({
+                position: coord,
+                scale: new Vector2(xScale * scale * wScale, yScale * scale * hScale),
+                rotation: renderData.rotation,
+                uvRange: { xmin: 0, xmax: 1, ymin: 0, ymax: 1 },
+                anchor: renderData.anchor || new Vector2(0.5, 0.5)
+            })
+            this._mesh.setMatrixAt(i, matrix);
 
         }
 

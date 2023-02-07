@@ -206,17 +206,13 @@ export class SpriteTextureAtlas {
 
             const matrixIndex = spriteData.renderedSprite.tiledTextureResult.tileIndex;
 
-            const matrix = new Matrix4();
-            matrix.setPosition(coord.x, coord.y, coord.z);
-            matrix.elements[0] = xScale * scale;
-            matrix.elements[1] = yScale * scale;
-            matrix.elements[2] = renderData.rotation;
-            matrix.elements[4] = renderData.uvRange.xmin;
-            matrix.elements[5] = renderData.uvRange.xmax;
-            matrix.elements[6] = renderData.uvRange.ymin;
-            matrix.elements[7] = renderData.uvRange.ymax;
-            matrix.elements[8] = renderData.anchor.x;
-            matrix.elements[9] = renderData.anchor.y;
+            const matrix = SpriteShaderExt.createInstanceMatrix({
+                position: coord,
+                scale: new Vector2(xScale * scale, yScale * scale),
+                rotation: renderData.rotation,
+                uvRange: renderData.uvRange,
+                anchor: renderData.anchor
+            });
             mesh.setMatrixAt(matrixIndex, matrix);
 
             mesh.instanceMatrix.needsUpdate = true;

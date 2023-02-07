@@ -1,4 +1,14 @@
-import { Shader } from "three";
+import { Matrix4, Shader, Vector2, Vector3 } from "three";
+import { RectangleRange } from "../../../@types/global/global";
+import { ICartesian2Like } from "../../@types/core/gis";
+
+type InstanceMatrixData = {
+    position: Vector3;
+    scale: Vector2;
+    rotation: number;
+    uvRange: RectangleRange;
+    anchor: ICartesian2Like;
+}
 
 export class SpriteShaderExt {
 
@@ -76,6 +86,26 @@ export class SpriteShaderExt {
                 `vec2 alignedPosition = ( position.xy - ( center - vec2( 0.5 ) ) ) * scale;`,
                 `vec2 alignedPosition = ( curPosition.xy - ( center - vec2( 0.5 ) ) ) * scale;`
             );
+    }
+
+    /**
+     * 构造实例矩阵
+     * @param matrixData 
+     * @returns 
+     */
+    public static createInstanceMatrix (matrixData: InstanceMatrixData) {
+        const matrix = new Matrix4();
+        matrix.setPosition(matrixData.position.x, matrixData.position.y, matrixData.position.z);
+        matrix.elements[0] = matrixData.scale.x;
+        matrix.elements[1] = matrixData.scale.y;
+        matrix.elements[2] = matrixData.rotation;
+        matrix.elements[4] = matrixData.uvRange.xmin;
+        matrix.elements[5] = matrixData.uvRange.xmax;
+        matrix.elements[6] = matrixData.uvRange.ymin;
+        matrix.elements[7] = matrixData.uvRange.ymax;
+        matrix.elements[8] = matrixData.anchor.x;
+        matrix.elements[9] = matrixData.anchor.y;
+        return matrix;
     }
 
 }

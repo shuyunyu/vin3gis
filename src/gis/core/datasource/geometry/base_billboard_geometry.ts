@@ -29,6 +29,7 @@ export type BillboardSingleRenderData = {
     position: Cartographic;
     rotation: number;
     scale: number;
+    anchor?: ICartesian2Like;
     width?: number;//渲染图片的宽度
     height?: number;//渲染图片的高度
     uvRange?: RectangleRange;//uv坐标范围
