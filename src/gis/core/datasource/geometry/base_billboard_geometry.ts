@@ -1,7 +1,5 @@
-import { Vector2 } from "three";
 import { RectangleRange } from "../../../../@types/global/global";
 import { AssetLoader } from "../../../../core/asset/asset_loader";
-import { math } from "../../../../core/math/math";
 import { Utils } from "../../../../core/utils/utils";
 import { ICartesian2Like } from "../../../@types/core/gis";
 import { GeometryRerenderProperty } from "../../../decorator/decorator";
@@ -20,8 +18,6 @@ export type BaseBillboardGeometryOptions = {
     width?: number;
     //高度 默认使用图片的高度
     height?: number;
-    //图片的中心点/锚点 左上角起算 defualt {x:0.5,y:0.5}
-    center?: ICartesian2Like;
 }
 
 //渲染单个billboard需要用到的数据
@@ -88,18 +84,6 @@ export class BaseBillboardGeometry extends BaseGeometry {
         this._height = val;
     }
 
-    private _center: ICartesian2Like;
-
-    public get center () {
-        return this._center;
-    }
-
-    @GeometryRerenderProperty()
-    public set center (val: ICartesian2Like) {
-        this._center = val;
-        this.clampCenter();
-    }
-
     protected _instanceCount: number;
 
     //实例个数 子类需要设置此值
@@ -116,8 +100,6 @@ export class BaseBillboardGeometry extends BaseGeometry {
         if (Utils.defined(options.height)) {
             this._height = options.height;
         }
-        this._center = Utils.defaultValue(options.center, new Vector2(0.5, 0.5));
-        this.clampCenter();
         this.visualizer = visualizer;
         this.image = options.image;
     }
@@ -129,11 +111,6 @@ export class BaseBillboardGeometry extends BaseGeometry {
      */
     public getRenderData (): BillboardSingleRenderData[] {
         return [];
-    }
-
-    private clampCenter () {
-        this._center.x = math.clamp(this._center.x, 0, 1);
-        this._center.y = math.clamp(this._center.y, 0, 1);
     }
 
     /**

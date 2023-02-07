@@ -166,7 +166,7 @@ class GISTest {
                 height: 41,
                 rotation: math.toRadian(0),
                 scale: 1,
-                center: { x: 0.5, y: 0 }
+                anchor: { x: 0.5, y: 0 }
             })
         })
         mapViewer.scene.entities.add(entity);

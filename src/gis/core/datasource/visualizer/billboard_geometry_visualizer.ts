@@ -2,7 +2,7 @@ import { Object3D, Event, Texture, SpriteMaterial, PerspectiveCamera, InstancedM
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
 import { Utils } from "../../../../core/utils/utils";
-import { GeometryPropertyChangeData, ICartesian2Like } from "../../../@types/core/gis";
+import { GeometryPropertyChangeData } from "../../../@types/core/gis";
 import { SpriteShaderExt } from "../../extend/sprite_shader_ext";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
@@ -30,15 +30,6 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
         bufferGeometry.setAttribute('position', new InterleavedBufferAttribute(interleavedBuffer, 3, 0, false));
         bufferGeometry.setAttribute('uv', new InterleavedBufferAttribute(interleavedBuffer, 2, 3, false));
         return bufferGeometry;
-    }
-
-    /**
-     * 获取图片的锚点
-     * - 子类需要重写此方法
-     * @param entity 
-     */
-    protected getImageAnchor (entity: Entity): ICartesian2Like {
-        return entity.billboard.center;
     }
 
     /**
