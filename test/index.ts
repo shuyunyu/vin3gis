@@ -183,11 +183,12 @@ class GISTest {
         globalThis.billboardEntity = entity;
 
 
-        //test MultiBillboard
+        // test MultiBillboard
 
         // const positions = [];
         // const rotations = [];
         // const scales = [];
+        // const anchors = [];
         // const count = 1000;
         // const d = 2;
         // for (let i = 0; i < count; i++) {
@@ -197,12 +198,13 @@ class GISTest {
         //     positions.push(Cartographic.fromDegrees(cLng, cLat, 0));
         //     // rotations.push(math.toRadian(Math.random() * 90));
         //     scales.push(Math.max(0.7, Math.random()));
+        //     anchors.push({ x: 0.5, y: 0.0 });
         // }
 
         // mapViewer.scene.entities.add(new Entity({
         //     billboard: new MultiBillboardGeometry({
         //         image: imageSrc,
-        //         center: { x: 0.5, y: 0 },
+        //         anchors: anchors,
         //         positions: positions,
         //         rotations: rotations,
         //         scales: scales

@@ -89,6 +89,7 @@ export class MultiBillboardGeometry extends BaseBillboardGeometry {
         this._positions = options.positions;
         this._instanceCount = this._positions.length;
         this._rotations = Utils.defaultValue(options.rotations, []);
+        this._anchors = Utils.defaultValue(options.anchors, []);
         this._scales = Utils.defaultValue(options.scales, []);
         this._widths = Utils.defaultValue(options.widths, []);
         this._heights = Utils.defaultValue(options.heights, []);

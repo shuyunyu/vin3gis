@@ -2,7 +2,8 @@ import { Utils } from "../../../../core/utils/utils";
 import { ICartesian2Like } from "../../../@types/core/gis";
 import { GeometryUpdateProperty } from "../../../decorator/decorator";
 import { Cartographic } from "../../cartographic";
-import { BillboardGeometryVisualizer } from "../visualizer/billboard_geometry_visualizer";
+import { billboardGeometryCanvasProvider } from "../../misc/provider/billboard_geometry_canvas_provider";
+import { AtlasBillboardGeometryVisualizer } from "../visualizer/atlas_billboard_geometry_visualizer";
 import { BaseBillboardGeometry, BaseBillboardGeometryOptions, BillboardSingleRenderData } from "./base_billboard_geometry";
 import { GeometryType } from "./geometry";
 
@@ -64,12 +65,16 @@ export class BillboardGeometry extends BaseBillboardGeometry {
     }
 
     public constructor (options: BillboardGeometryOptions) {
-        super(options, GeometryType.BILLBOARD, new BillboardGeometryVisualizer());
+        super(options, GeometryType.BILLBOARD, new AtlasBillboardGeometryVisualizer());
         this._position = options.position;
         this._rotation = Utils.defaultValue(options.rotation, 0);
         this._anchor = Utils.defaultValue(options.anchor, { x: 0.5, y: 0.5 });
         this._scale = Utils.defaultValue(options.scale, 1);
         this._instanceCount = 1;
+    }
+
+    protected onImageLoaded (imageEle: CanvasImageSource) {
+        this._texImageSource = billboardGeometryCanvasProvider.createCanvas(imageEle);
     }
 
     public getRenderData (): BillboardSingleRenderData[] {

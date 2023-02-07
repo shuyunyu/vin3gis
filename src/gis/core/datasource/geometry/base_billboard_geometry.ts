@@ -53,13 +53,27 @@ export class BaseBillboardGeometry extends BaseGeometry {
         this.updateImage();
     }
 
-    private _texImageSource: CanvasImageSource;
+    protected _texImageSource: CanvasImageSource;
 
     /**
      * 用来构建贴图的图片资源
      */
     public get texImageSource () {
         return this._texImageSource;
+    }
+
+    private _imageSourceWidth: number;
+
+    //图像原本宽度
+    public get imageSourceWidth () {
+        return this._imageSourceWidth;
+    }
+
+    private _imageSourceHeight: number;
+
+    //图像原本高度
+    public get imageSourceHeight () {
+        return this._imageSourceHeight;
     }
 
     private _width: number;
@@ -125,6 +139,9 @@ export class BaseBillboardGeometry extends BaseGeometry {
                 throttleServer: false
             }).then(imageEle => {
                 this._texImageSource = imageEle;
+                this._imageSourceWidth = imageEle.width;
+                this._imageSourceHeight = imageEle.height;
+                this.onImageLoaded(this._texImageSource);
                 this.updateWidthAndHeightProp(imageEle);
                 this._ready = true;
                 this.render();
@@ -133,10 +150,17 @@ export class BaseBillboardGeometry extends BaseGeometry {
             });
         } else {
             this._texImageSource = this._image as CanvasImageSource;
+            this._imageSourceWidth = Number(this._texImageSource.width);
+            this._imageSourceHeight = Number(this._texImageSource.height);
+            this.onImageLoaded(this._texImageSource);
             this.updateWidthAndHeightProp(this._texImageSource);
             this._ready = true;
             this.render();
         }
+    }
+
+    protected onImageLoaded (imageEle: CanvasImageSource) {
+
     }
 
     /**

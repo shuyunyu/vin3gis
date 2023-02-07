@@ -1,5 +1,6 @@
 import { Matrix4, Shader, Vector2, Vector3 } from "three";
 import { RectangleRange } from "../../../@types/global/global";
+import { math } from "../../../core/math/math";
 import { ICartesian2Like } from "../../@types/core/gis";
 
 type InstanceMatrixData = {
@@ -103,8 +104,8 @@ export class SpriteShaderExt {
         matrix.elements[5] = matrixData.uvRange.xmax;
         matrix.elements[6] = matrixData.uvRange.ymin;
         matrix.elements[7] = matrixData.uvRange.ymax;
-        matrix.elements[8] = matrixData.anchor.x;
-        matrix.elements[9] = matrixData.anchor.y;
+        matrix.elements[8] = math.clamp(matrixData.anchor.x, 0, 1);
+        matrix.elements[9] = math.clamp(matrixData.anchor.y, 0, 1);
         return matrix;
     }
 

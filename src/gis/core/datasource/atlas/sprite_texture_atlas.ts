@@ -38,6 +38,7 @@ type RenderSpriteOptions = {
     renderer: FrameRenderer;
     rotation: number;
     anchor: ICartesian2Like;
+    scale: { widthScale: number, heihgtScale: number },
     //指定的渲染尺寸
     specSize?: Size;
     //重新计算uv范围
@@ -166,9 +167,7 @@ export class SpriteTextureAtlas {
             const mesh = new InstancedMesh(bufferGeometry, mtl, instanceCount);
             //初始化一下 matrix和color 不然会出问题(FPS降低)
             for (let i = 0; i < instanceCount; i++) {
-                const matrix = new Matrix4();
-                matrix.scale(new Vector3(0, 0, 0));
-                mesh.setMatrixAt(i, matrix);
+                mesh.setMatrixAt(i, new Matrix4());
             }
             sprite = { tiledTexture: tiledTexture, geometry: bufferGeometry, material: mtl, mesh: mesh };
             this._sprites.push(sprite);
@@ -209,7 +208,7 @@ export class SpriteTextureAtlas {
 
             const matrix = SpriteShaderExt.createInstanceMatrix({
                 position: coord,
-                scale: new Vector2(xScale * scale, yScale * scale),
+                scale: new Vector2(xScale * scale * spriteData.renderedSprite.options.scale.widthScale, yScale * scale * spriteData.renderedSprite.options.scale.heihgtScale),
                 rotation: renderData.rotation,
                 uvRange: renderData.uvRange,
                 anchor: renderData.anchor
