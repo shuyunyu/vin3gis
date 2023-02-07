@@ -18,7 +18,7 @@ export class AtlasPointGeometryVisualizer extends SpriteAtlasGeometryVisualizer 
 
     protected getTexImageSource (entity: Entity): HTMLCanvasElement {
         const basePointGeometry = this.getEntityGeometry(entity) as BasePointGeometry;
-        const fullSize = basePointGeometry.outline ? basePointGeometry.size + basePointGeometry.outlineSize : basePointGeometry.size;
+        const fullSize = basePointGeometry.outline ? basePointGeometry.size + basePointGeometry.outlineSize * 2 : basePointGeometry.size;
         this._contentSize = fullSize;
         const canvas = pointGeometryCanvasProvider.createCanvas({
             canvasSize: fullSize,

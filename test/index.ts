@@ -220,7 +220,7 @@ class GISTest {
                 size: 30,
                 color: new Color("#FF0000"),
                 outline: true,
-                outlineSize: 10,
+                outlineSize: 5,
                 outlineColor: new Color("#00FFFF")
             })
         });
