@@ -1,4 +1,4 @@
-import { BufferGeometry, Color, InstancedMesh, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, PerspectiveCamera, SpriteMaterial, Vector2, Vector3 } from "three";
+import { BufferGeometry, InstancedMesh, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, PerspectiveCamera, SpriteMaterial, Vector2, Vector3 } from "three";
 import { RectangleRange } from "../../../../@types/global/global";
 import { math } from "../../../../core/math/math";
 import { Size } from "../../../../core/msic/size";
@@ -10,7 +10,6 @@ import { Cartographic } from "../../cartographic";
 import { SpriteShaderExt } from "../../extend/sprite_shader_ext";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
-import { BillboardSingleRenderData } from "../geometry/base_billboard_geometry";
 
 type TiledTextureSprite = {
     tiledTexture: TiledTexture;
@@ -36,6 +35,8 @@ type RenderSpriteOptions = {
     spriteImage: CanvasImageSource;
     tilingScheme: ITilingScheme;
     renderer: FrameRenderer;
+    rotation: number;
+    anchor: Vector2;
     //指定的渲染尺寸
     specSize?: Size;
     //重新计算uv范围
@@ -149,9 +150,7 @@ export class SpriteTextureAtlas {
         let sprite = this._sprites.find(geo => !geo.tiledTexture.isFull);
         if (!sprite) {
             const tiledTexture = new TiledTexture(this.size, this.tileSize);
-            //TODO set anchor
-            const anchor = new Vector2(0.5, 0.5);
-            const bufferGeometry = this.createBufferGeometry(anchor);
+            const bufferGeometry = this.createBufferGeometry();
             const instanceCount = tiledTexture.tilesCount;
             const mtl = new SpriteMaterial({
                 sizeAttenuation: false,
@@ -169,8 +168,6 @@ export class SpriteTextureAtlas {
                 const matrix = new Matrix4();
                 matrix.scale(new Vector3(0, 0, 0));
                 mesh.setMatrixAt(i, matrix);
-                const color = new Color();
-                mesh.setColorAt(i, color);
             }
             sprite = { tiledTexture: tiledTexture, geometry: bufferGeometry, material: mtl, mesh: mesh };
             this._sprites.push(sprite);
@@ -196,11 +193,12 @@ export class SpriteTextureAtlas {
             const xScale = showImageWidth * factor / renderer.size.height;
             const yScale = showImageHeight * factor / renderer.size.height;
 
-            const renderData: BillboardSingleRenderData = {
+            const renderData = {
                 position: spriteData.renderedSprite.options.position,
-                rotation: 0,
+                rotation: spriteData.renderedSprite.options.rotation,
+                anchor: spriteData.renderedSprite.options.anchor,
                 scale: spriteData.visible ? 1 : 0,
-                uvRange: spriteData.renderedSprite.tiledTextureResult.uvRange
+                uvRange: spriteData.renderedSprite.tiledTextureResult.uvRange,
             }
 
             const coord = Transform.cartographicToWorldVec3(renderData.position, tilingScheme);
@@ -209,30 +207,34 @@ export class SpriteTextureAtlas {
             const matrixIndex = spriteData.renderedSprite.tiledTextureResult.tileIndex;
 
             const matrix = new Matrix4();
-            matrix.setPosition(coord.x, coord.y, coord.z).scale(new Vector3(xScale * scale, yScale * scale, renderData.uvRange.ymax));
+            matrix.setPosition(coord.x, coord.y, coord.z);
+            matrix.elements[0] = xScale * scale;
+            matrix.elements[1] = yScale * scale;
+            matrix.elements[2] = renderData.rotation;
+            matrix.elements[4] = renderData.uvRange.xmin;
+            matrix.elements[5] = renderData.uvRange.xmax;
+            matrix.elements[6] = renderData.uvRange.ymin;
+            matrix.elements[7] = renderData.uvRange.ymax;
+            matrix.elements[8] = renderData.anchor.x;
+            matrix.elements[9] = renderData.anchor.y;
             mesh.setMatrixAt(matrixIndex, matrix);
 
-            mesh.setColorAt(matrixIndex, new Color(renderData.uvRange.xmin, renderData.uvRange.xmax, renderData.uvRange.ymin));
-
-            mesh.instanceColor.needsUpdate = true;
             mesh.instanceMatrix.needsUpdate = true;
         }
     }
 
     /**
      * 创建bufferGeometry
-     * @param anchor 
      * @returns 
      */
-    private createBufferGeometry (anchor: Vector2) {
+    private createBufferGeometry () {
         const bufferGeometry = new BufferGeometry();
         const float32Array = new Float32Array([
-            -1 + anchor.x, -anchor.y, 0, 0, 0,
-            anchor.x, -anchor.y, 0, 1, 0,
-            anchor.x, 1 - anchor.y, 0, 1, 1,
-            -1 + anchor.x, 1 - anchor.y, 0, 0, 1
+            - 0.5, - 0.5, 0, 0, 0,
+            0.5, - 0.5, 0, 1, 0,
+            0.5, 0.5, 0, 1, 1,
+            - 0.5, 0.5, 0, 0, 1
         ]);
-
         const interleavedBuffer = new InterleavedBuffer(float32Array, 5);
 
         bufferGeometry.setIndex([0, 1, 2, 0, 2, 3]);

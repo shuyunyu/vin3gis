@@ -63,6 +63,24 @@ export class SpriteAtlasGeometryVisualizer extends BaseGeometryVisualizer {
         return null;
     }
 
+    /**
+     * 获取sprite的旋转
+     * @param entity 
+     * @returns 
+     */
+    protected getSpriteRotation (entity: Entity) {
+        return 0;
+    }
+
+    /**
+     * 获取sprite的锚点
+     * @param entity 
+     * @returns 
+     */
+    protected getSpriteAnchor (entity: Entity) {
+        return new Vector2(0.5, 0.5);
+    }
+
     protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): Object3D<Event> {
         const texImageSource = this.getTexImageSource(entity);
         const atlas = spriteTextureAtlasManager.getAltas(texImageSource.width);
@@ -71,6 +89,8 @@ export class SpriteAtlasGeometryVisualizer extends BaseGeometryVisualizer {
             tilingScheme: tilingScheme,
             renderer: renderer,
             spriteImage: texImageSource,
+            rotation: this.getSpriteRotation(entity),
+            anchor: this.getSpriteAnchor(entity),
             specSize: this.getSpecSize(entity),
             //根据文本宽高重新计算一下uvRange
             recalcUvRange: (uvRange: RectangleRange, tileTextureSize: number, tileSize: number) => {
