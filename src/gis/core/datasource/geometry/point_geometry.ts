@@ -2,7 +2,7 @@ import { Color } from "three";
 import { Utils } from "../../../../core/utils/utils";
 import { GeometryRerenderProperty } from "../../../decorator/decorator";
 import { Cartographic } from "../../cartographic";
-import { PointGeometryVisualizer } from "../visualizer/point_geometry_visualizer";
+import { AtlasPointGeometryVisualizer } from "../visualizer/atlas_point_geometry_visualizer";
 import { BillboardSingleRenderData } from "./base_billboard_geometry";
 import { BasePointGeometry, BasePointGeometryOptions } from "./base_point_geometry";
 import { GeometryType } from "./geometry";
@@ -32,7 +32,7 @@ export class PointGeometry extends BasePointGeometry {
         options = options || {};
         super(GeometryType.POINT, options);
         this._position = Utils.defaultValue(options.position, Cartographic.ZERO.clone());
-        this.visualizer = new PointGeometryVisualizer();
+        this.visualizer = new AtlasPointGeometryVisualizer();
     }
 
     public getRenderData () {

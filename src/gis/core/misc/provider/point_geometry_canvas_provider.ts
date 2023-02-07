@@ -39,7 +39,7 @@ class PointGeometryCanvasProvider {
     public updateCanvas (opt: PointGeometryCanvasCreateOptions, canvas: HTMLCanvasElement) {
         canvas.width = canvas.height = opt.canvasSize;
         const ctx = canvas.getContext('2d');
-        ctx.clearRect(canvas.width, canvas.height, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         let size = opt.size;
         const center = opt.canvasSize / 2;
         if (opt.outline) {
