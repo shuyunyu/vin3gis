@@ -14,6 +14,14 @@ export type CanvasTextOptions = {
     backgroundColor?: string;
     horizontalPadding?: number;
     verticalPadding?: number;
+    outputSquare?: boolean; //是否输出正方形
+    specSquareSize?: number;//指定的尺寸
+}
+
+export type CanvasTextBuildResult = {
+    canvas: HTMLCanvasElement;
+    textWidth: number;
+    textHeight: number;
 }
 
 const fontHeightCache: Record<string, number> = {}
@@ -23,8 +31,11 @@ const fontHeightCache: Record<string, number> = {}
  */
 export class CanvasTextBuilder {
 
-    public static buildTextCanvas (text: string, options?: CanvasTextOptions) {
+    public static buildTextCanvas (text: string, options?: CanvasTextOptions): CanvasTextBuildResult {
         options = options || {};
+
+        const outputSquare = Utils.defaultValue(options.outputSquare, true);
+
         const font = options.font || '18px Arial';
         const fillStyle = options.fillStyle || '#000000';
 
@@ -32,7 +43,7 @@ export class CanvasTextBuilder {
         const shadowBlur = options.shadowBlur || 0;
         const shadowOffsetX = options.shadowOffsetX || 0;
         const shadowOffsetY = options.shadowOffsetY || 0;
-        const lineHeight = options.lineHeight || 1;
+        const lineHeight = options.lineHeight || 1.2;
 
         const backgroundColor = options.backgroundColor || 'transparent';
         const horizontalPadding = options.horizontalPadding || 0;
@@ -51,8 +62,16 @@ export class CanvasTextBuilder {
         const textWidth = Math.max.apply(null, lines.map(line => ctx.measureText(line).width));
         const textHeight = fontHeight + fontHeight * lineHeight * (lines.length - 1);
 
-        const canvasWidth = Math.max(2, MathUtils.ceilPowerOfTwo(textWidth + (2 * horizontalPadding)));
-        const canvasHeight = Math.max(2, MathUtils.ceilPowerOfTwo(textHeight + (2 * verticalPadding)));
+        let canvasWidth = Math.max(2, MathUtils.ceilPowerOfTwo(textWidth + (2 * horizontalPadding)));
+        let canvasHeight = Math.max(2, MathUtils.ceilPowerOfTwo(textHeight + (2 * verticalPadding)));
+
+        if (outputSquare) {
+            let max = Math.max(canvasWidth, canvasHeight);
+            if (Utils.defined(options.specSquareSize)) {
+                max = Math.max(max, options.specSquareSize);
+            }
+            canvasWidth = canvasHeight = max;
+        }
 
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;

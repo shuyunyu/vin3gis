@@ -41,6 +41,15 @@ export class InternalConfig {
     //是否在webWorker中加载瓦片贴图
     public static REQUEST_RASTER_TILE_IN_WORKER = true;
 
+    //sprite贴图集尺寸
+    public static SPRITE_TEXTURE_ATLAS_SIZE = 1024;
+
+    //sprite贴图集最小瓦片贴图尺寸
+    public static SPRITE_TEXTURE_ATLAS_MIN_TILE_SIZE = 8;
+
+    //sprite贴图集最大瓦片贴图尺寸
+    public static SPRITE_TEXTURE_ATLAS_MAX_TILE_SIZE = 512;
+
     /**
      * 校验相机的pitch是否有效
      * @param pitch 

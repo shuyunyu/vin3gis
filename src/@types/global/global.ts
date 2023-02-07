@@ -47,3 +47,13 @@ export interface ISchedulable {
     //对象每次被调度器调用时执行的函数
     update: (deltaTime: number) => void;
 }
+
+/**
+ * 表示一个矩形范围
+ */
+export type RectangleRange = {
+    xmin: number;
+    xmax: number;
+    ymin: number;
+    ymax: number;
+}

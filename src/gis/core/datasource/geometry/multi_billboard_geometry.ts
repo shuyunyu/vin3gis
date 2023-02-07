@@ -1,4 +1,5 @@
 import { Utils } from "../../../../core/utils/utils";
+import { ICartesian2Like } from "../../../@types/core/gis";
 import { GeometryUpdateProperty } from "../../../decorator/decorator";
 import { Cartographic } from "../../cartographic";
 import { BillboardGeometryVisualizer } from "../visualizer/billboard_geometry_visualizer";
@@ -8,6 +9,7 @@ import { GeometryType } from "./geometry";
 export type MultiBillboardGeometryOptions = {
     positions: Cartographic[];//位置数组
     rotations?: number[];//每个billboard的旋转值
+    anchors?: ICartesian2Like[];//每个billboard的anchor
     scales?: number[];//每个billboard的整体缩放值
     widths?: number[];//每个billboard的渲染宽度 px
     heights?: number[];//每个billboard的渲染高度 px
@@ -36,6 +38,17 @@ export class MultiBillboardGeometry extends BaseBillboardGeometry {
     @GeometryUpdateProperty()
     public set rotations (val: number[]) {
         this._rotations = val;
+    }
+
+    private _anchors: ICartesian2Like[];
+
+    public get anchors () {
+        return this._anchors;
+    }
+
+    @GeometryUpdateProperty()
+    public set anchors (val: ICartesian2Like[]) {
+        this._anchors = val;
     }
 
     private _scales: number[];
@@ -76,6 +89,7 @@ export class MultiBillboardGeometry extends BaseBillboardGeometry {
         this._positions = options.positions;
         this._instanceCount = this._positions.length;
         this._rotations = Utils.defaultValue(options.rotations, []);
+        this._anchors = Utils.defaultValue(options.anchors, []);
         this._scales = Utils.defaultValue(options.scales, []);
         this._widths = Utils.defaultValue(options.widths, []);
         this._heights = Utils.defaultValue(options.heights, []);
@@ -86,6 +100,7 @@ export class MultiBillboardGeometry extends BaseBillboardGeometry {
             const res: BillboardSingleRenderData = {
                 position: position,
                 rotation: this.rotations[index] || 0,
+                anchor: this._anchors[index] || { x: 0.5, y: 0.5 },
                 scale: this.scales[index] || 1,
                 width: this.widths[index],
                 height: this.heights[index]
@@ -99,9 +114,9 @@ export class MultiBillboardGeometry extends BaseBillboardGeometry {
             image: this.image,
             width: this.width,
             height: this.height,
-            center: this.center,
             positions: this.positions.map(p => p.clone()),
             rotations: this.rotations,
+            anchors: this.anchors,
             scales: this.scales,
             widths: this.widths,
             heights: this.heights

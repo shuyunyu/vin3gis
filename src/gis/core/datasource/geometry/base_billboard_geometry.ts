@@ -1,6 +1,5 @@
-import { Vector2 } from "three";
+import { RectangleRange } from "../../../../@types/global/global";
 import { AssetLoader } from "../../../../core/asset/asset_loader";
-import { math } from "../../../../core/math/math";
 import { Utils } from "../../../../core/utils/utils";
 import { ICartesian2Like } from "../../../@types/core/gis";
 import { GeometryRerenderProperty } from "../../../decorator/decorator";
@@ -19,8 +18,6 @@ export type BaseBillboardGeometryOptions = {
     width?: number;
     //高度 默认使用图片的高度
     height?: number;
-    //图片的中心点/锚点 左上角起算 defualt {x:0.5,y:0.5}
-    center?: ICartesian2Like;
 }
 
 //渲染单个billboard需要用到的数据
@@ -28,8 +25,10 @@ export type BillboardSingleRenderData = {
     position: Cartographic;
     rotation: number;
     scale: number;
+    anchor?: ICartesian2Like;
     width?: number;//渲染图片的宽度
     height?: number;//渲染图片的高度
+    uvRange?: RectangleRange;//uv坐标范围
 }
 
 export class BaseBillboardGeometry extends BaseGeometry {
@@ -54,13 +53,27 @@ export class BaseBillboardGeometry extends BaseGeometry {
         this.updateImage();
     }
 
-    private _texImageSource: CanvasImageSource;
+    protected _texImageSource: CanvasImageSource;
 
     /**
      * 用来构建贴图的图片资源
      */
     public get texImageSource () {
         return this._texImageSource;
+    }
+
+    private _imageSourceWidth: number;
+
+    //图像原本宽度
+    public get imageSourceWidth () {
+        return this._imageSourceWidth;
+    }
+
+    private _imageSourceHeight: number;
+
+    //图像原本高度
+    public get imageSourceHeight () {
+        return this._imageSourceHeight;
     }
 
     private _width: number;
@@ -85,18 +98,6 @@ export class BaseBillboardGeometry extends BaseGeometry {
         this._height = val;
     }
 
-    private _center: ICartesian2Like;
-
-    public get center () {
-        return this._center;
-    }
-
-    @GeometryRerenderProperty()
-    public set center (val: ICartesian2Like) {
-        this._center = val;
-        this.clampCenter();
-    }
-
     protected _instanceCount: number;
 
     //实例个数 子类需要设置此值
@@ -113,8 +114,6 @@ export class BaseBillboardGeometry extends BaseGeometry {
         if (Utils.defined(options.height)) {
             this._height = options.height;
         }
-        this._center = Utils.defaultValue(options.center, new Vector2(0.5, 0.5));
-        this.clampCenter();
         this.visualizer = visualizer;
         this.image = options.image;
     }
@@ -126,11 +125,6 @@ export class BaseBillboardGeometry extends BaseGeometry {
      */
     public getRenderData (): BillboardSingleRenderData[] {
         return [];
-    }
-
-    private clampCenter () {
-        this._center.x = math.clamp(this._center.x, 0, 1);
-        this._center.y = math.clamp(this._center.y, 0, 1);
     }
 
     /**
@@ -145,6 +139,9 @@ export class BaseBillboardGeometry extends BaseGeometry {
                 throttleServer: false
             }).then(imageEle => {
                 this._texImageSource = imageEle;
+                this._imageSourceWidth = imageEle.width;
+                this._imageSourceHeight = imageEle.height;
+                this.onImageLoaded(this._texImageSource);
                 this.updateWidthAndHeightProp(imageEle);
                 this._ready = true;
                 this.render();
@@ -153,10 +150,17 @@ export class BaseBillboardGeometry extends BaseGeometry {
             });
         } else {
             this._texImageSource = this._image as CanvasImageSource;
+            this._imageSourceWidth = Number(this._texImageSource.width);
+            this._imageSourceHeight = Number(this._texImageSource.height);
+            this.onImageLoaded(this._texImageSource);
             this.updateWidthAndHeightProp(this._texImageSource);
             this._ready = true;
             this.render();
         }
+    }
+
+    protected onImageLoaded (imageEle: CanvasImageSource) {
+
     }
 
     /**

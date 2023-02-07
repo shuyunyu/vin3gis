@@ -2,7 +2,8 @@ import { Object3D, Event, Texture, SpriteMaterial, PerspectiveCamera, InstancedM
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
 import { Utils } from "../../../../core/utils/utils";
-import { GeometryPropertyChangeData, ICartesian2Like } from "../../../@types/core/gis";
+import { GeometryPropertyChangeData } from "../../../@types/core/gis";
+import { SpriteShaderExt } from "../../extend/sprite_shader_ext";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
 import { Entity } from "../entity";
@@ -15,31 +16,20 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
 
     private _texSourceImage: TexImageSource;
 
-    private getBufferGeometry (entity: Entity) {
-        const anchor = this.getImageAnchor(entity);
+    private getBufferGeometry () {
         const bufferGeometry = new BufferGeometry();
         const float32Array = new Float32Array([
-            -1 + anchor.x, -anchor.y, 0, 0, 0,
-            anchor.x, -anchor.y, 0, 1, 0,
-            anchor.x, 1 - anchor.y, 0, 1, 1,
-            -1 + anchor.x, 1 - anchor.y, 0, 0, 1
+            - 0.5, - 0.5, 0, 0, 0,
+            0.5, - 0.5, 0, 1, 0,
+            0.5, 0.5, 0, 1, 1,
+            - 0.5, 0.5, 0, 0, 1
         ]);
-
         const interleavedBuffer = new InterleavedBuffer(float32Array, 5);
 
         bufferGeometry.setIndex([0, 1, 2, 0, 2, 3]);
         bufferGeometry.setAttribute('position', new InterleavedBufferAttribute(interleavedBuffer, 3, 0, false));
         bufferGeometry.setAttribute('uv', new InterleavedBufferAttribute(interleavedBuffer, 2, 3, false));
         return bufferGeometry;
-    }
-
-    /**
-     * 获取图片的锚点
-     * - 子类需要重写此方法
-     * @param entity 
-     */
-    protected getImageAnchor (entity: Entity): ICartesian2Like {
-        return entity.billboard.center;
     }
 
     /**
@@ -85,35 +75,17 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
             depthTest: false,
             //@ts-ignore
             onBeforeCompile: (shader: Shader, renderer: WebGLRenderer) => {
-                shader.vertexShader = shader.vertexShader.replace(
-                    /modelMatrix/g,
-                    `curModelMatrix`)
-                    .replace(/\( rotation \)/g, '( curRotation )')
-                    .replace(
-                        `vec4 mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );`,
-                        `#ifdef USE_INSTANCING
-                            vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0 );
-                            mat4 curModelMatrix = modelMatrix * instanceMatrix;
-
-                            float curRotation = curModelMatrix[2].z;
-
-                         #endif
-                         #ifndef USE_INSTANCING
-                            vec4 mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );
-                            mat4 curModelMatrix = modelMatrix;
-
-                            float curRotation = rotation;
-
-                         #endif
-                    `);
+                shader.vertexShader = SpriteShaderExt.extShader(shader);
             }
         });
-        const geometry = this.getBufferGeometry(entity);
+        const geometry = this.getBufferGeometry();
         const mesh = new InstancedMesh(geometry, mtl, this.getInstanceCount(entity));
         //@ts-ignore
         mesh.center = new Vector2(0.5, 0.5);
         this._mesh = mesh;
-
+        for (let i = 0; i < mesh.count; i++) {
+            mesh.setMatrixAt(i, new Matrix4());
+        }
         this.update(entity, tilingScheme, root, renderer);
 
         this._disposableObjects.push(mesh, mtl, texture, geometry);
@@ -154,6 +126,7 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
         const yScale = this._texSourceImage.height * factor / renderer.size.height;
 
         const billboardRenderData = this.getRenderData(entity);
+
         for (let i = 0; i < billboardRenderData.length; i++) {
             const renderData = billboardRenderData[i];
             const coord = Transform.cartographicToWorldVec3(renderData.position, tilingScheme);
@@ -163,9 +136,16 @@ export class BillboardGeometryVisualizer extends BaseGeometryVisualizer {
             const wScale = Utils.defined(renderData.width) ? renderData.width / this._texSourceImage.width : 1;
             const hScale = Utils.defined(renderData.height) ? renderData.height / this._texSourceImage.height : 1;
 
-            const matrix = new Matrix4();
-            matrix.setPosition(coord.x, coord.y, coord.z).scale(new Vector3(xScale * scale * wScale, yScale * scale * hScale, renderData.rotation));
+
+            const matrix = SpriteShaderExt.createInstanceMatrix({
+                position: coord,
+                scale: new Vector2(xScale * scale * wScale, yScale * scale * hScale),
+                rotation: renderData.rotation,
+                uvRange: { xmin: 0, xmax: 1, ymin: 0, ymax: 1 },
+                anchor: renderData.anchor || new Vector2(0.5, 0.5)
+            })
             this._mesh.setMatrixAt(i, matrix);
+
         }
 
         this._mesh.instanceMatrix.needsUpdate = true;

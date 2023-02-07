@@ -1,5 +1,5 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector3 } from "three";
-import { FrameRenderer, math, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
+import { FrameRenderer, math, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
@@ -17,6 +17,7 @@ import { ColorUtils } from "../src/core/utils/color_utils";
 import { ImageClipper } from "../src/gis/core/misc/image_clipper";
 import { MultiBillboardGeometry } from "../src/gis/core/datasource/geometry/multi_billboard_geometry";
 import { CanvasTextBuilder } from "../src/core/msic/canvas_text_builder";
+import { LabelGeometry } from "../src/gis/core/datasource/geometry/label_geometry";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -66,8 +67,9 @@ class GISTest {
 
     public static run (render: FrameRenderer, mapViewer: MapViewer) {
         this.testXHRWorker();
-        // this.testEntity(mapViewer);
-        this.textDrawText();
+        this.testEntity(mapViewer);
+        // this.textDrawText();
+        // this.testTiledTexture();
         // this.testImageClipper();
         // this.testDrawPoint(render);
         // this.testSchedule();
@@ -79,7 +81,7 @@ class GISTest {
     }
 
     private static textDrawText () {
-        const canvas = CanvasTextBuilder.buildTextCanvas('hello world!\nhello', {
+        const canvas = CanvasTextBuilder.buildTextCanvas('Vin3GIS001Vin3GIS001\nVin3GIS001', {
             backgroundColor: '#FF000022',
             lineHeight: 1
         }).canvas;
@@ -91,12 +93,66 @@ class GISTest {
         canvas.style.bottom = "10px";
         canvas.style.zIndex = "100";
         document.body.appendChild(canvas);
-        document.body.appendChild(canvas);
     }
 
     private static testEntity (mapViewer: MapViewer) {
         // this.testPointEntity(mapViewer);
         this.testBillboardEntity(mapViewer);
+        this.testTextGeometry(mapViewer);
+    }
+
+    private static testTextGeometry (mapViewer: MapViewer) {
+        const lng = 118.256;
+        const lat = 24.418;
+        const pos = Cartographic.fromDegrees(lng, lat, 0);
+        const entity = new Entity({
+            label: new LabelGeometry({
+                position: pos,
+                text: "Vin3GIS001Vin3GIS001\nVin3GIS001",
+                fontSize: 18,
+                fontColor: new Color("#FF0000"),
+                shadowColor: new Color("#00FFFF"),
+                shadowOffsetX: 1,
+                shadowOffsetY: 1,
+                shadowBlur: 1,
+                // rotation: math.toRadian(45),
+                // anchor: { x: 0.5, y: 0 }
+            })
+        });
+        mapViewer.scene.entities.add(entity);
+
+        const pos1 = Cartographic.fromDegrees(lng, lat + 0.1, 0);
+        const entity1 = new Entity({
+            point: new PointGeometry({
+                position: pos1,
+                size: 10,
+                color: new Color("#FF0000")
+            }),
+            label: new LabelGeometry({
+                position: pos1,
+                text: "Vin3GIS002",
+            })
+        });
+
+        mapViewer.scene.entities.add(entity1);
+
+        const pos2 = Cartographic.fromDegrees(lng, lat - 0.1, 0);
+        const entity2 = new Entity({
+            point: new PointGeometry({
+                position: pos2,
+                size: 10,
+                color: new Color("#FF0000")
+            }),
+            label: new LabelGeometry({
+                position: pos2,
+                text: "Vin3GIS003",
+            })
+        });
+
+        mapViewer.scene.entities.add(entity2);
+
+        globalThis.mapViewer = mapViewer;
+        globalThis.textEntity = entity;
     }
 
     private static testBillboardEntity (mapViewer: MapViewer) {
@@ -112,7 +168,7 @@ class GISTest {
                 height: 41,
                 rotation: math.toRadian(0),
                 scale: 1,
-                center: { x: 0.5, y: 0 }
+                anchor: { x: 0.5, y: 0 }
             })
         })
         mapViewer.scene.entities.add(entity);
@@ -127,11 +183,12 @@ class GISTest {
         globalThis.billboardEntity = entity;
 
 
-        //test MultiBillboard
+        // test MultiBillboard
 
         // const positions = [];
         // const rotations = [];
         // const scales = [];
+        // const anchors = [];
         // const count = 1000;
         // const d = 2;
         // for (let i = 0; i < count; i++) {
@@ -141,12 +198,13 @@ class GISTest {
         //     positions.push(Cartographic.fromDegrees(cLng, cLat, 0));
         //     // rotations.push(math.toRadian(Math.random() * 90));
         //     scales.push(Math.max(0.7, Math.random()));
+        //     anchors.push({ x: 0.5, y: 0.0 });
         // }
 
         // mapViewer.scene.entities.add(new Entity({
         //     billboard: new MultiBillboardGeometry({
         //         image: imageSrc,
-        //         center: { x: 0.5, y: 0 },
+        //         anchors: anchors,
         //         positions: positions,
         //         rotations: rotations,
         //         scales: scales
@@ -170,32 +228,35 @@ class GISTest {
         global.pointEntity = entity;
         mapViewer.scene.entities.suspendEvents();
         const pointCount = 100;
-        for (let i = 0; i < pointCount; i++) {
-            const lng = 118.256 + Math.random() * 0.5;
-            const lat = 24.418 + Math.random() * 0.1;
-            const pos = Cartographic.fromDegrees(lng, lat, 0);
-            const entity = new Entity({
-                point: new PointGeometry({
-                    position: pos,
-                    size: 10,
-                    color: new Color("#00FFFF")
-                })
-            });
-            mapViewer.scene.entities.add(entity);
-        }
+        // for (let i = 0; i < pointCount; i++) {
+        //     const lng = 118.256 + Math.random() * 0.5;
+        //     const lat = 24.418 + Math.random() * 0.1;
+        //     const pos = Cartographic.fromDegrees(lng, lat, 0);
+        //     const entity = new Entity({
+        //         point: new PointGeometry({
+        //             position: pos,
+        //             size: 10,
+        //             color: new Color("#00FFFF")
+        //         })
+        //     });
+        //     mapViewer.scene.entities.add(entity);
+        // }
 
         //MultiPointGeometry
         const posArr = [];
+        const scales = [];
         for (let i = 0; i < pointCount; i++) {
             const lng = 118.256 - Math.random() * 0.5;
             const lat = 24.418 - Math.random() * 0.1;
             const pos = Cartographic.fromDegrees(lng, lat, 0);
             posArr.push(pos);
+            scales.push(Math.max(0.5, Math.random()))
         }
         mapViewer.scene.entities.add(new Entity({
             multiPoint: new MultiPointGeometry({
                 positions: posArr,
-                size: 10,
+                scales: scales,
+                size: 20,
                 color: new Color("#FF0000")
             })
         }));
@@ -504,6 +565,33 @@ class GISTest {
 
         //     }
         // }, this);
+    }
+
+    private static testTiledTexture () {
+        const tiledTexture = new TiledTexture(1024, 256);
+        const canvas = tiledTexture.canvas;
+        canvas.style.border = "1px solid";
+        canvas.style.width = canvas.width + "px";
+        canvas.style.height = canvas.height + "px";
+        canvas.style.position = "absolute";
+        canvas.style.right = "10px";
+        canvas.style.top = "10px";
+        canvas.style.zIndex = "100";
+        document.body.appendChild(canvas);
+
+        const res1 = CanvasTextBuilder.buildTextCanvas('hello world!\nhello', {
+            backgroundColor: '#FF000022',
+            lineHeight: 1
+        });
+        console.log(tiledTexture.tileImage(res1.canvas));
+
+        const res2 = CanvasTextBuilder.buildTextCanvas(`Canvas.style.position = "absolute";`, {
+            lineHeight: 1,
+            backgroundColor: '#FF000022',
+        });
+        console.log(tiledTexture.tileImage(res2.canvas));
+
+        global.tiledTexture = tiledTexture;
     }
 
 }
