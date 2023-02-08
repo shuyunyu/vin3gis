@@ -12,8 +12,8 @@ export type CanvasTextOptions = {
     shadowOffsetY?: number;
     lineHeight?: number;
     backgroundColor?: string;
-    horizontalPadding?: number;
-    verticalPadding?: number;
+    pixelOffsetX?: number;
+    pixelOffsetY?: number;
     outputSquare?: boolean; //是否输出正方形
     specSquareSize?: number;//指定的尺寸
 }
@@ -46,8 +46,8 @@ export class CanvasTextBuilder {
         const lineHeight = options.lineHeight || 1.2;
 
         const backgroundColor = options.backgroundColor || 'transparent';
-        const horizontalPadding = options.horizontalPadding || 0;
-        const verticalPadding = options.verticalPadding || 0;
+        const pixelOffsetX = options.pixelOffsetX || 0;
+        const pixelOffestY = options.pixelOffsetY || 0;
 
         const align = options.align || new Vector2();
 
@@ -59,11 +59,11 @@ export class CanvasTextBuilder {
 
         const fontHeight = this.calcFontHeight(font);
         const lines = text.split('\n');
-        const textWidth = Math.max.apply(null, lines.map(line => ctx.measureText(line).width));
-        const textHeight = fontHeight + fontHeight * lineHeight * (lines.length - 1);
+        let textWidth = Math.max.apply(null, lines.map(line => ctx.measureText(line).width));
+        let textHeight = fontHeight + fontHeight * lineHeight * (lines.length - 1);
 
-        let canvasWidth = Math.max(2, MathUtils.ceilPowerOfTwo(textWidth + (2 * horizontalPadding)));
-        let canvasHeight = Math.max(2, MathUtils.ceilPowerOfTwo(textHeight + (2 * verticalPadding)));
+        let canvasWidth = Math.max(2, MathUtils.ceilPowerOfTwo(textWidth + Math.abs(pixelOffsetX)));
+        let canvasHeight = Math.max(2, MathUtils.ceilPowerOfTwo(textHeight + Math.abs(pixelOffestY)));
 
         if (outputSquare) {
             let max = Math.max(canvasWidth, canvasHeight);
@@ -80,7 +80,7 @@ export class CanvasTextBuilder {
 
         ctx.fillStyle = backgroundColor;
         // ctx.fillRect(0, 0, textWidth + (2 * horizontalPadding), textHeight + (2 * verticalPadding));
-        ctx.fillRect(0, 0, textWidth + (2 * horizontalPadding), textHeight + (2 * verticalPadding));
+        ctx.fillRect(pixelOffsetX > 0 ? pixelOffestY : 0, pixelOffestY > 0 ? pixelOffestY : 0, textWidth, textHeight);
         // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.fillStyle = fillStyle;
@@ -101,8 +101,11 @@ export class CanvasTextBuilder {
         const y = 0.5 * ((fontHeight * lineHeight) - fontHeight);
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
-            ctx.fillText(line, x + horizontalPadding, (fontHeight * lineHeight * i) + verticalPadding + y);
+            ctx.fillText(line, x + (pixelOffsetX > 0 ? pixelOffsetX : 0), (fontHeight * lineHeight * i) + (pixelOffestY > 0 ? pixelOffestY : 0) + y);
         }
+
+        textWidth += Math.abs(pixelOffsetX);
+        textHeight += Math.abs(pixelOffestY);
 
         return {
             canvas: canvas,
