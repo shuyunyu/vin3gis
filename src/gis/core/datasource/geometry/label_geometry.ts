@@ -20,8 +20,8 @@ export type LabelGeometryOptions = {
     shadowBlur?: number;
     shadowOffsetX?: number;
     shadowOffsetY?: number;
-    horizontalPadding?: number;
-    verticalPadding?: number;
+    pixelOffsetX?: number;
+    pixelOffsetY?: number;
     backgroundColor?: string | Color;
     lineHeight?: number;
     anchor?: ICartesian2Like;
@@ -138,27 +138,27 @@ export class LabelGeometry extends BaseGeometry {
         this.drawText();
     }
 
-    private _horizontalPadding: number;
+    private _pixelOffsetX: number;
 
-    public get horizontalPadding () {
-        return this._horizontalPadding;
+    public get pixelOffsetX () {
+        return this._pixelOffsetX;
     }
 
     @GeometryUpdateProperty()
-    public set horizontalPadding (val: number) {
-        this._horizontalPadding = val;
+    public set pixelOffsetX (val: number) {
+        this._pixelOffsetX = val;
         this.drawText();
     }
 
-    private _verticalPadding: number;
+    private _pixelOffsetY: number;
 
-    public get verticalPadding () {
-        return this._verticalPadding;
+    public get pixelOffsetY () {
+        return this._pixelOffsetY;
     }
 
     @GeometryUpdateProperty()
-    public set verticalPadding (val: number) {
-        this._verticalPadding = val;
+    public set pixelOffsetY (val: number) {
+        this._pixelOffsetY = val;
         this.drawText();
     }
 
@@ -243,8 +243,8 @@ export class LabelGeometry extends BaseGeometry {
         this._shadowBlur = Utils.defaultValue(options.shadowBlur, 0);
         this._shadowOffsetX = Utils.defaultValue(options.shadowOffsetX, 0);
         this._shadowOffsetY = Utils.defaultValue(options.shadowOffsetY, 0);
-        this._horizontalPadding = Utils.defaultValue(options.horizontalPadding, 0);
-        this._verticalPadding = Utils.defaultValue(options.verticalPadding, 0);
+        this._pixelOffsetX = Utils.defaultValue(options.pixelOffsetX, 0);
+        this._pixelOffsetY = Utils.defaultValue(options.pixelOffsetY, 0);
         this._backgroundColor = Utils.defaultValue(options.backgroundColor, "transparent");
         this._lineHeight = Utils.defaultValue(options.lineHeight, 1.2);
         this._anchor = Utils.defaultValue(options.anchor, new Vector2(0.5, 0.5));
@@ -264,8 +264,8 @@ export class LabelGeometry extends BaseGeometry {
             shadowOffsetY: this.shadowOffsetY,
             lineHeight: this.lineHeight,
             backgroundColor: this.getColorString(this.backgroundColor),
-            horizontalPadding: this.horizontalPadding,
-            verticalPadding: this.verticalPadding
+            pixelOffsetX: this.pixelOffsetX,
+            pixelOffsetY: this.pixelOffsetY
         });
     }
 
