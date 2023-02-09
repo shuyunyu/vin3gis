@@ -1,6 +1,6 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector2, Vector3 } from "three";
 import { FrameRenderer, math, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
-import { AMapImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
+import { AMapImageryTileProvider, AnchorConstant, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
@@ -170,7 +170,7 @@ class GISTest {
                 height: 41,
                 rotation: math.toRadian(0),
                 scale: 1,
-                anchor: { x: 0.5, y: 0 }
+                anchor: AnchorConstant.CenterBottom
             })
         })
         mapViewer.scene.entities.add(entity);
