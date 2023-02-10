@@ -273,4 +273,24 @@ export class LabelGeometry extends BaseGeometry {
         return Utils.isString(color) ? color as string : ColorUtils.toCSSHexString(color as Color);
     }
 
+    public clone () {
+        return new LabelGeometry({
+            position: this.position.clone(),
+            text: this.text,
+            fontSize: this.fontSize,
+            fontFamily: this.fontFamily,
+            fontColor: this.getColorString(this.fontColor),
+            shadowColor: this.getColorString(this.shadowColor),
+            shadowBlur: this.shadowBlur,
+            shadowOffsetX: this.shadowOffsetX,
+            shadowOffsetY: this.shadowOffsetY,
+            pixelOffsetX: this.pixelOffsetX,
+            pixelOffsetY: this.pixelOffsetY,
+            backgroundColor: this.getColorString(this.backgroundColor),
+            lineHeight: this.lineHeight,
+            anchor: this.anchor,
+            rotation: this.rotation
+        });
+    }
+
 }

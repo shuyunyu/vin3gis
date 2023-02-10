@@ -18,6 +18,7 @@ import { ImageClipper } from "../src/gis/core/misc/image_clipper";
 import { MultiBillboardGeometry } from "../src/gis/core/datasource/geometry/multi_billboard_geometry";
 import { CanvasTextBuilder } from "../src/core/msic/canvas_text_builder";
 import { LabelGeometry } from "../src/gis/core/datasource/geometry/label_geometry";
+import { PolylineGeometry } from "../src/gis/core/datasource/geometry/polyline_geometry";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -97,8 +98,24 @@ class GISTest {
 
     private static testEntity (mapViewer: MapViewer) {
         // this.testPointEntity(mapViewer);
-        this.testBillboardEntity(mapViewer);
-        this.testTextGeometry(mapViewer);
+        // this.testBillboardEntity(mapViewer);
+        // this.testTextGeometry(mapViewer);
+        this.testLineGeometry(mapViewer);
+    }
+
+    private static testLineGeometry (mapViewer: MapViewer) {
+        const lnglats: number[][] = [
+            [118.256, 24.418],
+            [118.356, 24.418],
+            [118.356, 24.318],
+            [118.556, 24.318],
+        ];
+        const entity = new Entity({
+            polyline: new PolylineGeometry({
+                positions: lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0))
+            })
+        });
+        mapViewer.scene.entities.add(entity);
     }
 
     private static testTextGeometry (mapViewer: MapViewer) {

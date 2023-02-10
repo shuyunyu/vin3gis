@@ -6,6 +6,7 @@ import { LabelGeometry } from "../../core/datasource/geometry/label_geometry";
 import { MultiPointGeometry } from "../../core/datasource/geometry/multi_point_geometry";
 import { PointCloudGeometry } from "../../core/datasource/geometry/point_cloud_geometry";
 import { PointGeometry } from "../../core/datasource/geometry/point_geometry";
+import { PolylineGeometry } from "../../core/datasource/geometry/polyline_geometry";
 import { ViewPort } from "../../core/misc/view_port";
 import { IImageryTileProvider } from "../../core/provider/imagery_tile_provider";
 import { Imagery } from "../../core/scene/imagery";
@@ -116,6 +117,7 @@ export type EntityOptions = {
     pointCloud?: PointCloudGeometry;
     billboard?: BaseBillboardGeometry;
     label?: LabelGeometry;
+    polyline?: PolylineGeometry;
 }
 
 //entity geometry 属性变更属性
