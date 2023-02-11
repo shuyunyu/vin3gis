@@ -36,13 +36,14 @@ export class LineMaterial extends ShaderMaterial {
         }
     }
 
-    public get lineWidth () {
+    //@ts-ignore
+    public get linewidth () {
         return this.uniforms.linewidth.value;
     }
 
     //@ts-ignore
     public set linewidth (val) {
-        if (this.uniforms && this.uniforms.lineWidth) this.uniforms.linewidth.value = val;
+        if (this.uniforms && this.uniforms.linewidth) this.uniforms.linewidth.value = val;
     }
 
     public get dashed () {
@@ -138,7 +139,9 @@ export class LineMaterial extends ShaderMaterial {
             uniforms: ext.uniforms,
             vertexShader: ext.vertexShader,
             fragmentShader: ext.fragmentShader,
-            clipping: true
+            clipping: true,
+            depthTest: false,
+            transparent: true
         });
         this.isLineMaterial = true;
         this.setValues(options);

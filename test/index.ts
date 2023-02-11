@@ -32,12 +32,12 @@ window.onload = () => {
         //EmptyImageryTileProvider
         //AMapImageryTileProvider
         //TdtImageryTileProvider
-        // imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
+        imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
         // imageryTileProivder: new BaiduImageryTileProvider({ correction: true }),
         // imageryTileProivder: new OSMImageryTileProvider(),
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
-        imageryTileProivder: new EmptyImageryTileProvider(),
+        // imageryTileProivder: new EmptyImageryTileProvider(),
         // imageryTileProivder: new ArcGISImageryTileProvider({
         //     url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
         //     // token: '1d109683f4d84198e37a38c442d68311'
@@ -112,7 +112,8 @@ class GISTest {
         ];
         const entity = new Entity({
             polyline: new PolylineGeometry({
-                positions: lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0))
+                positions: lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0)),
+                color: new Color('#FF0000')
             })
         });
         mapViewer.scene.entities.add(entity);
