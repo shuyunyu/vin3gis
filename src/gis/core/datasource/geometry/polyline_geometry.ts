@@ -9,6 +9,7 @@ import { GeometryType } from "./geometry";
 export type PolylineGeometryOptions = {
     positions?: Cartographic[];
     color?: Color;
+    width?: number;
 }
 
 export class PolylineGeometry extends BaseGeometry {
@@ -24,7 +25,7 @@ export class PolylineGeometry extends BaseGeometry {
         this._positions = val;
     }
 
-    private _color?: Color;
+    private _color: Color;
 
     public get color () {
         return this._color;
@@ -35,11 +36,23 @@ export class PolylineGeometry extends BaseGeometry {
         this._color = val;
     }
 
+    private _width: number;
+
+    public get width () {
+        return this._width;
+    }
+
+    @GeometryUpdateProperty()
+    public set width (val: number) {
+        this._width = val;
+    }
+
     public constructor (options?: PolylineGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.POLYLINE });
         this._positions = Utils.defaultValue(options.positions, []);
-        this.color = Utils.defaultValue(options.color, new Color());
+        this._color = Utils.defaultValue(options.color, new Color());
+        this._width = Utils.defaultValue(options.width, 1);
         this.visualizer = new PolylineGeometryVisualizer();
     }
 

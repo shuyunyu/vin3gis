@@ -1,4 +1,4 @@
-import { ShaderMaterial, ShaderMaterialParameters, Vector2 } from "three";
+import { DoubleSide, ShaderMaterial, ShaderMaterialParameters, Vector2 } from "three";
 import { LineShaderExt } from "../line_shader_ext";
 
 export type LineMaterialOptions = {
@@ -141,7 +141,8 @@ export class LineMaterial extends ShaderMaterial {
             fragmentShader: ext.fragmentShader,
             clipping: true,
             depthTest: false,
-            transparent: true
+            transparent: true,
+            side: DoubleSide
         });
         this.isLineMaterial = true;
         this.setValues(options);
