@@ -40,6 +40,7 @@ export class PolylineGeometryVisualizer extends BaseGeometryVisualizer {
             resolution: new Vector2(renderer.size.width, renderer.size.height),
             dashed: false,
             alphaToCoverage: true,
+            opacity: 1
         });
         const line = new Line2(geometry, mtl);
         this._mtl = mtl;
