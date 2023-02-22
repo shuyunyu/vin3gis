@@ -9,6 +9,7 @@ export enum GeometryType {
     MULTI_POINT = "multi-point",
     POINT_CLOUD = "point-cloud",
     POLYLINE = "polyline",
+    MULTI_POLYLINE = "multi-polyline",
     POLYGON = "polygon",
     CIRCLE = "circle",
     LABEL = "label",

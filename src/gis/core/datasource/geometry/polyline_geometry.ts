@@ -58,7 +58,9 @@ export class PolylineGeometry extends BaseGeometry {
 
     public clone () {
         return new PolylineGeometry({
-            positions: this.positions.map(pos => pos.clone())
+            positions: this.positions.map(pos => pos.clone()),
+            color: this.color.clone(),
+            width: this.width
         });
     }
 
