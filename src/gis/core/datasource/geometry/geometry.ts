@@ -22,6 +22,8 @@ export enum GeometryType {
  * 定义几何接口
  */
 export interface IGeometry {
+    //uuid
+    id: string;
     //几何类型
     type: GeometryType;
     //渲染器
