@@ -1,5 +1,6 @@
 import { Object3D, Event, Color, Vector2 } from "three";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
+import { Utils } from "../../../../core/utils/utils";
 import { GeometryPropertyChangeData } from "../../../@types/core/gis";
 import { Line2 } from "../../extend/line/line2";
 import { LineMaterial } from "../../extend/line/line_material";
@@ -21,11 +22,11 @@ export class MultiPolylineGeometryVisualizer extends BaseGeometryVisualizer {
     }
 
     protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): Object3D<Event> {
-        const multiPolyline = entity.multiPolyline;
         const geometry = new MultiLineGeometry();
         geometry.setPositions(this.getPositionData(entity, tilingScheme));
         geometry.setColors(this.getColorData(entity));
-        geometry.setLinewidths(this.getLinewidthsData(entity, entity.multiPolyline.widths))
+        geometry.setLinewidths(this.getLinewidthsData(entity, entity.multiPolyline.widths));
+        geometry.setDashArguments(this.getDashArgsData(entity));
         this._geo = geometry;
         const mtl = new LineMaterial({
             color: 0xffffff,
@@ -121,6 +122,28 @@ export class MultiPolylineGeometryVisualizer extends BaseGeometryVisualizer {
         return widthsArray;
     }
 
+    /**
+     * 获取dash相关的参数数据
+     * @param entity 
+     * @returns 
+     */
+    private getDashArgsData (entity: Entity) {
+        const multiPolyline = entity.multiPolyline;
+        const points = multiPolyline.positions;
+        const dashArgsArray: number[][] = [];
+        points.forEach((ps, index) => {
+            const ds: number[] = [];
+            const dashed = multiPolyline.dasheds[index];
+            const dashOffset = Utils.defaultValue(multiPolyline.dashOffsets[index], 0);
+            const dashScale = Utils.defaultValue(multiPolyline.dashScales[index], 1);
+            const dashSize = Utils.defaultValue(multiPolyline.dashSizes[index], 1);
+            ps.forEach(p => {
+                ds.push(dashed ? 1 : 0, dashOffset, dashScale, dashSize);
+            })
+            dashArgsArray.push(ds);
+        });
+        return dashArgsArray;
+    }
 
     public onRendererSize (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): void {
         this.update(entity, tilingScheme, root, renderer);
@@ -136,6 +159,8 @@ export class MultiPolylineGeometryVisualizer extends BaseGeometryVisualizer {
                 this._geo.setColors(this.getColorData(entity));
             } else if (propertyChangeData.name === "widths") {
                 this._geo.setLinewidths(this.getLinewidthsData(entity, multiPolyline.widths));
+            } else if (propertyChangeData.name.startsWith("dash")) {
+                this._geo.setDashArguments(this.getDashArgsData(entity));
             }
         }
     }

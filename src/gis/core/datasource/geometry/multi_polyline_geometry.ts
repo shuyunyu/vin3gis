@@ -12,6 +12,10 @@ export type MultiPolylineGeometryOptions = {
     widths?: number[];
     useVertexColors?: boolean[];//是否使用顶点颜色
     vertexColors?: Color[][];
+    dasheds?: boolean[];//是否是虚线
+    dashOffsets?: number[];
+    dashScales?: number[];
+    dashSizes?: number[];
 }
 
 export class MultiPolylineGeometry extends BaseGeometry {
@@ -72,6 +76,50 @@ export class MultiPolylineGeometry extends BaseGeometry {
         this._vertexColors = val;
     }
 
+    private _dasheds: boolean[];
+
+    public get dasheds () {
+        return this._dasheds;
+    }
+
+    @GeometryUpdateProperty()
+    public set dasheds (val: boolean[]) {
+        this._dasheds = val;
+    }
+
+    private _dashOffsets: number[];
+
+    public get dashOffsets () {
+        return this._dashOffsets;
+    }
+
+    @GeometryUpdateProperty()
+    public set dashOffsets (val: number[]) {
+        this._dashOffsets = val;
+    }
+
+    private _dashScales: number[];
+
+    public get dashScales () {
+        return this._dashScales;
+    }
+
+    @GeometryUpdateProperty()
+    public set dashScales (val: number[]) {
+        this._dashScales = val;
+    }
+
+    private _dashSizes: number[];
+
+    public get dashSizes () {
+        return this._dashSizes;
+    }
+
+    @GeometryUpdateProperty()
+    public set dashSizes (val: number[]) {
+        this._dashSizes = val;
+    }
+
     public constructor (options?: MultiPolylineGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.MULTI_POLYLINE });
@@ -80,6 +128,10 @@ export class MultiPolylineGeometry extends BaseGeometry {
         this._widths = Utils.defaultValue(options.widths, []);
         this._useVertexColor = Utils.defaultValue(options.useVertexColors, []);
         this._vertexColors = Utils.defaultValue(options.vertexColors, []);
+        this._dasheds = Utils.defaultValue(options.dasheds, []);
+        this._dashOffsets = Utils.defaultValue(options.dashOffsets, []);
+        this._dashScales = Utils.defaultValue(options.dashScales, []);
+        this._dashSizes = Utils.defaultValue(options.dashSizes, []);
         this.visualizer = new MultiPolylineGeometryVisualizer();
     }
 
@@ -89,7 +141,11 @@ export class MultiPolylineGeometry extends BaseGeometry {
             colors: this.colors.map(color => color.clone()),
             widths: [].concat(this._widths),
             useVertexColors: [].concat(this._useVertexColor),
-            vertexColors: this.vertexColors.map(vcs => vcs.map(c => c.clone()))
+            vertexColors: this.vertexColors.map(vcs => vcs.map(c => c.clone())),
+            dasheds: this.dasheds,
+            dashOffsets: this.dashOffsets,
+            dashScales: this.dashScales,
+            dashSizes: this.dashSizes
         });
     }
 

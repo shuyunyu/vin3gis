@@ -151,7 +151,10 @@ class GISTest {
                         new Color('#00FFFF')
                     ].reverse(),
                     []
-                ]
+                ],
+                dasheds: [true],
+                dashSizes: [1],
+                dashScales: [2]
             })
         });
         mapViewer.scene.entities.add(entity1);
