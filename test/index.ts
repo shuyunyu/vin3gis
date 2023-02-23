@@ -137,7 +137,17 @@ class GISTest {
             multiPolyline: new MultiPolylineGeometry({
                 positions: positionsArray,
                 colors: [new Color("#00FF00"), new Color("#0000FF")],
-                widths: [1, 5]
+                widths: [1, 5],
+                useVertexColors: [true, false],
+                vertexColors: [
+                    [
+                        new Color('#FF0000'),
+                        new Color('#00FF00'),
+                        new Color('#0000FF'),
+                        new Color('#00FFFF')
+                    ].reverse(),
+                    []
+                ]
             })
         });
         mapViewer.scene.entities.add(entity1);

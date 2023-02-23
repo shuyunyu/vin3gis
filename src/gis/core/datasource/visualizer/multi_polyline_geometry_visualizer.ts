@@ -24,7 +24,7 @@ export class MultiPolylineGeometryVisualizer extends BaseGeometryVisualizer {
         const multiPolyline = entity.multiPolyline;
         const geometry = new MultiLineGeometry();
         geometry.setPositions(this.getPositionData(entity, tilingScheme));
-        geometry.setColors(this.getColorData(entity, multiPolyline.colors));
+        geometry.setColors(this.getColorData(entity));
         geometry.setLinewidths(this.getLinewidthsData(entity, entity.multiPolyline.widths))
         this._geo = geometry;
         const mtl = new LineMaterial({
@@ -75,17 +75,27 @@ export class MultiPolylineGeometryVisualizer extends BaseGeometryVisualizer {
      * @param color 
      * @returns 
      */
-    private getColorData (entity: Entity, colors: Color[]) {
+    private getColorData (entity: Entity) {
         const multiPolyline = entity.multiPolyline;
         const points = multiPolyline.positions;
         const colorsArray: number[][] = [];
         const defaultColor = new Color();
+        const colors = multiPolyline.colors;
         points.forEach((ps, index) => {
             const ccolors: number[] = [];
-            const color = colors[index] || defaultColor;
-            ps.forEach(p => {
-                ccolors.push(color.r, color.g, color.b);
-            })
+            const useVertexColor = multiPolyline.useVertexColor[index];
+            if (useVertexColor) {
+                const cVertexColors = multiPolyline.vertexColors[index];
+                ps.forEach((p, i) => {
+                    const color = cVertexColors[i] || defaultColor;
+                    ccolors.push(color.r, color.g, color.b);
+                })
+            } else {
+                const color = colors[index] || defaultColor
+                ps.forEach(p => {
+                    ccolors.push(color.r, color.g, color.b);
+                })
+            }
             colorsArray.push(ccolors);
         });
         return colorsArray;
@@ -122,8 +132,8 @@ export class MultiPolylineGeometryVisualizer extends BaseGeometryVisualizer {
             const multiPolyline = entity.multiPolyline;
             if (propertyChangeData.name === "positions") {
                 this._geo.setPositions(this.getPositionData(entity, tilingScheme));
-            } else if (propertyChangeData.name === "colors") {
-                this._geo.setColors(this.getColorData(entity, multiPolyline.colors));
+            } else if (propertyChangeData.name === "colors" || propertyChangeData.name === "useVertexColor" || propertyChangeData.name === "vertexColors") {
+                this._geo.setColors(this.getColorData(entity));
             } else if (propertyChangeData.name === "widths") {
                 this._geo.setLinewidths(this.getLinewidthsData(entity, multiPolyline.widths));
             }

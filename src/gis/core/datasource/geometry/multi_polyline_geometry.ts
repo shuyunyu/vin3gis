@@ -10,6 +10,8 @@ export type MultiPolylineGeometryOptions = {
     positions?: Cartographic[][];
     colors?: Color[];
     widths?: number[];
+    useVertexColors?: boolean[];//是否使用顶点颜色
+    vertexColors?: Color[][];
 }
 
 export class MultiPolylineGeometry extends BaseGeometry {
@@ -48,12 +50,36 @@ export class MultiPolylineGeometry extends BaseGeometry {
         this._widths = val;
     }
 
+    private _useVertexColor: boolean[];
+
+    public get useVertexColor () {
+        return this._useVertexColor;
+    }
+
+    @GeometryUpdateProperty()
+    public set useVertexColor (val: boolean[]) {
+        this._useVertexColor = val;
+    }
+
+    private _vertexColors: Color[][];
+
+    public get vertexColors () {
+        return this._vertexColors;
+    }
+
+    @GeometryUpdateProperty()
+    public set vertexColors (val: Color[][]) {
+        this._vertexColors = val;
+    }
+
     public constructor (options?: MultiPolylineGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.MULTI_POLYLINE });
         this._positions = Utils.defaultValue(options.positions, []);
         this._colors = Utils.defaultValue(options.colors, []);
         this._widths = Utils.defaultValue(options.widths, []);
+        this._useVertexColor = Utils.defaultValue(options.useVertexColors, []);
+        this._vertexColors = Utils.defaultValue(options.vertexColors, []);
         this.visualizer = new MultiPolylineGeometryVisualizer();
     }
 
@@ -61,7 +87,9 @@ export class MultiPolylineGeometry extends BaseGeometry {
         return new MultiPolylineGeometry({
             positions: this.positions.map(pos => pos.map(p => p.clone())),
             colors: this.colors.map(color => color.clone()),
-            widths: [].concat(this._widths)
+            widths: [].concat(this._widths),
+            useVertexColors: [].concat(this._useVertexColor),
+            vertexColors: this.vertexColors.map(vcs => vcs.map(c => c.clone()))
         });
     }
 
