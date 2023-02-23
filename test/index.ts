@@ -193,7 +193,9 @@ class GISTest {
             const jsonEntity = new Entity({
                 multiPolyline: new MultiPolylineGeometry({
                     positions: positionsArray,
-                    colors: positionsArray.map(_ => new Color("#444444"))
+                    // colors: positionsArray.map(_ => new Color("#FFFF00")),
+                    colors: positionsArray.map(_ => new Color("#444444")),
+                    // widths: positionsArray.map(_ => 2)
                 })
             })
             mapViewer.scene.entities.add(jsonEntity);

@@ -42,6 +42,8 @@ export * from "./core/datasource/geometry/point_cloud_geometry";
 export * from "./core/datasource/geometry/billboard_geometry";
 export * from "./core/datasource/geometry/multi_billboard_geometry";
 export * from "./core/datasource/geometry/label_geometry";
+export * from "./core/datasource/geometry/polyline_geometry";
+export * from "./core/datasource/geometry/multi_polyline_geometry";
 
 export * from "./core/viewer/map_viewer";
 export * from "./core/camera/earth_camera";
