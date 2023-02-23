@@ -1,6 +1,6 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector2, Vector3 } from "three";
 import { FrameRenderer, math, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
-import { AMapImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
+import { AMapImageryTileProvider, AnchorConstant, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
@@ -18,6 +18,8 @@ import { ImageClipper } from "../src/gis/core/misc/image_clipper";
 import { MultiBillboardGeometry } from "../src/gis/core/datasource/geometry/multi_billboard_geometry";
 import { CanvasTextBuilder } from "../src/core/msic/canvas_text_builder";
 import { LabelGeometry } from "../src/gis/core/datasource/geometry/label_geometry";
+import { PolylineGeometry } from "../src/gis/core/datasource/geometry/polyline_geometry";
+import { MultiPolylineGeometry } from "../src/gis/core/datasource/geometry/multi_polyline_geometry";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -97,8 +99,66 @@ class GISTest {
 
     private static testEntity (mapViewer: MapViewer) {
         // this.testPointEntity(mapViewer);
-        this.testBillboardEntity(mapViewer);
-        this.testTextGeometry(mapViewer);
+        // this.testBillboardEntity(mapViewer);
+        // this.testTextGeometry(mapViewer);
+        this.testLineGeometry(mapViewer);
+    }
+
+    private static testLineGeometry (mapViewer: MapViewer) {
+        const lnglats: number[][] = [
+            [118.256, 24.418],
+            [118.356, 24.418],
+            [118.356, 24.318],
+            [118.556, 24.318],
+        ];
+        const entity = new Entity({
+            polyline: new PolylineGeometry({
+                positions: lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0)),
+                color: new Color('#FF0000'),
+                width: 3,
+                useVertexColor: true,
+                vertexColors: [
+                    new Color('#FF0000'),
+                    new Color('#00FF00'),
+                    new Color('#0000FF'),
+                    new Color('#00FFFF')
+                ],
+                dashed: false,
+                dashOffset: 0,
+                dashSize: 2,
+                dashScale: 2
+            })
+        });
+        mapViewer.scene.entities.add(entity);
+        globalThis.lineEneity = entity;
+
+        const positionsArray = [
+            lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1] - 0.2, 0)),
+            lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1] + 0.2, 0))
+        ]
+
+        const entity1 = new Entity({
+            multiPolyline: new MultiPolylineGeometry({
+                positions: positionsArray,
+                colors: [new Color("#00FF00"), new Color("#0000FF")],
+                widths: [1, 5],
+                useVertexColors: [true, false],
+                vertexColors: [
+                    [
+                        new Color('#FF0000'),
+                        new Color('#00FF00'),
+                        new Color('#0000FF'),
+                        new Color('#00FFFF')
+                    ].reverse(),
+                    []
+                ],
+                dasheds: [true],
+                dashSizes: [1],
+                dashScales: [2]
+            })
+        });
+        mapViewer.scene.entities.add(entity1);
+        global.multiLineEntity = entity1;
     }
 
     private static testTextGeometry (mapViewer: MapViewer) {
@@ -170,7 +230,7 @@ class GISTest {
                 height: 41,
                 rotation: math.toRadian(0),
                 scale: 1,
-                anchor: { x: 0.5, y: 0 }
+                anchor: AnchorConstant.CenterBottom
             })
         })
         mapViewer.scene.entities.add(entity);

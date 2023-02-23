@@ -7,7 +7,11 @@ type GeometryOptions = {
     type: GeometryType;
 }
 
+let geometryCount = 0;
+
 export class BaseGeometry implements IGeometry {
+
+    public readonly id: string;
 
     public readonly type: GeometryType;
 
@@ -25,6 +29,7 @@ export class BaseGeometry implements IGeometry {
 
     public constructor (options: GeometryOptions) {
         this.type = options.type;
+        this.id = `Geometry.${geometryCount++}`;
     }
 
     public clone () {

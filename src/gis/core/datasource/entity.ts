@@ -5,8 +5,10 @@ import { EntityGeometryRenderDriver, EntityOptions } from "../../@types/core/gis
 import { BaseBillboardGeometry } from "./geometry/base_billboard_geometry";
 import { LabelGeometry } from "./geometry/label_geometry";
 import { MultiPointGeometry } from "./geometry/multi_point_geometry";
+import { MultiPolylineGeometry } from "./geometry/multi_polyline_geometry";
 import { PointCloudGeometry } from "./geometry/point_cloud_geometry";
 import { PointGeometry } from "./geometry/point_geometry";
+import { PolylineGeometry } from "./geometry/polyline_geometry";
 
 export class Entity {
 
@@ -68,6 +70,18 @@ export class Entity {
         return this._label;
     }
 
+    private _polyline?: PolylineGeometry;
+
+    public get polyline () {
+        return this._polyline;
+    }
+
+    private _multiPolyline?: MultiPolylineGeometry;
+
+    public get multiPolyline () {
+        return this._multiPolyline;
+    }
+
     public constructor (options: EntityOptions) {
         this.id = Utils.createGuid();
         this.visibleChangedEvent = new GenericEvent();
@@ -94,6 +108,14 @@ export class Entity {
         if (options.label) {
             this._label = options.label;
             this._label.entity = this;
+        }
+        if (options.polyline) {
+            this._polyline = options.polyline;
+            this._polyline.entity = this;
+        }
+        if (options.multiPolyline) {
+            this._multiPolyline = options.multiPolyline;
+            this._multiPolyline.entity = this;
         }
     }
 
