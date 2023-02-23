@@ -7,6 +7,7 @@
 uniform vec2 resolution;
 
 attribute float instanceLinewidth;
+attribute vec4 instanceDashArgs;
 
 attribute vec3 instanceStart;
 attribute vec3 instanceEnd;
@@ -14,34 +15,26 @@ attribute vec3 instanceEnd;
 attribute vec3 instanceColorStart;
 attribute vec3 instanceColorEnd;
 
-#ifdef WORLD_UNITS
-
 varying vec4 worldPos;
 varying vec3 worldStart;
 varying vec3 worldEnd;
-
-#ifdef USE_DASH
-
 varying vec2 vUv;
 
-#endif
+// #ifdef USE_DASH
 
-#else
+// uniform float dashScale;
+// attribute float instanceDistanceStart;
+// attribute float instanceDistanceEnd;
+// varying float vLineDistance;
 
-varying vec2 vUv;
+// #endif
 
-#endif
-
-#ifdef USE_DASH
-
-uniform float dashScale;
 attribute float instanceDistanceStart;
 attribute float instanceDistanceEnd;
 varying float vLineDistance;
 
-#endif
-
 varying float v_linewidth;
+varying vec4 v_dashArgs;
 
 void trimSegment(const in vec4 start,inout vec4 end){
     
@@ -61,6 +54,11 @@ void trimSegment(const in vec4 start,inout vec4 end){
 void main(){
     
     v_linewidth=instanceLinewidth;
+    v_dashArgs=instanceDashArgs;
+    
+    float a_dashScale=instanceDashArgs.z;
+    
+    bool useDash=instanceDashArgs.x==1.;
     
     #ifdef USE_COLOR
     
@@ -68,12 +66,10 @@ void main(){
     
     #endif
     
-    #ifdef USE_DASH
-    
-    vLineDistance=(position.y<.5)?dashScale*instanceDistanceStart:dashScale*instanceDistanceEnd;
-    vUv=uv;
-    
-    #endif
+    if(useDash){
+        vLineDistance=(position.y<.5)?a_dashScale*instanceDistanceStart:a_dashScale*instanceDistanceEnd;
+        vUv=uv;
+    }
     
     float aspect=resolution.x/resolution.y;
     
@@ -150,17 +146,15 @@ void main(){
     
     // don't extend the line if we're rendering dashes because we
     // won't be rendering the endcaps
-    #ifndef USE_DASH
-    
-    // extend the line bounds to encompass  endcaps
-    start.xyz+=-worldDir*instanceLinewidth*.5;
-    end.xyz+=worldDir*instanceLinewidth*.5;
-    
-    // shift the position of the quad so it hugs the forward edge of the line
-    offset.xy-=dir*forwardOffset;
-    offset.z+=.5;
-    
-    #endif
+    if(!useDash){
+        // extend the line bounds to encompass  endcaps
+        start.xyz+=-worldDir*instanceLinewidth*.5;
+        end.xyz+=worldDir*instanceLinewidth*.5;
+        
+        // shift the position of the quad so it hugs the forward edge of the line
+        offset.xy-=dir*forwardOffset;
+        offset.z+=.5;
+    }
     
     // endcaps
     if(position.y>1.||position.y<0.){

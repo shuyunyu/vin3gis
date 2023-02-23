@@ -85,6 +85,31 @@ export class LineGeometry extends LineSegmentsGeometry {
 
     }
 
+    public setDashArguments (array: number[]) {
+        // converts [ r1, g1, b1,  r2, g2, b2, ... ] to pairs format
+
+        const length = array.length - 4;
+        const dashArgs = new Float32Array(2 * length);
+
+        for (let i = 0; i < length; i += 4) {
+
+            dashArgs[2 * i] = array[i];
+            dashArgs[2 * i + 1] = array[i + 1];
+            dashArgs[2 * i + 2] = array[i + 2];
+            dashArgs[2 * i + 3] = array[i + 3];
+
+            dashArgs[2 * i + 4] = array[i + 4];
+            dashArgs[2 * i + 5] = array[i + 5];
+            dashArgs[2 * i + 6] = array[i + 6];
+            dashArgs[2 * i + 7] = array[i + 7];
+
+        }
+
+        super.setDashArguments(dashArgs);
+
+        return this;
+    }
+
     public fromLine (line: Line) {
 
         const geometry = line.geometry;

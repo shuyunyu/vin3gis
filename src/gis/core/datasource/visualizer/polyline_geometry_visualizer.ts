@@ -25,6 +25,7 @@ export class PolylineGeometryVisualizer extends BaseGeometryVisualizer {
         geometry.setPositions(this.getPositionData(entity, tilingScheme));
         geometry.setColors(this.getColorData(entity));
         geometry.setLinewidths(this.getLineWidthData(entity, entity.polyline.width));
+        geometry.setDashArguments(this.getDashArgsData(entity));
         this._geo = geometry;
         const mtl = new LineMaterial({
             color: 0xffffff,
@@ -100,6 +101,20 @@ export class PolylineGeometryVisualizer extends BaseGeometryVisualizer {
         return linewidths;
     }
 
+    /**
+     * 获取dash相关的参数数据
+     * @param entity 
+     */
+    private getDashArgsData (entity: Entity) {
+        const polyline = entity.polyline;
+        const points = polyline.positions;
+        const dashArgs = [];
+        points.forEach(p => {
+            dashArgs.push(polyline.dashed ? 1 : 0, polyline.dashOffset, polyline.dashScale, polyline.dashSize);
+        });
+        return dashArgs;
+    }
+
     public onRendererSize (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): void {
         this.update(entity, tilingScheme, root, renderer);
     }
@@ -115,6 +130,8 @@ export class PolylineGeometryVisualizer extends BaseGeometryVisualizer {
                 this._geo.setColors(colors);
             } else if (propertyChangeData.name === "width") {
                 this._geo.setLinewidths(this.getLineWidthData(entity, polyline.width));
+            } else if (propertyChangeData.name.startsWith("dash")) {
+                this._geo.setDashArguments(this.getDashArgsData(entity));
             }
         }
     }

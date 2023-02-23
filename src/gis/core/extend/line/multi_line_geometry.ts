@@ -41,6 +41,7 @@ export class MultiLineGeometry extends LineSegmentsGeometry {
 
     }
 
+    //@ts-ignore
     public setColors (colorArray: number[][]) {
 
         // converts [ r1, g1, b1,  r2, g2, b2, ... ] to pairs format

@@ -1,34 +1,14 @@
 uniform vec3 diffuse;
 uniform float opacity;
 
-#ifdef USE_DASH
-
-uniform float dashOffset;
-uniform float dashSize;
-uniform float gapSize;
-
-#endif
-
 varying float vLineDistance;
 varying float v_linewidth;
-
-#ifdef WORLD_UNITS
+varying vec4 v_dashArgs;
 
 varying vec4 worldPos;
 varying vec3 worldStart;
 varying vec3 worldEnd;
-
-#ifdef USE_DASH
-
 varying vec2 vUv;
-
-#endif
-
-#else
-
-varying vec2 vUv;
-
-#endif
 
 #include<common>
 #include<color_pars_fragment>
@@ -69,13 +49,17 @@ void main(){
     
     #include<clipping_planes_fragment>
     
-    #ifdef USE_DASH
+    float a_dashOffset=v_dashArgs.y;
+    float a_dashSize=v_dashArgs.w;
+    float a_gapSize=1.;
     
-    if(vUv.y<-1.||vUv.y>1.)discard;// discard endcaps
+    bool useDash=v_dashArgs.x==1.;
     
-    if(mod(vLineDistance+dashOffset,dashSize+gapSize)>dashSize)discard;// todo - FIX
-    
-    #endif
+    if(useDash){
+        if(vUv.y<-1.||vUv.y>1.)discard;// discard endcaps
+        
+        if(mod(vLineDistance+a_dashOffset,a_dashSize+a_gapSize)>a_dashSize)discard;// todo - FIX
+    }
     
     float alpha=opacity;
     
@@ -92,24 +76,22 @@ void main(){
     float len=length(delta);
     float norm=len/v_linewidth;
     
-    #ifndef USE_DASH
-    
-    #ifdef USE_ALPHA_TO_COVERAGE
-    
-    float dnorm=fwidth(norm);
-    alpha=1.-smoothstep(.5-dnorm,.5+dnorm,norm);
-    
-    #else
-    
-    if(norm>.5){
+    if(useDash){
+        #ifdef USE_ALPHA_TO_COVERAGE
         
-        discard;
+        float dnorm=fwidth(norm);
+        alpha=1.-smoothstep(.5-dnorm,.5+dnorm,norm);
         
+        #else
+        
+        if(norm>.5){
+            
+            discard;
+            
+        }
+        
+        #endif
     }
-    
-    #endif
-    
-    #endif
     
     #else
     

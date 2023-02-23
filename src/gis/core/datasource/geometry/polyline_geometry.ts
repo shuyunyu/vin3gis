@@ -12,6 +12,10 @@ export type PolylineGeometryOptions = {
     width?: number;
     useVertexColor?: boolean;//是否使用顶点颜色
     vertexColors?: Color[];//顶点颜色数组
+    dashed?: boolean;//是否为虚线
+    dashOffset?: number;//虚线偏移量
+    dashScale?: number;//虚线缩放量
+    dashSize?: number;//虚线尺寸
 }
 
 export class PolylineGeometry extends BaseGeometry {
@@ -71,6 +75,50 @@ export class PolylineGeometry extends BaseGeometry {
         this._vertexColors = val;
     }
 
+    private _dashed: boolean;
+
+    public get dashed () {
+        return this._dashed;
+    }
+
+    @GeometryUpdateProperty()
+    public set dashed (val: boolean) {
+        this._dashed = val;
+    }
+
+    private _dashOffset: number;
+
+    public get dashOffset () {
+        return this._dashOffset;
+    }
+
+    @GeometryUpdateProperty()
+    public set dashOffset (val: number) {
+        this._dashOffset = val;
+    }
+
+    private _dashScale: number;
+
+    public get dashScale () {
+        return this._dashScale;
+    }
+
+    @GeometryUpdateProperty()
+    public set dashScale (val: number) {
+        this._dashScale = val;
+    }
+
+    private _dashSize: number;
+
+    public get dashSize () {
+        return this._dashSize;
+    }
+
+    @GeometryUpdateProperty()
+    public set dashSize (val: number) {
+        this._dashSize = val;
+    }
+
     public constructor (options?: PolylineGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.POLYLINE });
@@ -79,6 +127,10 @@ export class PolylineGeometry extends BaseGeometry {
         this._width = Utils.defaultValue(options.width, 1);
         this._useVertexColor = Utils.defaultValue(options.useVertexColor, false);
         this._vertexColors = Utils.defaultValue(options.vertexColors, []);
+        this._dashed = Utils.defaultValue(options.dashed, false);
+        this._dashOffset = Utils.defaultValue(options.dashOffset, 0);
+        this._dashScale = Utils.defaultValue(options.dashScale, 1);
+        this._dashSize = Utils.defaultValue(options.dashSize, 1);
         this.visualizer = new PolylineGeometryVisualizer();
     }
 
@@ -88,7 +140,11 @@ export class PolylineGeometry extends BaseGeometry {
             color: this.color.clone(),
             width: this.width,
             useVertexColor: this.useVertexColor,
-            vertexColors: this.vertexColors.map(c => c.clone())
+            vertexColors: this.vertexColors.map(c => c.clone()),
+            dashed: this.dashed,
+            dashOffset: this.dashOffset,
+            dashScale: this.dashScale,
+            dashSize: this.dashSize
         });
     }
 

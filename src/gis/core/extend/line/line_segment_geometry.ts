@@ -79,7 +79,7 @@ export class LineSegmentsGeometry extends InstancedBufferGeometry {
 
     }
 
-    public setColors (array) {
+    public setColors (array: Float32Array | number[]) {
 
         let colors;
 
@@ -111,6 +111,25 @@ export class LineSegmentsGeometry extends InstancedBufferGeometry {
         }
         const instanceLinewidthBuffer = new InstancedInterleavedBuffer(linewidths, 2, 1);
         this.setAttribute('instanceLinewidth', new InterleavedBufferAttribute(instanceLinewidthBuffer, 1, 0));
+
+        return this;
+    }
+
+    /**
+     * 设置dash相关的参数
+     * @param dashArgsArr 
+     */
+    public setDashArguments (dashArgsArr: Float32Array | number[]) {
+        let dashArgs;
+        if (dashArgsArr instanceof Float32Array) {
+            dashArgs = dashArgsArr;
+        } else if (Array.isArray(dashArgsArr)) {
+            dashArgs = new Float32Array(dashArgsArr);
+        }
+        const instanceDashArgsBuffer = new InstancedInterleavedBuffer(dashArgs, 8, 1);
+        this.setAttribute('instanceDashArgs', new InterleavedBufferAttribute(instanceDashArgsBuffer, 4, 0));
+
+        return this;
     }
 
     public fromWireframeGeometry (geometry) {

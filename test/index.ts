@@ -122,7 +122,11 @@ class GISTest {
                     new Color('#00FF00'),
                     new Color('#0000FF'),
                     new Color('#00FFFF')
-                ]
+                ],
+                dashed: false,
+                dashOffset: 0,
+                dashSize: 2,
+                dashScale: 2
             })
         });
         mapViewer.scene.entities.add(entity);
