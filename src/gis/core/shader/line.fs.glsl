@@ -1,6 +1,5 @@
 uniform vec3 diffuse;
 uniform float opacity;
-uniform float linewidth;
 
 #ifdef USE_DASH
 
@@ -11,6 +10,7 @@ uniform float gapSize;
 #endif
 
 varying float vLineDistance;
+varying float v_linewidth;
 
 #ifdef WORLD_UNITS
 
@@ -90,7 +90,7 @@ void main(){
     vec3 p2=rayEnd*params.y;
     vec3 delta=p1-p2;
     float len=length(delta);
-    float norm=len/linewidth;
+    float norm=len/v_linewidth;
     
     #ifndef USE_DASH
     

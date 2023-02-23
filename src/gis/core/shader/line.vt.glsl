@@ -4,8 +4,9 @@
 #include<logdepthbuf_pars_vertex>
 #include<clipping_planes_pars_vertex>
 
-uniform float linewidth;
 uniform vec2 resolution;
+
+attribute float instanceLinewidth;
 
 attribute vec3 instanceStart;
 attribute vec3 instanceEnd;
@@ -40,6 +41,8 @@ varying float vLineDistance;
 
 #endif
 
+varying float v_linewidth;
+
 void trimSegment(const in vec4 start,inout vec4 end){
     
     // trim end segment so it terminates between the camera plane and the near plane
@@ -56,6 +59,8 @@ void trimSegment(const in vec4 start,inout vec4 end){
 }
 
 void main(){
+    
+    v_linewidth=instanceLinewidth;
     
     #ifdef USE_COLOR
     
@@ -148,8 +153,8 @@ void main(){
     #ifndef USE_DASH
     
     // extend the line bounds to encompass  endcaps
-    start.xyz+=-worldDir*linewidth*.5;
-    end.xyz+=worldDir*linewidth*.5;
+    start.xyz+=-worldDir*instanceLinewidth*.5;
+    end.xyz+=worldDir*instanceLinewidth*.5;
     
     // shift the position of the quad so it hugs the forward edge of the line
     offset.xy-=dir*forwardOffset;
@@ -164,8 +169,8 @@ void main(){
         
     }
     
-    // adjust for linewidth
-    offset*=linewidth*.5;
+    // adjust for instanceLinewidth
+    offset*=instanceLinewidth*.5;
     
     // set the world position
     worldPos=(position.y<.5)?start:end;
@@ -200,8 +205,8 @@ void main(){
         
     }
     
-    // adjust for linewidth
-    offset*=linewidth;
+    // adjust for instanceLinewidth
+    offset*=instanceLinewidth;
     
     // adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
     offset/=resolution.y;

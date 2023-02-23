@@ -19,6 +19,7 @@ import { MultiBillboardGeometry } from "../src/gis/core/datasource/geometry/mult
 import { CanvasTextBuilder } from "../src/core/msic/canvas_text_builder";
 import { LabelGeometry } from "../src/gis/core/datasource/geometry/label_geometry";
 import { PolylineGeometry } from "../src/gis/core/datasource/geometry/polyline_geometry";
+import { MultiPolylineGeometry } from "../src/gis/core/datasource/geometry/multi_polyline_geometry";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -119,6 +120,21 @@ class GISTest {
         });
         mapViewer.scene.entities.add(entity);
         globalThis.lineEneity = entity;
+
+        const positionsArray = [
+            lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1] - 0.2, 0)),
+            lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1] + 0.2, 0))
+        ]
+
+        const entity1 = new Entity({
+            multiPolyline: new MultiPolylineGeometry({
+                positions: positionsArray,
+                colors: [new Color("#00FF00"), new Color("#0000FF")],
+                widths: [1, 5]
+            })
+        });
+        mapViewer.scene.entities.add(entity1);
+        global.multiLineEntity = entity1;
     }
 
     private static testTextGeometry (mapViewer: MapViewer) {

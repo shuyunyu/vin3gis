@@ -102,6 +102,17 @@ export class LineSegmentsGeometry extends InstancedBufferGeometry {
 
     }
 
+    public setLinewidths (linewidthArray: Float32Array | number[]) {
+        let linewidths;
+        if (linewidthArray instanceof Float32Array) {
+            linewidths = linewidthArray;
+        } else if (Array.isArray(linewidthArray)) {
+            linewidths = new Float32Array(linewidthArray);
+        }
+        const instanceLinewidthBuffer = new InstancedInterleavedBuffer(linewidths, 2, 1);
+        this.setAttribute('instanceLinewidth', new InterleavedBufferAttribute(instanceLinewidthBuffer, 1, 0));
+    }
+
     public fromWireframeGeometry (geometry) {
 
         this.setPositions(geometry.attributes.position.array);

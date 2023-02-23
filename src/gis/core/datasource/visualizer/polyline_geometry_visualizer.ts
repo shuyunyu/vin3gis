@@ -21,20 +21,14 @@ export class PolylineGeometryVisualizer extends BaseGeometryVisualizer {
     }
 
     protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): Object3D<Event> {
-        const points = entity.polyline.positions.map(pos => Transform.cartographicToWorldVec3(pos, tilingScheme));
-        const color = entity.polyline.color;
-        const ps = [];
-        points.forEach(p => {
-            ps.push(p.x, p.y, p.z);
-        });
-        const colors = this.getColorData(entity, color);
         const geometry = new LineGeometry();
-        geometry.setPositions(ps);
-        geometry.setColors(colors);
+        geometry.setPositions(this.getPositionData(entity, tilingScheme));
+        geometry.setColors(this.getColorData(entity, entity.polyline.color));
+        geometry.setLinewidths(this.getLineWidthData(entity, entity.polyline.width));
         this._geo = geometry;
         const mtl = new LineMaterial({
             color: 0xffffff,
-            linewidth: entity.polyline.width, // in world units with size attenuation, pixels otherwise
+            linewidth: 1, // in world units with size attenuation, pixels otherwise
             vertexColors: true,
             //resolution:  // to be set by renderer, eventually
             resolution: new Vector2(renderer.size.width, renderer.size.height),
@@ -48,6 +42,21 @@ export class PolylineGeometryVisualizer extends BaseGeometryVisualizer {
         line.scale.set(1, 1, 1);
         this._disposableObjects.push(geometry, mtl);
         return line;
+    }
+
+    /**
+     * 获取顶点位置数据
+     * @param entity 
+     * @param tilingScheme 
+     * @returns 
+     */
+    private getPositionData (entity: Entity, tilingScheme: ITilingScheme) {
+        const points = entity.polyline.positions.map(pos => Transform.cartographicToWorldVec3(pos, tilingScheme));
+        const ps = [];
+        points.forEach(p => {
+            ps.push(p.x, p.y, p.z);
+        });
+        return ps;
     }
 
     /**
@@ -66,18 +75,37 @@ export class PolylineGeometryVisualizer extends BaseGeometryVisualizer {
         return colors;
     }
 
+    /**
+     * 获取线宽数据
+     * @param entity 
+     * @returns 
+     */
+    private getLineWidthData (entity: Entity, linewidth: number) {
+        const polyline = entity.polyline;
+        const points = polyline.positions;
+        const linewidths = [];
+        points.forEach(p => {
+            linewidths.push(linewidth);
+        });
+        return linewidths;
+    }
+
     public onRendererSize (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): void {
         this.update(entity, tilingScheme, root, renderer);
     }
 
     public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer, propertyChangeData?: GeometryPropertyChangeData): void {
-        const polyline = entity.polyline;
         this._mtl.resolution = new Vector2(renderer.size.width, renderer.size.height);
-        if (propertyChangeData.name === "color") {
-            const colors = this.getColorData(entity, polyline.color);
-            this._geo.setColors(colors);
-        } else if (propertyChangeData.name === "width") {
-            this._mtl.linewidth = polyline.width;
+        if (propertyChangeData) {
+            const polyline = entity.polyline;
+            if (propertyChangeData.name === "positions") {
+                this._geo.setPositions(this.getPositionData(entity, tilingScheme));
+            } else if (propertyChangeData.name === "color") {
+                const colors = this.getColorData(entity, polyline.color);
+                this._geo.setColors(colors);
+            } else if (propertyChangeData.name === "width") {
+                this._geo.setLinewidths(this.getLineWidthData(entity, polyline.width));
+            }
         }
     }
 

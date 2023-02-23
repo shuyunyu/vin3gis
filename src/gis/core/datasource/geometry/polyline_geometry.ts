@@ -1,6 +1,6 @@
 import { Color } from "three";
 import { Utils } from "../../../../core/utils/utils";
-import { GeometryRerenderProperty, GeometryUpdateProperty } from "../../../decorator/decorator";
+import { GeometryUpdateProperty } from "../../../decorator/decorator";
 import { Cartographic } from "../../cartographic";
 import { PolylineGeometryVisualizer } from "../visualizer/polyline_geometry_visualizer";
 import { BaseGeometry } from "./base_geometry";
@@ -20,7 +20,7 @@ export class PolylineGeometry extends BaseGeometry {
         return this._positions;
     }
 
-    @GeometryRerenderProperty()
+    @GeometryUpdateProperty()
     public set positions (val: Cartographic[]) {
         this._positions = val;
     }

@@ -15,13 +15,11 @@ export class MultiLineGeometry extends LineSegmentsGeometry {
 
         // converts [ x1, y1, z1,  x2, y2, z2, ... ] to pairs format
 
-        let totalLength = 0;
-        positionArray.forEach(array => totalLength += array.length - 3);
-
-        const points = new Float32Array(2 * totalLength);
+        let pts = [];
 
         positionArray.forEach(array => {
             const length = array.length - 3;
+            const points = new Array(2 * length);
             for (let i = 0; i < length; i += 3) {
 
                 points[2 * i] = array[i];
@@ -33,9 +31,10 @@ export class MultiLineGeometry extends LineSegmentsGeometry {
                 points[2 * i + 5] = array[i + 5];
 
             }
+            pts = pts.concat(points);
         })
 
-        super.setPositions(points);
+        super.setPositions(new Float32Array(pts));
 
         return this;
 
@@ -46,13 +45,11 @@ export class MultiLineGeometry extends LineSegmentsGeometry {
 
         // converts [ r1, g1, b1,  r2, g2, b2, ... ] to pairs format
 
-        let totalLength = 0;
-        colorArray.forEach(array => totalLength += array.length - 3);
-
-        const colors = new Float32Array(2 * totalLength);
+        let cs = [];
 
         colorArray.forEach(array => {
             const length = array.length - 3;
+            const colors = new Array(2 * length);
             for (let i = 0; i < length; i += 3) {
 
                 colors[2 * i] = array[i];
@@ -64,9 +61,40 @@ export class MultiLineGeometry extends LineSegmentsGeometry {
                 colors[2 * i + 5] = array[i + 5];
 
             }
+
+            cs = cs.concat(colors);
+
         })
 
-        super.setColors(colors);
+        super.setColors(new Float32Array(cs));
+
+        return this;
+
+    }
+
+    //@ts-ignore
+    public setLinewidths (linewidthArray: number[][]) {
+
+        // converts [ r1, g1, b1,  r2, g2, b2, ... ] to pairs format
+
+        let lws = [];
+
+        linewidthArray.forEach(array => {
+            const length = array.length - 1;
+            const linewidths = new Array(2 * length);
+
+            for (let i = 0; i < length; i++) {
+
+                linewidths[2 * i] = array[i];
+                linewidths[2 * i + 1] = array[i + 1];
+
+            }
+
+            lws = lws.concat(linewidths);
+
+        })
+
+        super.setLinewidths(new Float32Array(lws));
 
         return this;
 
