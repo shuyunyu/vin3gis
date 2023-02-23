@@ -115,7 +115,14 @@ class GISTest {
             polyline: new PolylineGeometry({
                 positions: lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0)),
                 color: new Color('#FF0000'),
-                width: 3
+                width: 3,
+                useVertexColor: true,
+                vertexColors: [
+                    new Color('#FF0000'),
+                    new Color('#00FF00'),
+                    new Color('#0000FF'),
+                    new Color('#00FFFF')
+                ]
             })
         });
         mapViewer.scene.entities.add(entity);

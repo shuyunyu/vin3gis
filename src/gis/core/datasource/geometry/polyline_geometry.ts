@@ -10,6 +10,8 @@ export type PolylineGeometryOptions = {
     positions?: Cartographic[];
     color?: Color;
     width?: number;
+    useVertexColor?: boolean;//是否使用顶点颜色
+    vertexColors?: Color[];//顶点颜色数组
 }
 
 export class PolylineGeometry extends BaseGeometry {
@@ -47,12 +49,36 @@ export class PolylineGeometry extends BaseGeometry {
         this._width = val;
     }
 
+    private _useVertexColor: boolean;
+
+    public get useVertexColor () {
+        return this._useVertexColor;
+    }
+
+    @GeometryUpdateProperty()
+    public set useVertexColor (val: boolean) {
+        this._useVertexColor = val;
+    }
+
+    private _vertexColors: Color[];
+
+    public get vertexColors () {
+        return this._vertexColors;
+    }
+
+    @GeometryUpdateProperty()
+    public set vertexColors (val: Color[]) {
+        this._vertexColors = val;
+    }
+
     public constructor (options?: PolylineGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.POLYLINE });
         this._positions = Utils.defaultValue(options.positions, []);
         this._color = Utils.defaultValue(options.color, new Color());
         this._width = Utils.defaultValue(options.width, 1);
+        this._useVertexColor = Utils.defaultValue(options.useVertexColor, false);
+        this._vertexColors = Utils.defaultValue(options.vertexColors, []);
         this.visualizer = new PolylineGeometryVisualizer();
     }
 
@@ -60,7 +86,9 @@ export class PolylineGeometry extends BaseGeometry {
         return new PolylineGeometry({
             positions: this.positions.map(pos => pos.clone()),
             color: this.color.clone(),
-            width: this.width
+            width: this.width,
+            useVertexColor: this.useVertexColor,
+            vertexColors: this.vertexColors.map(c => c.clone())
         });
     }
 

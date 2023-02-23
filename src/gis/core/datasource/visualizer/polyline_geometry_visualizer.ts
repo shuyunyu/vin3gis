@@ -23,7 +23,7 @@ export class PolylineGeometryVisualizer extends BaseGeometryVisualizer {
     protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): Object3D<Event> {
         const geometry = new LineGeometry();
         geometry.setPositions(this.getPositionData(entity, tilingScheme));
-        geometry.setColors(this.getColorData(entity, entity.polyline.color));
+        geometry.setColors(this.getColorData(entity));
         geometry.setLinewidths(this.getLineWidthData(entity, entity.polyline.width));
         this._geo = geometry;
         const mtl = new LineMaterial({
@@ -65,13 +65,23 @@ export class PolylineGeometryVisualizer extends BaseGeometryVisualizer {
      * @param color 
      * @returns 
      */
-    private getColorData (entity: Entity, color: Color) {
+    private getColorData (entity: Entity) {
         const polyline = entity.polyline;
         const points = polyline.positions;
         const colors = [];
-        points.forEach(p => {
-            colors.push(color.r, color.g, color.b);
-        });
+        if (polyline.useVertexColor) {
+            const colorArray = polyline.vertexColors;
+            const defaultColor = new Color();
+            points.forEach((p, index) => {
+                const color = colorArray[index] || defaultColor;
+                colors.push(color.r, color.g, color.b);
+            });
+        } else {
+            const color = polyline.color;
+            points.forEach(p => {
+                colors.push(color.r, color.g, color.b);
+            });
+        }
         return colors;
     }
 
@@ -100,8 +110,8 @@ export class PolylineGeometryVisualizer extends BaseGeometryVisualizer {
             const polyline = entity.polyline;
             if (propertyChangeData.name === "positions") {
                 this._geo.setPositions(this.getPositionData(entity, tilingScheme));
-            } else if (propertyChangeData.name === "color") {
-                const colors = this.getColorData(entity, polyline.color);
+            } else if (propertyChangeData.name === "color" || propertyChangeData.name === "useVertexColor" || propertyChangeData.name === "vertexColors") {
+                const colors = this.getColorData(entity);
                 this._geo.setColors(colors);
             } else if (propertyChangeData.name === "width") {
                 this._geo.setLinewidths(this.getLineWidthData(entity, polyline.width));
