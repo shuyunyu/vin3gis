@@ -172,4 +172,31 @@ export class AssetLoader {
         return this.loadTexture(Object.assign(params, { taskType: SystemDefines.RequestTaskeType.RASTER_TILE }));
     }
 
+    /**
+     * 加载json数据
+     * @param params 
+     * @returns 
+     */
+    public static loadJSON<T> (params: AssetDefines.LoadAssetParams) {
+        return new Promise<T>((resolve, reject) => {
+            requestSystem.request({
+                url: params.url,
+                taskType: SystemDefines.RequestTaskeType.JSON,
+                imageTask: false,
+                requestInWorker: params.requestInWorker,
+                params: params.params,
+                priority: params.priority,
+                throttle: params.throttle,
+                throttleServer: params.throttleServer,
+                onComplete: function (result: RequestTaskResult): void {
+                    if (result.status === RequestTaskStatus.SUCCESS) {
+                        resolve(result.response.data as T);
+                    } else {
+                        reject(result.error);
+                    }
+                }
+            })
+        });
+    }
+
 }

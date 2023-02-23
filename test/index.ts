@@ -1,5 +1,5 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector2, Vector3 } from "three";
-import { FrameRenderer, math, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
+import { AssetLoader, FrameRenderer, math, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, AnchorConstant, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
@@ -159,6 +159,46 @@ class GISTest {
         });
         mapViewer.scene.entities.add(entity1);
         global.multiLineEntity = entity1;
+
+        AssetLoader.loadJSON({ url: "https://geojson.cn/api/data/china.json" }).then((json: any) => {
+            const positionsArray = [];
+            const features = json.features;
+            for (let i = 0; i < features.length; i++) {
+                const feature = features[i];
+                const geometry = feature.geometry;
+                if (geometry && geometry.type === "Polygon") {
+                    const coordinates = geometry.coordinates;
+                    const positions = [];
+                    for (let j = 0; j < coordinates.length; j++) {
+                        const coordArr = coordinates[j];
+                        coordArr.forEach(coord => {
+                            positions.push(Cartographic.fromDegrees(coord[0], coord[1], 0));
+                        });
+                    }
+                    positionsArray.push(positions);
+                } else if (geometry && geometry.type === "MultiPolygon") {
+                    const rings = geometry.coordinates;
+                    rings.forEach(ring => {
+                        ring.forEach(coordinates => {
+                            const positions = [];
+                            for (let j = 0; j < coordinates.length; j++) {
+                                const coord = coordinates[j];
+                                positions.push(Cartographic.fromDegrees(coord[0], coord[1], 0));
+                            }
+                            positionsArray.push(positions);
+                        });
+                    });
+                }
+            }
+            const jsonEntity = new Entity({
+                multiPolyline: new MultiPolylineGeometry({
+                    positions: positionsArray,
+                    colors: positionsArray.map(_ => new Color("#444444"))
+                })
+            })
+            mapViewer.scene.entities.add(jsonEntity);
+        });
+
     }
 
     private static testTextGeometry (mapViewer: MapViewer) {
