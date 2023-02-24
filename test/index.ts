@@ -109,18 +109,25 @@ class GISTest {
     private static testPolygonGeometry (mapViewer: MapViewer) {
         const lnglats: number[][] = [
             [118.256, 24.418],
-            [118.356, 24.418],
-            [118.356, 24.318],
-            [118.556, 24.318],
-            [118.556, 24.218],
-            [118.256, 24.218],
+            [118.656, 24.418],
+            [118.656, 24.118],
+            [118.256, 24.118],
             [118.256, 24.418],
+        ];
+        const offset = 0.08;
+        const holeslnglats: number[][] = [
+            [118.256 + offset, 24.418 - offset],
+            [118.656 - offset, 24.418 - offset],
+            [118.656 - offset, 24.118 + offset],
+            [118.256 + offset, 24.118 + offset],
+            [118.256 + offset, 24.418 - offset],
         ];
         const entity = new Entity({
             polygon: new PolygonGeometry({
                 positions: lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0)),
                 color: new Color("#FF0000"),
-                height: 0
+                height: 0,
+                holes: [holeslnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0))]
             })
         });
         mapViewer.scene.entities.add(entity);

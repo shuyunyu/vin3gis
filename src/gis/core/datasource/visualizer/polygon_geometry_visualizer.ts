@@ -1,4 +1,4 @@
-import { Object3D, Event, Shape, Vector2, Mesh, MeshBasicMaterial, DoubleSide, Vector3 } from "three";
+import { Object3D, Event, Shape, Vector2, Mesh, MeshBasicMaterial, DoubleSide, Vector3, Path } from "three";
 import { VecConstants } from "../../../../core/constants/vec_constants";
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
@@ -27,6 +27,9 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
         const polygon = entity.polygon;
         const centerAndPoints = this.getCenterAndPoints(entity, tilingScheme);
         const shape = new Shape(centerAndPoints.points);
+        if (centerAndPoints.holes) {
+            shape.holes = centerAndPoints.holes;
+        }
         const geometry = new ChangableShapeGeometry(shape);
         this._geo = geometry;
         const material = new MeshBasicMaterial({
@@ -51,7 +54,7 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
      * @param tilingScheme 
      * @returns 
      */
-    private getCenterAndPoints (entity: Entity, tilingScheme: ITilingScheme): { center: Vector3, points: Vector2[] } {
+    private getCenterAndPoints (entity: Entity, tilingScheme: ITilingScheme): { center: Vector3, points: Vector2[], holes?: Path[] } {
         const polygon = entity.polygon;
         if (polygon.positions.length < 3) {
             return {
@@ -64,14 +67,39 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
             const pnts = points.map(point => {
                 return new Vector2(point.x - start.x, start.z - point.z);
             });
+
+            let holes: Path[];
+
+            if (polygon.holes) {
+                const holesPoints = polygon.holes.map(hole => {
+                    return hole.map(pos => {
+                        const point = Transform.cartographicToWorldVec3(pos, tilingScheme);
+                        return new Vector2(point.x - start.x, start.z - point.z);
+                    });
+                });
+                holes = [];
+                holesPoints.forEach(holePoints => {
+                    if (holePoints.length) {
+                        holes.push(new Path(holePoints));
+                    }
+                });
+            }
+
             start.y = this.getWorldHeight(entity, tilingScheme);
             return {
                 center: start,
-                points: pnts
+                points: pnts,
+                holes: holes && holes.length ? holes : null
             }
         }
     }
 
+    /**
+     * 获取polygon的世界高度
+     * @param entity 
+     * @param tilingScheme 
+     * @returns 
+     */
     private getWorldHeight (entity: Entity, tilingScheme: ITilingScheme) {
         const hPoint = Transform.cartographicToWorldVec3(Cartographic.fromDegrees(0, 0, entity.polygon.height), tilingScheme);
         return hPoint.y;
@@ -84,9 +112,12 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
                 this._mtl.opacity = polygon.opacity;
             } else if (propertyChangeData.name === "color") {
                 this._mtl.color = polygon.color;
-            } else if (propertyChangeData.name === "positions") {
+            } else if (propertyChangeData.name === "positions" || propertyChangeData.name === "holes") {
                 const centerAndPoints = this.getCenterAndPoints(entity, tilingScheme);
                 const shape = new Shape(centerAndPoints.points);
+                if (centerAndPoints.holes) {
+                    shape.holes = centerAndPoints.holes;
+                }
                 this._geo.setShapes(shape);
                 this._mesh.position.copy(centerAndPoints.center);
                 this._mesh.matrixWorldNeedsUpdate = true;

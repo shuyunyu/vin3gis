@@ -12,6 +12,7 @@ export type PolygonGeometryOptions = {
     color?: Color;
     opacity?: number;
     height?: number;//polygon位于空间中的高度
+    holes?: Cartographic[][];//洞
 }
 
 export class PolygonGeometry extends BaseGeometry {
@@ -60,6 +61,17 @@ export class PolygonGeometry extends BaseGeometry {
         this._height = val;
     }
 
+    private _holes: Cartographic[][];
+
+    public get holes () {
+        return this._holes;
+    }
+
+    @GeometryUpdateProperty()
+    public set holes (val: Cartographic[][]) {
+        this._holes = val;
+    }
+
     public constructor (options?: PolygonGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.POLYGON });
@@ -67,6 +79,7 @@ export class PolygonGeometry extends BaseGeometry {
         this._color = Utils.defaultValue(options.color, new Color());
         this._opacity = math.clamp(Utils.defaultValue(options.opacity, 1), 0, 1);
         this._height = Utils.defaultValue(options.height, 0);
+        this._holes = Utils.defaultValue(options.holes, null);
         this.visualizer = new PolygonGeometryVisualizer();
     }
 
@@ -75,7 +88,8 @@ export class PolygonGeometry extends BaseGeometry {
             positions: this.positions.map(pos => pos.clone()),
             color: this.color.clone(),
             opacity: this.opacity,
-            height: this.height
+            height: this.height,
+            holes: this.holes.map(item => item.map(coord => coord.clone()))
         });
     }
 
