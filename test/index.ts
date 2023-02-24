@@ -20,6 +20,7 @@ import { CanvasTextBuilder } from "../src/core/msic/canvas_text_builder";
 import { LabelGeometry } from "../src/gis/core/datasource/geometry/label_geometry";
 import { PolylineGeometry } from "../src/gis/core/datasource/geometry/polyline_geometry";
 import { MultiPolylineGeometry } from "../src/gis/core/datasource/geometry/multi_polyline_geometry";
+import { PolygonGeometry } from "../src/gis/core/datasource/geometry/polygon_geometry";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -101,7 +102,36 @@ class GISTest {
         // this.testPointEntity(mapViewer);
         // this.testBillboardEntity(mapViewer);
         // this.testTextGeometry(mapViewer);
-        this.testLineGeometry(mapViewer);
+        // this.testLineGeometry(mapViewer);
+        this.testPolygonGeometry(mapViewer);
+    }
+
+    private static testPolygonGeometry (mapViewer: MapViewer) {
+        const lnglats: number[][] = [
+            [118.256, 24.418],
+            [118.356, 24.418],
+            [118.356, 24.318],
+            [118.556, 24.318],
+            [118.556, 24.218],
+            [118.256, 24.218],
+            [118.256, 24.418],
+        ];
+        const entity = new Entity({
+            polygon: new PolygonGeometry({
+                positions: lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0)),
+                color: new Color("#FF0000")
+            })
+        });
+        mapViewer.scene.entities.add(entity);
+        globalThis.polygonEntity = entity;
+
+        // const newLngLats = [].concat(lnglats);
+        // newLngLats.push(
+        //     [118.256, 24.218],
+        //     [118.256, 24.418]);
+        // setTimeout(() => {
+        //     entity.polygon.positions = newLngLats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0));
+        // }, 1000 * 1);
     }
 
     private static testLineGeometry (mapViewer: MapViewer) {

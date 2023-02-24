@@ -8,6 +8,7 @@ import { MultiPointGeometry } from "./geometry/multi_point_geometry";
 import { MultiPolylineGeometry } from "./geometry/multi_polyline_geometry";
 import { PointCloudGeometry } from "./geometry/point_cloud_geometry";
 import { PointGeometry } from "./geometry/point_geometry";
+import { PolygonGeometry } from "./geometry/polygon_geometry";
 import { PolylineGeometry } from "./geometry/polyline_geometry";
 
 export class Entity {
@@ -82,6 +83,12 @@ export class Entity {
         return this._multiPolyline;
     }
 
+    private _polygon?: PolygonGeometry;
+
+    public get polygon () {
+        return this._polygon;
+    }
+
     public constructor (options: EntityOptions) {
         this.id = Utils.createGuid();
         this.visibleChangedEvent = new GenericEvent();
@@ -116,6 +123,10 @@ export class Entity {
         if (options.multiPolyline) {
             this._multiPolyline = options.multiPolyline;
             this._multiPolyline.entity = this;
+        }
+        if (options.polygon) {
+            this._polygon = options.polygon;
+            this._polygon.entity = this;
         }
     }
 
