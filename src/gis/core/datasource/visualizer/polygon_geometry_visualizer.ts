@@ -1,9 +1,10 @@
-import { Object3D, Event, Shape, Vector2, Mesh, MeshBasicMaterial, DoubleSide, Vector3, Path } from "three";
+import { Object3D, Event, Shape, Vector2, Mesh, MeshBasicMaterial, DoubleSide, Vector3, Path, Material } from "three";
 import { VecConstants } from "../../../../core/constants/vec_constants";
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
 import { GeometryPropertyChangeData } from "../../../@types/core/gis";
 import { Cartographic } from "../../cartographic";
+import { ChangableExtrudedGeometry, ExtrudedGeometryOptions } from "../../extend/shape/changable_extruded_geometry";
 import { ChangableShapeGeometry } from "../../extend/shape/changable_shape_geometry";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
@@ -15,9 +16,9 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
 
     private _mesh: Mesh;
 
-    private _geo: ChangableShapeGeometry;
+    private _geo: ChangableShapeGeometry | ChangableExtrudedGeometry;
 
-    private _mtl: MeshBasicMaterial;
+    private _mtl: Material;
 
     protected getEntityGeometry (entity: Entity): BaseGeometry {
         return entity.polygon;
@@ -30,9 +31,9 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
         if (centerAndPoints.holes) {
             shape.holes = centerAndPoints.holes;
         }
-        const geometry = new ChangableShapeGeometry(shape);
+        const geometry = polygon.extrudedHeight ? new ChangableExtrudedGeometry(shape, this.getExtrudedGeometryOptions(entity)) : new ChangableShapeGeometry(shape);
         this._geo = geometry;
-        const material = new MeshBasicMaterial({
+        const material = polygon.material || new MeshBasicMaterial({
             color: polygon.color,
             side: DoubleSide,
             transparent: true,
@@ -105,25 +106,71 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
         return hPoint.y;
     }
 
+    /**
+     * 获取ExtrudedGeometry的构成参数
+     * @param entity 
+     * @returns 
+     */
+    private getExtrudedGeometryOptions (entity: Entity): ExtrudedGeometryOptions {
+        return {
+            depth: Transform.carCoordToWorldCoord(entity.polygon.extrudedHeight),
+            bevelEnabled: false,
+            steps: 1
+        }
+    }
+
     public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer, propertyChangeData?: GeometryPropertyChangeData): void {
         if (propertyChangeData) {
             const polygon = entity.polygon;
             if (propertyChangeData.name === "opacity") {
                 this._mtl.opacity = polygon.opacity;
             } else if (propertyChangeData.name === "color") {
-                this._mtl.color = polygon.color;
-            } else if (propertyChangeData.name === "positions" || propertyChangeData.name === "holes") {
+                if (this._mtl.hasOwnProperty("color")) {
+                    //@ts-ignore
+                    this._mtl.color = polygon.color;
+                }
+            } else if (propertyChangeData.name === "positions" || propertyChangeData.name === "holes" || propertyChangeData.name === "extrudedHeight") {
                 const centerAndPoints = this.getCenterAndPoints(entity, tilingScheme);
                 const shape = new Shape(centerAndPoints.points);
                 if (centerAndPoints.holes) {
                     shape.holes = centerAndPoints.holes;
                 }
-                this._geo.setShapes(shape);
+                let geometryChanged = false;
+                if (propertyChangeData.name === "extrudedHeight") {
+                    if (propertyChangeData.nextVal) {
+                        if (!(this._geo instanceof ChangableExtrudedGeometry)) {
+                            this.manualDisposableObjects([this._geo]);
+                            this._geo = new ChangableExtrudedGeometry(shape, this.getExtrudedGeometryOptions(entity));
+                            this._mesh.geometry = this._geo;
+                            this._disposableObjects.push(this._geo);
+                            geometryChanged = true;
+                        }
+                    } else {
+                        if (!(this._geo instanceof ChangableShapeGeometry)) {
+                            this.manualDisposableObjects([this._geo]);
+                            this._geo = new ChangableShapeGeometry(shape);
+                            this._mesh.geometry = this._geo;
+                            this._disposableObjects.push(this._geo);
+                            geometryChanged = true;
+                        }
+                    }
+                }
+                if (!geometryChanged) {
+                    if (this._geo instanceof ChangableShapeGeometry) {
+                        this._geo.setShapes(shape, this._geo.parameters.curveSegments);
+                    } else {
+                        this._geo.setShapes(shape, this.getExtrudedGeometryOptions(entity));
+                    }
+                }
                 this._mesh.position.copy(centerAndPoints.center);
                 this._mesh.matrixWorldNeedsUpdate = true;
             } else if (propertyChangeData.name === "height") {
                 this._mesh.position.y = this.getWorldHeight(entity, tilingScheme);
                 this._mesh.matrixWorldNeedsUpdate = true;
+            } else if (propertyChangeData.name === "material") {
+                this._mesh.material = polygon.material;
+                this.manualDisposableObjects([this._mtl]);
+                this._disposableObjects.push(this._mtl);
             }
         }
     }

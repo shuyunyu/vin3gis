@@ -1,6 +1,6 @@
 import { BufferGeometry, Curve, Float32BufferAttribute, Shape, ShapeUtils, Vector2, Vector3 } from "three";
 
-type Options = {
+export type ExtrudedGeometryOptions = {
     curveSegments?: number;
     steps?: number;
     depth?: number;
@@ -23,19 +23,27 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
 
     public parameters: {
         shapes: Shape | Shape[],
-        options: Options
+        options: ExtrudedGeometryOptions
     }
 
-    public constructor (shapes: Shape | Shape[], options: Options = {}) {
+    public constructor (shapes: Shape | Shape[], options: ExtrudedGeometryOptions = {}) {
 
         super();
 
         this.type = 'ExtrudeGeometry';
 
+        this.setShapes(shapes, options);
+
+    }
+
+    public setShapes (shapes: Shape | Shape[], options?: ExtrudedGeometryOptions) {
+
         this.parameters = {
             shapes: shapes,
             options: options
         };
+
+        this.clearGroups();
 
         shapes = Array.isArray(shapes) ? shapes : [shapes];
 
@@ -670,7 +678,6 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
             }
 
         }
-
     }
 
     copy (source) {

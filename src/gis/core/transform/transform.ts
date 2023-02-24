@@ -29,6 +29,15 @@ export class Transform {
     }
 
     /**
+     * 转换单个笛卡尔坐标为THREEJSZ中的坐标
+     * @param val 
+     * @returns 
+     */
+    public static carCoordToWorldCoord (val: number) {
+        return val / this.THREEJS_UNIT_PER_METERS;
+    }
+
+    /**
      * 转换地球上的Cartesian3为世界坐标中的Cartesian3。
      * 由于取Y平面作为地图平面，而实际上地图平面为Z平面 所以需要转换一下
      * 将car3转换为地图平面(Y)上的坐标

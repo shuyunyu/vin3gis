@@ -1,4 +1,4 @@
-import { Color } from "three";
+import { Color, Material } from "three";
 import { math } from "../../../../core/math/math";
 import { Utils } from "../../../../core/utils/utils";
 import { GeometryUpdateProperty } from "../../../decorator/decorator";
@@ -14,6 +14,7 @@ export type PolygonGeometryOptions = {
     height?: number;//polygon位于空间中的高度
     holes?: Cartographic[][];//洞
     extrudedHeight?: number;//挤压高度
+    material?: Material;//材质
 }
 
 export class PolygonGeometry extends BaseGeometry {
@@ -84,6 +85,17 @@ export class PolygonGeometry extends BaseGeometry {
         this._extrudedHeight = Math.max(val, 0);
     }
 
+    private _material: Material;
+
+    public get material () {
+        return this._material;
+    }
+
+    @GeometryUpdateProperty()
+    public set material (val: Material) {
+        this._material = val;
+    }
+
     public constructor (options?: PolygonGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.POLYGON });
@@ -93,6 +105,7 @@ export class PolygonGeometry extends BaseGeometry {
         this._height = Utils.defaultValue(options.height, 0);
         this._holes = Utils.defaultValue(options.holes, null);
         this._extrudedHeight = Math.max(Utils.defaultValue(options.extrudedHeight, 0), 0);
+        this._material = options.material;
         this.visualizer = new PolygonGeometryVisualizer();
     }
 
@@ -103,7 +116,8 @@ export class PolygonGeometry extends BaseGeometry {
             opacity: this.opacity,
             height: this.height,
             holes: this.holes.map(item => item.map(coord => coord.clone())),
-            extrudedHeight: this.extrudedHeight
+            extrudedHeight: this.extrudedHeight,
+            material: this.material
         });
     }
 

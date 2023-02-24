@@ -14,18 +14,16 @@ export class ChangableShapeGeometry extends BufferGeometry {
 
         this.type = 'ChangableShapeGeometry';
 
-        this.parameters = {
-            shapes: shapes,
-            curveSegments: curveSegments
-        };
-
         this.setShapes(shapes, curveSegments);
 
     }
 
     public setShapes (shapes: Shape | Shape[] = [], curveSegments: number | number[] = []) {
         // buffers
-
+        this.parameters = {
+            shapes: shapes,
+            curveSegments: curveSegments
+        };
         const indices = [];
         const vertices = [];
         const normals = [];

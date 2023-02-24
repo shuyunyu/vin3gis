@@ -120,6 +120,21 @@ export class BaseGeometryVisualizer implements IGeometryVisualizer {
         return true;
     }
 
+    /**
+     * 手动释放对象
+     * @param objs 
+     */
+    protected manualDisposableObjects (objs: SystemDefines.Disposable[]) {
+        for (let i = 0; i < objs.length; i++) {
+            const obj = objs[i];
+            const index = this._disposableObjects.indexOf(obj);
+            if (index > -1) {
+                this._disposableObjects.splice(index, 1);
+            }
+            disposeSystem.disposeObj(obj);
+        }
+    }
+
     public remove (entity: Entity, root: Object3D) {
         if (this._geometryObject) {
             if (this.shouldRemoveObjectOnRemoveGeometry()) root.remove(this._geometryObject);
