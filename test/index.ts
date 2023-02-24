@@ -102,8 +102,8 @@ class GISTest {
         // this.testPointEntity(mapViewer);
         // this.testBillboardEntity(mapViewer);
         // this.testTextGeometry(mapViewer);
-        // this.testLineGeometry(mapViewer);
         this.testPolygonGeometry(mapViewer);
+        // this.testLineGeometry(mapViewer);
     }
 
     private static testPolygonGeometry (mapViewer: MapViewer) {
@@ -141,6 +141,59 @@ class GISTest {
         // setTimeout(() => {
         //     entity.polygon.positions = newLngLats.map(lnglat => Cartographic.fromDegrees(lnglat[0] - 0.1, lnglat[1] - 0.1, 0)).reverse();
         // }, 1000 * 1);
+        return;
+        AssetLoader.loadJSON({ url: "https://geojson.cn/api/data/china.json" }).then((json: any) => {
+            const positionsArray = [];
+            const features = json.features;
+            for (let i = 0; i < features.length; i++) {
+                const feature = features[i];
+                const geometry = feature.geometry;
+                if (geometry && geometry.type === "Polygon") {
+                    const coordinates = geometry.coordinates;
+                    const positions = [];
+                    for (let j = 0; j < coordinates.length; j++) {
+                        const coordArr = coordinates[j];
+                        coordArr.forEach(coord => {
+                            positions.push(Cartographic.fromDegrees(coord[0], coord[1], 0));
+                        });
+                    }
+                    positionsArray.push(positions);
+                } else if (geometry && geometry.type === "MultiPolygon") {
+                    const rings = geometry.coordinates;
+                    rings.forEach(ring => {
+                        ring.forEach(coordinates => {
+                            const positions = [];
+                            for (let j = 0; j < coordinates.length; j++) {
+                                const coord = coordinates[j];
+                                positions.push(Cartographic.fromDegrees(coord[0], coord[1], 0));
+                            }
+                            positionsArray.push(positions);
+                        });
+                    });
+                }
+            }
+            mapViewer.scene.entities.suspendEvents();
+            const colors = [
+                new Color("#FF0000"),
+                new Color("#FFFF00"),
+                new Color("#00FF00"),
+                new Color("#00FFFF")
+            ]
+            positionsArray.forEach(positions => {
+                const extrudedHeight = 100000;
+                const e = new Entity({
+                    polygon: new PolygonGeometry({
+                        positions: positions,
+                        color: colors[Math.floor(Math.random() * 4)],
+                        extrudedHeight: extrudedHeight,
+                        height: -extrudedHeight / 2
+                    })
+                });
+                mapViewer.scene.entities.add(e);
+            })
+            mapViewer.scene.entities.resumeEvents();
+        })
+
     }
 
     private static testLineGeometry (mapViewer: MapViewer) {
