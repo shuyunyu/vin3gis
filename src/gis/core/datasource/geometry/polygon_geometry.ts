@@ -13,6 +13,7 @@ export type PolygonGeometryOptions = {
     opacity?: number;
     height?: number;//polygon位于空间中的高度
     holes?: Cartographic[][];//洞
+    extrudedHeight?: number;//挤压高度
 }
 
 export class PolygonGeometry extends BaseGeometry {
@@ -72,6 +73,17 @@ export class PolygonGeometry extends BaseGeometry {
         this._holes = val;
     }
 
+    private _extrudedHeight: number;
+
+    public get extrudedHeight () {
+        return this._extrudedHeight;
+    }
+
+    @GeometryUpdateProperty()
+    public set extrudedHeight (val: number) {
+        this._extrudedHeight = Math.max(val, 0);
+    }
+
     public constructor (options?: PolygonGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.POLYGON });
@@ -80,6 +92,7 @@ export class PolygonGeometry extends BaseGeometry {
         this._opacity = math.clamp(Utils.defaultValue(options.opacity, 1), 0, 1);
         this._height = Utils.defaultValue(options.height, 0);
         this._holes = Utils.defaultValue(options.holes, null);
+        this._extrudedHeight = Math.max(Utils.defaultValue(options.extrudedHeight, 0), 0);
         this.visualizer = new PolygonGeometryVisualizer();
     }
 
@@ -89,7 +102,8 @@ export class PolygonGeometry extends BaseGeometry {
             color: this.color.clone(),
             opacity: this.opacity,
             height: this.height,
-            holes: this.holes.map(item => item.map(coord => coord.clone()))
+            holes: this.holes.map(item => item.map(coord => coord.clone())),
+            extrudedHeight: this.extrudedHeight
         });
     }
 
