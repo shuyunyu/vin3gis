@@ -3,6 +3,7 @@ import { VecConstants } from "../../../../core/constants/vec_constants";
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
 import { GeometryPropertyChangeData } from "../../../@types/core/gis";
+import { Cartographic } from "../../cartographic";
 import { ChangableShapeGeometry } from "../../extend/shape/changable_shape_geometry";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
@@ -63,11 +64,17 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
             const pnts = points.map(point => {
                 return new Vector2(point.x - start.x, start.z - point.z);
             });
+            start.y = this.getWorldHeight(entity, tilingScheme);
             return {
                 center: start,
                 points: pnts
             }
         }
+    }
+
+    private getWorldHeight (entity: Entity, tilingScheme: ITilingScheme) {
+        const hPoint = Transform.cartographicToWorldVec3(Cartographic.fromDegrees(0, 0, entity.polygon.height), tilingScheme);
+        return hPoint.y;
     }
 
     public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer, propertyChangeData?: GeometryPropertyChangeData): void {
@@ -82,6 +89,9 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
                 const shape = new Shape(centerAndPoints.points);
                 this._geo.setShapes(shape);
                 this._mesh.position.copy(centerAndPoints.center);
+                this._mesh.matrixWorldNeedsUpdate = true;
+            } else if (propertyChangeData.name === "height") {
+                this._mesh.position.y = this.getWorldHeight(entity, tilingScheme);
                 this._mesh.matrixWorldNeedsUpdate = true;
             }
         }

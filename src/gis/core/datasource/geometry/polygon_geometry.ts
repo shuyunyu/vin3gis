@@ -8,9 +8,10 @@ import { BaseGeometry } from "./base_geometry";
 import { GeometryType } from "./geometry";
 
 export type PolygonGeometryOptions = {
-    positions?: Cartographic[];
+    positions?: Cartographic[];//取lnglat构建平面,height将会被忽略
     color?: Color;
     opacity?: number;
+    height?: number;//polygon位于空间中的高度
 }
 
 export class PolygonGeometry extends BaseGeometry {
@@ -48,12 +49,24 @@ export class PolygonGeometry extends BaseGeometry {
         this._opacity = math.clamp(val, 0, 1);
     }
 
+    private _height: number;
+
+    public get height () {
+        return this._height;
+    }
+
+    @GeometryUpdateProperty()
+    public set height (val: number) {
+        this._height = val;
+    }
+
     public constructor (options?: PolygonGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.POLYGON });
         this._positions = Utils.defaultValue(options.positions, []);
         this._color = Utils.defaultValue(options.color, new Color());
         this._opacity = math.clamp(Utils.defaultValue(options.opacity, 1), 0, 1);
+        this._height = Utils.defaultValue(options.height, 0);
         this.visualizer = new PolygonGeometryVisualizer();
     }
 
@@ -61,7 +74,8 @@ export class PolygonGeometry extends BaseGeometry {
         return new PolygonGeometry({
             positions: this.positions.map(pos => pos.clone()),
             color: this.color.clone(),
-            opacity: this.opacity
+            opacity: this.opacity,
+            height: this.height
         });
     }
 

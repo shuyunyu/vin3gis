@@ -119,18 +119,16 @@ class GISTest {
         const entity = new Entity({
             polygon: new PolygonGeometry({
                 positions: lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0)),
-                color: new Color("#FF0000")
+                color: new Color("#FF0000"),
+                height: 0
             })
         });
         mapViewer.scene.entities.add(entity);
         globalThis.polygonEntity = entity;
 
         // const newLngLats = [].concat(lnglats);
-        // newLngLats.push(
-        //     [118.256, 24.218],
-        //     [118.256, 24.418]);
         // setTimeout(() => {
-        //     entity.polygon.positions = newLngLats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0));
+        //     entity.polygon.positions = newLngLats.map(lnglat => Cartographic.fromDegrees(lnglat[0] - 0.1, lnglat[1] - 0.1, 0)).reverse();
         // }, 1000 * 1);
     }
 
