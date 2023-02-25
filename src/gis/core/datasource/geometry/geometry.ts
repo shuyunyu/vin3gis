@@ -11,6 +11,7 @@ export enum GeometryType {
     POLYLINE = "polyline",
     MULTI_POLYLINE = "multi-polyline",
     POLYGON = "polygon",
+    MULTI_POLYGON = "multi-polygon",
     CIRCLE = "circle",
     LABEL = "label",
     BILLBOARD = "billboard",

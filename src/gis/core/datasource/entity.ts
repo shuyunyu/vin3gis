@@ -5,6 +5,7 @@ import { EntityGeometryRenderDriver, EntityOptions } from "../../@types/core/gis
 import { BaseBillboardGeometry } from "./geometry/base_billboard_geometry";
 import { LabelGeometry } from "./geometry/label_geometry";
 import { MultiPointGeometry } from "./geometry/multi_point_geometry";
+import { MultiPolygonGeometry } from "./geometry/multi_polygon_geometry";
 import { MultiPolylineGeometry } from "./geometry/multi_polyline_geometry";
 import { PointCloudGeometry } from "./geometry/point_cloud_geometry";
 import { PointGeometry } from "./geometry/point_geometry";
@@ -89,6 +90,12 @@ export class Entity {
         return this._polygon;
     }
 
+    private _multiPolygon?: MultiPolygonGeometry;
+
+    public get multiPolygon () {
+        return this._multiPolygon;
+    }
+
     public constructor (options: EntityOptions) {
         this.id = Utils.createGuid();
         this.visibleChangedEvent = new GenericEvent();
@@ -127,6 +134,10 @@ export class Entity {
         if (options.polygon) {
             this._polygon = options.polygon;
             this._polygon.entity = this;
+        }
+        if (options.multiPolygon) {
+            this._multiPolygon = options.multiPolygon;
+            this._multiPolygon.entity = this;
         }
     }
 

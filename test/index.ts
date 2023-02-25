@@ -1,6 +1,6 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, MeshBasicMaterial, MeshPhongMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector2, Vector3 } from "three";
 import { AssetLoader, FrameRenderer, math, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
-import { AMapImageryTileProvider, AnchorConstant, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
+import { AMapImageryTileProvider, AnchorConstant, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
@@ -134,14 +134,14 @@ class GISTest {
                 // })
             })
         });
-        mapViewer.scene.entities.add(entity);
+        // mapViewer.scene.entities.add(entity);
         globalThis.polygonEntity = entity;
 
         // const newLngLats = [].concat(lnglats);
         // setTimeout(() => {
         //     entity.polygon.positions = newLngLats.map(lnglat => Cartographic.fromDegrees(lnglat[0] - 0.1, lnglat[1] - 0.1, 0)).reverse();
         // }, 1000 * 1);
-        return;
+        // return;
         AssetLoader.loadJSON({ url: "https://geojson.cn/api/data/china.json" }).then((json: any) => {
             const positionsArray = [];
             const features = json.features;
@@ -179,18 +179,25 @@ class GISTest {
                 new Color("#00FF00"),
                 new Color("#00FFFF")
             ]
-            positionsArray.forEach(positions => {
-                const extrudedHeight = 100000;
-                const e = new Entity({
-                    polygon: new PolygonGeometry({
-                        positions: positions,
-                        color: colors[Math.floor(Math.random() * 4)],
-                        extrudedHeight: extrudedHeight,
-                        height: -extrudedHeight / 2
-                    })
-                });
-                mapViewer.scene.entities.add(e);
+            // positionsArray.forEach(positions => {
+            //     const extrudedHeight = 100000;
+            //     const e = new Entity({
+            //         polygon: new PolygonGeometry({
+            //             positions: positions,
+            //             color: colors[Math.floor(Math.random() * 4)],
+            //             extrudedHeight: extrudedHeight,
+            //             height: -extrudedHeight / 2
+            //         })
+            //     });
+            //     mapViewer.scene.entities.add(e);
+            // })
+
+            const multiPolygonEntity = new Entity({
+                multiPolygon: new MultiPolygonGeometry({
+                    positions: positionsArray
+                })
             })
+            mapViewer.scene.entities.add(multiPolygonEntity);
             mapViewer.scene.entities.resumeEvents();
         })
 
