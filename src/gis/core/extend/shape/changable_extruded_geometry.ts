@@ -1,9 +1,11 @@
 import { BufferGeometry, Curve, Float32BufferAttribute, Shape, ShapeUtils, Vector2, Vector3 } from "three";
+import { Utils } from "../../../../core/utils/utils";
 
 export type ExtrudedGeometryOptions = {
     curveSegments?: number;
     steps?: number;
     depth?: number;
+    depths?: number[];
     bevelEnabled?: boolean;
     bevelThickness?: number;
     bevelSize?: number;
@@ -44,9 +46,9 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
         };
 
         this.clearGroups();
-
-        shapes = Array.isArray(shapes) ? shapes : [shapes];
-
+        const isArrayShape = Array.isArray(shapes)
+        shapes = (isArrayShape ? shapes : [shapes]) as Shape[];
+        let depths = isArrayShape ? options.depths : [options.depth];
         const scope = this;
 
         const verticesArray = [];
@@ -55,7 +57,7 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
         for (let i = 0, l = shapes.length; i < l; i++) {
 
             const shape = shapes[i];
-            addShape(shape);
+            addShape(shape, depths[i]);
 
         }
 
@@ -68,7 +70,7 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
 
         // functions
 
-        function addShape (shape) {
+        function addShape (shape, specDepth) {
 
             const placeholder = [];
 
@@ -76,7 +78,7 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
 
             const curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
             const steps = options.steps !== undefined ? options.steps : 1;
-            const depth = options.depth !== undefined ? options.depth : 1;
+            const depth = Utils.defined(specDepth) ? specDepth : options.depth !== undefined ? options.depth : 1;
 
             let bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
             let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 0.2;

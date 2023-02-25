@@ -31,7 +31,7 @@ export class MultiPolygonGeometryViauzlizer extends BaseGeometryVisualizer {
         }
         const geometry = new ChangableExtrudedGeometry(shapes, {
             bevelEnabled: false,
-            depth: 0
+            depths: shapes.map(_ => Math.random() * 100 * 2)
         });
         const material = new MeshBasicMaterial({
             color: new Color("#FF0000"),
