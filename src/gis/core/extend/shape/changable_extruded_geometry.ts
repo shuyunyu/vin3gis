@@ -5,7 +5,6 @@ export type ExtrudedGeometryOptions = {
     curveSegments?: number;
     steps?: number;
     depth?: number;
-    depths?: number[];
     bevelEnabled?: boolean;
     bevelThickness?: number;
     bevelSize?: number;
@@ -18,6 +17,8 @@ export type ExtrudedGeometryOptions = {
     };
     instanceColors?: Color[];
     instanceOpacities?: number[];
+    instanceDepths?: number[];
+    instanceHeights?: number[];
 }
 
 /**
@@ -50,7 +51,7 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
         this.clearGroups();
         const isArrayShape = Array.isArray(shapes)
         shapes = (isArrayShape ? shapes : [shapes]) as Shape[];
-        let depths = isArrayShape ? options.depths : [options.depth];
+        let depths = isArrayShape ? options.instanceDepths : [options.depth];
         const scope = this;
 
         const verticesArray = [];
@@ -78,6 +79,13 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
                     instanceOpacities.push(Utils.defaultValue(options.instanceOpacities[i], 1));
                 }
 
+            }
+
+            if (isArrayShape && options.instanceHeights) {
+                const height = Utils.defaultValue(options.instanceHeights[i], 0);
+                for (let j = startIndex; j < endIndex; j += 3) {
+                    verticesArray[j + 2] += height;
+                }
             }
 
         }
