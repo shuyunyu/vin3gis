@@ -5,6 +5,7 @@ import { Cartographic } from "../../cartographic"
 import { MultiPolylineGeometryVisualizer } from "../visualizer/multi_polyline_geometry_visualizer";
 import { BaseGeometry } from "./base_geometry";
 import { GeometryType } from "./geometry";
+import { PolylineGeometry } from "./polyline_geometry";
 
 export type MultiPolylineGeometryOptions = {
     positions?: Cartographic[][];
@@ -146,6 +147,45 @@ export class MultiPolylineGeometry extends BaseGeometry {
             dashOffsets: this.dashOffsets,
             dashScales: this.dashScales,
             dashSizes: this.dashSizes
+        });
+    }
+
+    /**
+     * 从PolylineGeometry构建此对象
+     * @param polylines 
+     */
+    public static fromPolylines (polylines: PolylineGeometry[]) {
+        const positions: Cartographic[][] = [];
+        const colors: Color[] = [];
+        const widths: number[] = [];
+        const useVertexColors: boolean[] = [];
+        const vertexColors: Color[][] = [];
+        const dashed: boolean[] = [];
+        const dashOffsets: number[] = [];
+        const dashScales: number[] = [];
+        const dashSizes: number[] = [];
+        for (let i = 0; i < polylines.length; i++) {
+            const polyline = polylines[i];
+            positions.push(polyline.positions);
+            colors.push(polyline.color);
+            widths.push(polyline.width);
+            useVertexColors.push(polyline.useVertexColor);
+            vertexColors.push(polyline.vertexColors);
+            dashed.push(polyline.dashed);
+            dashOffsets.push(polyline.dashOffset);
+            dashScales.push(polyline.dashScale);
+            dashSizes.push(polyline.dashSize);
+        }
+        return new MultiPolylineGeometry({
+            positions: positions,
+            colors: colors,
+            widths: widths,
+            useVertexColors: useVertexColors,
+            vertexColors: vertexColors,
+            dasheds: dashed,
+            dashOffsets: dashOffsets,
+            dashScales: dashScales,
+            dashSizes: dashSizes
         });
     }
 

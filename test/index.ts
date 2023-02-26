@@ -1,6 +1,6 @@
-import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector2, Vector3 } from "three";
+import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, MeshBasicMaterial, MeshPhongMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector2, Vector3 } from "three";
 import { AssetLoader, FrameRenderer, math, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
-import { AMapImageryTileProvider, AnchorConstant, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
+import { AMapImageryTileProvider, AnchorConstant, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
@@ -20,6 +20,7 @@ import { CanvasTextBuilder } from "../src/core/msic/canvas_text_builder";
 import { LabelGeometry } from "../src/gis/core/datasource/geometry/label_geometry";
 import { PolylineGeometry } from "../src/gis/core/datasource/geometry/polyline_geometry";
 import { MultiPolylineGeometry } from "../src/gis/core/datasource/geometry/multi_polyline_geometry";
+import { PolygonGeometry } from "../src/gis/core/datasource/geometry/polygon_geometry";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -101,7 +102,106 @@ class GISTest {
         // this.testPointEntity(mapViewer);
         // this.testBillboardEntity(mapViewer);
         // this.testTextGeometry(mapViewer);
-        this.testLineGeometry(mapViewer);
+        this.testPolygonGeometry(mapViewer);
+        // this.testLineGeometry(mapViewer);
+    }
+
+    private static testPolygonGeometry (mapViewer: MapViewer) {
+        const lnglats: number[][] = [
+            [118.256, 24.418],
+            [118.656, 24.418],
+            [118.656, 24.118],
+            [118.256, 24.118],
+            [118.256, 24.418],
+        ];
+        const offset = 0.08;
+        const holeslnglats: number[][] = [
+            [118.256 + offset, 24.418 - offset],
+            [118.656 - offset, 24.418 - offset],
+            [118.656 - offset, 24.118 + offset],
+            [118.256 + offset, 24.118 + offset],
+            [118.256 + offset, 24.418 - offset],
+        ];
+        const entity = new Entity({
+            polygon: new PolygonGeometry({
+                positions: lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0)),
+                color: new Color("#FF0000"),
+                height: 0,
+                holes: [holeslnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0))],
+                extrudedHeight: 0,
+                // material: new MeshBasicMaterial({
+                //     color: new Color("#FFFF00")
+                // })
+            })
+        });
+        // mapViewer.scene.entities.add(entity);
+        globalThis.polygonEntity = entity;
+
+        // const newLngLats = [].concat(lnglats);
+        // setTimeout(() => {
+        //     entity.polygon.positions = newLngLats.map(lnglat => Cartographic.fromDegrees(lnglat[0] - 0.1, lnglat[1] - 0.1, 0)).reverse();
+        // }, 1000 * 1);
+        // return;
+        AssetLoader.loadJSON({ url: "https://geojson.cn/api/data/china.json" }).then((json: any) => {
+            const positionsArray = [];
+            const features = json.features;
+            for (let i = 0; i < features.length; i++) {
+                const feature = features[i];
+                const geometry = feature.geometry;
+                if (geometry && geometry.type === "Polygon") {
+                    const coordinates = geometry.coordinates;
+                    const positions = [];
+                    for (let j = 0; j < coordinates.length; j++) {
+                        const coordArr = coordinates[j];
+                        coordArr.forEach(coord => {
+                            positions.push(Cartographic.fromDegrees(coord[0], coord[1], 0));
+                        });
+                    }
+                    positionsArray.push(positions);
+                } else if (geometry && geometry.type === "MultiPolygon") {
+                    const rings = geometry.coordinates;
+                    rings.forEach(ring => {
+                        ring.forEach(coordinates => {
+                            const positions = [];
+                            for (let j = 0; j < coordinates.length; j++) {
+                                const coord = coordinates[j];
+                                positions.push(Cartographic.fromDegrees(coord[0], coord[1], 0));
+                            }
+                            positionsArray.push(positions);
+                        });
+                    });
+                }
+            }
+            mapViewer.scene.entities.suspendEvents();
+            const colors = [
+                new Color("#FF0000"),
+                new Color("#FFFF00"),
+                new Color("#00FF00"),
+                new Color("#00FFFF")
+            ]
+            // positionsArray.forEach(positions => {
+            //     const extrudedHeight = 100000;
+            //     const e = new Entity({
+            //         polygon: new PolygonGeometry({
+            //             positions: positions,
+            //             color: colors[Math.floor(Math.random() * 4)],
+            //             extrudedHeight: extrudedHeight,
+            //             height: -extrudedHeight / 2
+            //         })
+            //     });
+            //     mapViewer.scene.entities.add(e);
+            // })
+
+            const multiPolygonEntity = new Entity({
+                multiPolygon: new MultiPolygonGeometry({
+                    positions: positionsArray,
+                    colors: positionsArray.map(_ => ColorUtils.randomColor())
+                })
+            })
+            mapViewer.scene.entities.add(multiPolygonEntity);
+            mapViewer.scene.entities.resumeEvents();
+        })
+
     }
 
     private static testLineGeometry (mapViewer: MapViewer) {

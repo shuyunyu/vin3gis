@@ -1,12 +1,13 @@
 import { Color } from "three";
 import { BaseBillboardGeometry } from "../../core/datasource/geometry/base_billboard_geometry";
 import { BaseGeometry } from "../../core/datasource/geometry/base_geometry";
-import { BillboardGeometry } from "../../core/datasource/geometry/billboard_geometry";
 import { LabelGeometry } from "../../core/datasource/geometry/label_geometry";
 import { MultiPointGeometry } from "../../core/datasource/geometry/multi_point_geometry";
+import { MultiPolygonGeometry } from "../../core/datasource/geometry/multi_polygon_geometry";
 import { MultiPolylineGeometry } from "../../core/datasource/geometry/multi_polyline_geometry";
 import { PointCloudGeometry } from "../../core/datasource/geometry/point_cloud_geometry";
 import { PointGeometry } from "../../core/datasource/geometry/point_geometry";
+import { PolygonGeometry } from "../../core/datasource/geometry/polygon_geometry";
 import { PolylineGeometry } from "../../core/datasource/geometry/polyline_geometry";
 import { ViewPort } from "../../core/misc/view_port";
 import { IImageryTileProvider } from "../../core/provider/imagery_tile_provider";
@@ -120,6 +121,8 @@ export type EntityOptions = {
     label?: LabelGeometry;
     polyline?: PolylineGeometry;
     multiPolyline?: MultiPolylineGeometry;
+    polygon?: PolygonGeometry;
+    multiPolygon?: MultiPolygonGeometry;
 }
 
 //entity geometry 属性变更属性

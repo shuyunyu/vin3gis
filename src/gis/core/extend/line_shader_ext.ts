@@ -1,4 +1,4 @@
-import { ShaderChunk, UniformsLib, UniformsUtils, Vector2 } from "three";
+import { UniformsLib, UniformsUtils, Vector2 } from "three";
 import lineVtShader from "../shader/line.vt.glsl";
 import lineFsShader from "../shader/line.fs.glsl";
 import { Utils } from "../../../core/utils/utils";
@@ -23,7 +23,6 @@ export class LineShaderExt {
 
     public static extShader () {
         const uniforms = UniformsUtils.merge([UniformsLib.common, UniformsLib.fog, UniformsOfLine]);
-        ShaderChunk
         return {
             uniforms: uniforms,
             vertexShader: vtShader,
