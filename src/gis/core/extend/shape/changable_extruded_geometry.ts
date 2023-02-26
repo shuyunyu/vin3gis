@@ -1,4 +1,4 @@
-import { BufferGeometry, Curve, Float32BufferAttribute, Shape, ShapeUtils, Vector2, Vector3 } from "three";
+import { BufferGeometry, Color, Curve, Float32BufferAttribute, Shape, ShapeUtils, Vector2, Vector3 } from "three";
 import { Utils } from "../../../../core/utils/utils";
 
 export type ExtrudedGeometryOptions = {
@@ -16,6 +16,8 @@ export type ExtrudedGeometryOptions = {
         generateTopUV: Function;
         generateSideWallUV: Function
     };
+    instanceColors?: Color[];
+    instanceOpacities?: number[];
 }
 
 /**
@@ -54,10 +56,29 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
         const verticesArray = [];
         const uvArray = [];
 
+        const instanceColors = [];
+        const instanceOpacities = [];
+        const defaultColor = new Color();
+
         for (let i = 0, l = shapes.length; i < l; i++) {
 
             const shape = shapes[i];
+            const startIndex = verticesArray.length;
             addShape(shape, depths[i]);
+            const endIndex = verticesArray.length;
+
+            if (isArrayShape && options.instanceColors) {
+                const color = options.instanceColors[i] || defaultColor;
+                for (let j = startIndex; j < endIndex; j += 3) {
+                    instanceColors.push(color.r, color.g, color.b);
+                }
+            }
+            if (isArrayShape && options.instanceOpacities) {
+                for (let j = startIndex; j < endIndex; j += 3) {
+                    instanceOpacities.push(Utils.defaultValue(options.instanceOpacities[i], 1));
+                }
+
+            }
 
         }
 
@@ -65,7 +86,12 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
 
         this.setAttribute('position', new Float32BufferAttribute(verticesArray, 3));
         this.setAttribute('uv', new Float32BufferAttribute(uvArray, 2));
-
+        if (instanceColors.length) {
+            this.setAttribute('instanceColor', new Float32BufferAttribute(instanceColors, 3));
+        }
+        if (instanceOpacities) {
+            this.setAttribute('instanceOpacity', new Float32BufferAttribute(instanceOpacities, 1));
+        }
         this.computeVertexNormals();
 
         // functions

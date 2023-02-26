@@ -1,8 +1,11 @@
-import { Object3D, Event, Vector2, Path, Vector3, Shape, Color, DoubleSide, MeshBasicMaterial, Mesh } from "three";
+import { Object3D, Event, Vector2, Path, Vector3, Shape, DoubleSide, Mesh, ShaderMaterial, Color } from "three";
 import { VecConstants } from "../../../../core/constants/vec_constants";
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
-import { ChangableExtrudedGeometry } from "../../extend/shape/changable_extruded_geometry";
+import { Utils } from "../../../../core/utils/utils";
+import { GeometryPropertyChangeData } from "../../../@types/core/gis";
+import { PolygonShaderExt } from "../../extend/polygon_shader_ext";
+import { ChangableExtrudedGeometry, ExtrudedGeometryOptions } from "../../extend/shape/changable_extruded_geometry";
 import { ITilingScheme } from "../../tilingscheme/tiling_scheme";
 import { Transform } from "../../transform/transform";
 import { Entity } from "../entity";
@@ -11,34 +14,26 @@ import { BaseGeometryVisualizer } from "./base_geometry_visualizer";
 
 export class MultiPolygonGeometryViauzlizer extends BaseGeometryVisualizer {
 
+    private _geo: ChangableExtrudedGeometry;
+
     protected getEntityGeometry (entity: Entity): BaseGeometry {
         return entity.multiPolygon;
     }
 
     protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): Object3D<Event> {
         const centerAndPoints = this.getCenterAndPoints(entity, tilingScheme);
-        const shapes: Shape[] = [];
-        for (let i = 0; i < centerAndPoints.points.length; i++) {
-            const points = centerAndPoints.points[i];
-            if (points.length) {
-                const shape = new Shape(points);
-                const holes = centerAndPoints.holes[i];
-                if (holes && holes.length) {
-                    shape.holes = holes;
-                }
-                shapes.push(shape);
-            }
-        }
-        const geometry = new ChangableExtrudedGeometry(shapes, {
-            bevelEnabled: false,
-            depths: shapes.map(_ => Math.random() * 100 * 2)
-        });
-        const material = new MeshBasicMaterial({
-            color: new Color("#FF0000"),
+        const shapes = this.getShapes(entity, centerAndPoints);
+        const geometry = new ChangableExtrudedGeometry(shapes, this.getExtrudedGeometryOptions(entity, shapes));
+        this._geo = geometry;
+        const ext = PolygonShaderExt.extShader();
+        const material = new ShaderMaterial({
+            uniforms: ext.uniforms,
+            vertexShader: ext.vertexShader,
+            fragmentShader: ext.fragmentShader,
             side: DoubleSide,
             transparent: true,
             depthTest: false,
-            opacity: 1
+            opacity: 1,
         });
         const mesh = new Mesh(geometry, material);
         mesh.position.copy(centerAndPoints.center);
@@ -106,6 +101,56 @@ export class MultiPolygonGeometryViauzlizer extends BaseGeometryVisualizer {
             holes: []
         }
 
+    }
+
+    private getShapes (entity: Entity, centerAndPoints: any) {
+        const shapes: Shape[] = [];
+        for (let i = 0; i < centerAndPoints.points.length; i++) {
+            const points = centerAndPoints.points[i];
+            if (points.length) {
+                const shape = new Shape(points);
+                const holes = centerAndPoints.holes[i];
+                if (holes && holes.length) {
+                    shape.holes = holes;
+                }
+                shapes.push(shape);
+            }
+        }
+        return shapes;
+    }
+
+    /**
+     * 获取ExtrudedGeometry的构成参数
+     * @param entity 
+     * @param shapes
+     * @returns 
+     */
+    private getExtrudedGeometryOptions (entity: Entity, shapes: Shape[]): ExtrudedGeometryOptions {
+        const multiPolygon = entity.multiPolygon;
+        const depths = [];
+        const colors = [];
+        const opacities = [];
+        const defaultColor = new Color();
+        shapes.forEach((_, index) => {
+            depths.push(Math.max(Utils.defaultValue(multiPolygon.extrudedHeights[index], 0)));
+            colors.push(Utils.defaultValue(multiPolygon.colors[index], defaultColor));
+            opacities.push(math.clamp(Utils.defaultValue(multiPolygon.opacities[index], 1), 0, 1));
+        });
+        return {
+            bevelEnabled: false,
+            depths: depths,
+            instanceColors: colors,
+            instanceOpacities: opacities
+        }
+    }
+
+    public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer, propertyChangeData?: GeometryPropertyChangeData): void {
+        if (propertyChangeData) {
+            const centerAndPoints = this.getCenterAndPoints(entity, tilingScheme);
+            const shapes = this.getShapes(entity, centerAndPoints);
+            const options = this.getExtrudedGeometryOptions(entity, shapes);
+            this._geo.setShapes(shapes, options);
+        }
     }
 
 }

@@ -194,7 +194,8 @@ class GISTest {
 
             const multiPolygonEntity = new Entity({
                 multiPolygon: new MultiPolygonGeometry({
-                    positions: positionsArray
+                    positions: positionsArray,
+                    colors: positionsArray.map(_ => ColorUtils.randomColor())
                 })
             })
             mapViewer.scene.entities.add(multiPolygonEntity);
