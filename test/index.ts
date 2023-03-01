@@ -34,12 +34,12 @@ window.onload = () => {
         //EmptyImageryTileProvider
         //AMapImageryTileProvider
         //TdtImageryTileProvider
-        // imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
+        imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
         // imageryTileProivder: new BaiduImageryTileProvider({ correction: true }),
         // imageryTileProivder: new OSMImageryTileProvider(),
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
-        imageryTileProivder: new EmptyImageryTileProvider(),
+        // imageryTileProivder: new EmptyImageryTileProvider(),
         // imageryTileProivder: new ArcGISImageryTileProvider({
         //     url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
         //     // token: '1d109683f4d84198e37a38c442d68311'
@@ -102,7 +102,7 @@ class GISTest {
         // this.testPointEntity(mapViewer);
         // this.testBillboardEntity(mapViewer);
         // this.testTextGeometry(mapViewer);
-        this.testPolygonGeometry(mapViewer);
+        // this.testPolygonGeometry(mapViewer);
         // this.testLineGeometry(mapViewer);
     }
 

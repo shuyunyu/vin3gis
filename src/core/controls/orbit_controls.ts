@@ -6,7 +6,9 @@ import {
     Spherical,
     TOUCH,
     Vector2,
-    Vector3
+    Vector3,
+    Plane,
+    Ray
 } from 'three';
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
@@ -96,8 +98,55 @@ class OrbitControls extends EventDispatcher {
         // the target DOM element for key events
         this._domElementKeyEvents = null;
 
+        // ZOOM-TO-CURSOR
+        this.cursorScreen = new Vector3();
+        this.cursorWorld = new Vector3();
+        this.enableZoomToCursor = false;
+        this.adjustmentAfterZoomNeeded = false;
+        this.maxTargetDistanceFromOrigin = Infinity;
+        //
+
         //
         // public methods
+        //
+
+        // ZOOM-TO-CURSOR
+        this.adjustAfterZoom = function () {
+            const lastTarget = scope.target.clone();
+            const newCursorWorld = new Vector3(scope.cursorScreen.x, scope.cursorScreen.y, scope.target.clone().project(scope.object).z).clone().unproject(scope.object);
+            const delta = new Vector3().subVectors(scope.cursorWorld, newCursorWorld);
+
+            let target = null;
+
+            if (!scope.screenSpacePanning) {
+                const plane = new Plane(scope.object.up.clone());
+                const ray = new Ray(scope.object.position.clone(), new Vector3().subVectors(scope.target.clone().add(delta), scope.object.position).normalize());
+                target = ray.intersectPlane(plane, new Vector3);
+
+                if (target === null || new Vector3().subVectors(scope.object.position, scope.target).normalize().multiply(scope.object.up.clone().normalize()).length() < 0.00001) {
+                    scope.target.add(delta);
+                    if (scope.target.length() > this.maxTargetDistanceFromOrigin) scope.target.setLength(this.maxTargetDistanceFromOrigin);
+                    scope.object.position.add(new Vector3().subVectors(scope.target, lastTarget));
+
+                    const mulVector = new Vector3(1 - scope.object.up.x, 1 - scope.object.up.y, 1 - scope.object.up.z);
+                    scope.target.multiply(mulVector);
+                    scope.object.position.multiply(mulVector);
+                }
+                else {
+                    if (target.length() > this.maxTargetDistanceFromOrigin) target.setLength(this.maxTargetDistanceFromOrigin);
+                    scope.target.copy(target);
+                    scope.object.position.add(new Vector3().subVectors(scope.target, lastTarget));
+                }
+            }
+            else {
+                scope.target.add(delta);
+                scope.object.position.add(delta);
+            }
+        }
+
+        this.setCursorWorld = function () {
+            scope.cursorWorld.copy(new Vector3(scope.cursorScreen.x, scope.cursorScreen.y, scope.target.clone().project(scope.object).z).unproject(scope.object));
+        }
         //
 
         this.getPolarAngle = function () {
@@ -122,13 +171,6 @@ class OrbitControls extends EventDispatcher {
 
             domElement.addEventListener('keydown', onKeyDown);
             this._domElementKeyEvents = domElement;
-
-        };
-
-        this.stopListenToKeyEvents = function () {
-
-            this._domElementKeyEvents.removeEventListener('keydown', onKeyDown);
-            this._domElementKeyEvents = null;
 
         };
 
@@ -277,11 +319,26 @@ class OrbitControls extends EventDispatcher {
                 // min(camera displacement, camera rotation in radians)^2 > EPS
                 // using small-angle approximation cos(x/2) = 1 - x^2 / 8
 
+                // ZOOM-TO-CURSOR
+                if (scope.target.length() > this.maxTargetDistanceFromOrigin) {
+                    const lastTarget = scope.target.clone();
+                    scope.target.setLength(this.maxTargetDistanceFromOrigin);
+                    scope.object.position.add(new Vector3().subVectors(scope.target, lastTarget));
+                }
+                //
+
                 if (zoomChanged ||
                     lastPosition.distanceToSquared(scope.object.position) > EPS ||
                     8 * (1 - lastQuaternion.dot(scope.object.quaternion)) > EPS) {
 
                     scope.dispatchEvent(_changeEvent);
+
+                    // ZOOM-TO-CURSOR
+                    if (scope.enableZoomToCursor && scope.adjustmentAfterZoomNeeded) {
+                        scope.adjustmentAfterZoomNeeded = false;
+                        this.adjustAfterZoom();
+                    }
+                    //
 
                     lastPosition.copy(scope.object.position);
                     lastQuaternion.copy(scope.object.quaternion);
@@ -312,7 +369,6 @@ class OrbitControls extends EventDispatcher {
             if (scope._domElementKeyEvents !== null) {
 
                 scope._domElementKeyEvents.removeEventListener('keydown', onKeyDown);
-                scope._domElementKeyEvents = null;
 
             }
 
@@ -470,6 +526,9 @@ class OrbitControls extends EventDispatcher {
         }();
 
         function dollyOut (dollyScale) {
+            // ZOOM-TO-CURSOR
+            if (scope.enableZoomToCursor) scope.setCursorWorld();
+            //
 
             if (scope.object.isPerspectiveCamera) {
 
@@ -488,9 +547,18 @@ class OrbitControls extends EventDispatcher {
 
             }
 
+            // ZOOM-TO-CURSOR
+            if (scope.enableZoomToCursor) {
+                if (scope.object.isOrthographicCamera) scope.adjustAfterZoom();
+                else if (scope.object.isPerspectiveCamera) scope.adjustmentAfterZoomNeeded = true;
+            }
+            //
         }
 
         function dollyIn (dollyScale) {
+            // ZOOM-TO-CURSOR
+            if (scope.enableZoomToCursor) scope.setCursorWorld();
+            //
 
             if (scope.object.isPerspectiveCamera) {
 
@@ -509,6 +577,12 @@ class OrbitControls extends EventDispatcher {
 
             }
 
+            // ZOOM-TO-CURSOR
+            if (scope.enableZoomToCursor) {
+                if (scope.object.isOrthographicCamera) scope.adjustAfterZoom();
+                else if (scope.object.isPerspectiveCamera) scope.adjustmentAfterZoomNeeded = true;
+            }
+            //
         }
 
         //
@@ -610,62 +684,22 @@ class OrbitControls extends EventDispatcher {
             switch (event.code) {
 
                 case scope.keys.UP:
-
-                    if (event.ctrlKey || event.metaKey || event.shiftKey) {
-
-                        rotateUp(2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight);
-
-                    } else {
-
-                        pan(0, scope.keyPanSpeed);
-
-                    }
-
+                    pan(0, scope.keyPanSpeed);
                     needsUpdate = true;
                     break;
 
                 case scope.keys.BOTTOM:
-
-                    if (event.ctrlKey || event.metaKey || event.shiftKey) {
-
-                        rotateUp(- 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight);
-
-                    } else {
-
-                        pan(0, - scope.keyPanSpeed);
-
-                    }
-
+                    pan(0, - scope.keyPanSpeed);
                     needsUpdate = true;
                     break;
 
                 case scope.keys.LEFT:
-
-                    if (event.ctrlKey || event.metaKey || event.shiftKey) {
-
-                        rotateLeft(2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight);
-
-                    } else {
-
-                        pan(scope.keyPanSpeed, 0);
-
-                    }
-
+                    pan(scope.keyPanSpeed, 0);
                     needsUpdate = true;
                     break;
 
                 case scope.keys.RIGHT:
-
-                    if (event.ctrlKey || event.metaKey || event.shiftKey) {
-
-                        rotateLeft(- 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight);
-
-                    } else {
-
-                        pan(- scope.keyPanSpeed, 0);
-
-                    }
-
+                    pan(- scope.keyPanSpeed, 0);
                     needsUpdate = true;
                     break;
 
@@ -1257,6 +1291,43 @@ class OrbitControls extends EventDispatcher {
         scope.domElement.addEventListener('pointerdown', onPointerDown);
         scope.domElement.addEventListener('pointercancel', onPointerCancel);
         scope.domElement.addEventListener('wheel', onMouseWheel, { passive: false });
+
+        // ZOOM-TO-CURSOR
+        scope.domElement.addEventListener('mousemove', event => {
+            if (!scope.enableZoomToCursor) return;
+            scope.cursorScreen.copy(
+                new Vector3(
+                    ((event.clientX - scope.domElement.getBoundingClientRect().left) / scope.domElement.clientWidth) * 2 - 1,
+                    - ((event.clientY - scope.domElement.getBoundingClientRect().top) / scope.domElement.clientHeight) * 2 + 1,
+                    scope.target.clone().project(scope.object).z
+                )
+            );
+        });
+
+        const handleTouch = event => {
+            const touches = event.touches;
+            let touch;
+            if (touches.length === 1) {
+                touch = new Vector2(touches[0].clientX, touches[0].clientY);
+            }
+            else if (touches.length === 2) {
+                touch = new Vector2((touches[0].clientX + touches[1].clientX) / 2, (touches[0].clientY + touches[1].clientY) / 2);
+            }
+
+            if (touch !== undefined) {
+                scope.cursorScreen.copy(
+                    new Vector3(
+                        ((touch.x - scope.domElement.getBoundingClientRect().left) / scope.domElement.clientWidth) * 2 - 1,
+                        - ((touch.y - scope.domElement.getBoundingClientRect().top) / scope.domElement.clientHeight) * 2 + 1,
+                        scope.target.clone().project(scope.object).z
+                    )
+                );
+            }
+        };
+
+        scope.domElement.addEventListener('touchstart', handleTouch);
+        scope.domElement.addEventListener('touchmove', handleTouch);
+        //
 
         // force an update at start
 

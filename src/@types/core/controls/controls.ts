@@ -24,6 +24,7 @@ export interface IControlsProperty {
     maxZoom: number;
     minDistance: number;
     maxDistance: number;
+    enableZoomToCursor: boolean;
     mouseButtons: { [key in 'LEFT' | 'MIDDLE' | 'RIGHT']: MOUSE.PAN | MOUSE.ROTATE | MOUSE.DOLLY | undefined }
 }
 

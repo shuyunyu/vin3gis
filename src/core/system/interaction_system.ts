@@ -37,7 +37,8 @@ export class InteractionSystem extends System {
                 MIDDLE: undefined
             },
             minPolarAngle: math.toRadian(0),
-            maxPolarAngle: math.toRadian(89.8)
+            maxPolarAngle: math.toRadian(89.8),
+            enableZoomToCursor: true
         }
     }
 
