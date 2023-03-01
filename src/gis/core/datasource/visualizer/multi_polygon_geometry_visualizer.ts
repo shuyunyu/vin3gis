@@ -133,7 +133,7 @@ export class MultiPolygonGeometryViauzlizer extends BaseGeometryVisualizer {
         const heights = [];
         const defaultColor = new Color();
         shapes.forEach((_, index) => {
-            depths.push(Math.max(Utils.defaultValue(multiPolygon.extrudedHeights[index], 0)));
+            depths.push(Transform.carCoordToWorldCoord(Math.max(Utils.defaultValue(multiPolygon.extrudedHeights[index], 0))));
             colors.push(Utils.defaultValue(multiPolygon.colors[index], defaultColor));
             opacities.push(math.clamp(Utils.defaultValue(multiPolygon.opacities[index], 1), 0, 1));
             heights.push(Utils.defaultValue(multiPolygon.heights[index], 0));
