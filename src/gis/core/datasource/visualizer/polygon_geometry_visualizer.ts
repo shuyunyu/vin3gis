@@ -1,4 +1,4 @@
-import { Object3D, Event, Shape, Vector2, Mesh, MeshBasicMaterial, DoubleSide, Vector3, Path, Material } from "three";
+import { Object3D, Event, Shape, Vector2, Mesh, MeshBasicMaterial, DoubleSide, Vector3, Path, Material, MeshLambertMaterial } from "three";
 import { VecConstants } from "../../../../core/constants/vec_constants";
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
@@ -33,13 +33,7 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
         }
         const geometry = polygon.extrudedHeight ? new ChangableExtrudedGeometry(shape, this.getExtrudedGeometryOptions(entity)) : new ChangableShapeGeometry(shape);
         this._geo = geometry;
-        const material = polygon.material || new MeshBasicMaterial({
-            color: polygon.color,
-            side: DoubleSide,
-            transparent: true,
-            depthTest: false,
-            opacity: polygon.opacity
-        });
+        const material = this.getMaterial(entity);
         this._mtl = material;
         const mesh = new Mesh(geometry, material);
         this._mesh = mesh;
@@ -47,6 +41,23 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
         mesh.rotateX(-math.PI_OVER_TWO);
         this._disposableObjects.push(geometry, material);
         return mesh;
+    }
+
+    private getMaterial (entity: Entity) {
+        const polygon = entity.polygon;
+        return polygon.material || polygon.effectedByLight ? new MeshLambertMaterial({
+            color: polygon.color,
+            side: DoubleSide,
+            transparent: true,
+            depthTest: false,
+            opacity: polygon.opacity
+        }) : new MeshBasicMaterial({
+            color: polygon.color,
+            side: DoubleSide,
+            transparent: true,
+            depthTest: false,
+            opacity: polygon.opacity
+        })
     }
 
     /**
@@ -171,6 +182,15 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
                 this._mesh.material = polygon.material;
                 this.manualDisposableObjects([this._mtl]);
                 this._disposableObjects.push(this._mtl);
+                this._mtl = this._mesh.material;
+            } else if (propertyChangeData.name === "effectedByLight") {
+                const mtl = this.getMaterial(entity);
+                if (this._mtl !== mtl) {
+                    this.manualDisposableObjects([this._mtl]);
+                    this._disposableObjects.push(this._mtl);
+                    this._mesh.material = mtl;
+                    this._mtl = mtl;
+                }
             }
         }
     }

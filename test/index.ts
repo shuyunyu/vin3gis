@@ -1,4 +1,4 @@
-import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, MeshBasicMaterial, MeshPhongMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector2, Vector3 } from "three";
+import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector2, Vector3 } from "three";
 import { AssetLoader, FrameRenderer, math, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, AnchorConstant, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
@@ -102,7 +102,7 @@ class GISTest {
         // this.testPointEntity(mapViewer);
         // this.testBillboardEntity(mapViewer);
         // this.testTextGeometry(mapViewer);
-        // this.testPolygonGeometry(mapViewer);
+        this.testPolygonGeometry(mapViewer);
         // this.testLineGeometry(mapViewer);
     }
 
@@ -127,21 +127,26 @@ class GISTest {
                 positions: lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0)),
                 color: new Color("#FF0000"),
                 height: 0,
-                holes: [holeslnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0))],
-                extrudedHeight: 0,
-                // material: new MeshBasicMaterial({
-                //     color: new Color("#FFFF00")
+                // holes: [holeslnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0))],
+                extrudedHeight: 10000,
+                effectedByLight: true,
+                // opacity: 0.5
+                // material: new MeshLambertMaterial({
+                //     color: new Color("#FFFF00"),
+                //     depthTest: false,
+                //     transparent: true,
+                //     // side: DoubleSide
                 // })
             })
         });
-        // mapViewer.scene.entities.add(entity);
+        mapViewer.scene.entities.add(entity);
         globalThis.polygonEntity = entity;
 
         // const newLngLats = [].concat(lnglats);
         // setTimeout(() => {
         //     entity.polygon.positions = newLngLats.map(lnglat => Cartographic.fromDegrees(lnglat[0] - 0.1, lnglat[1] - 0.1, 0)).reverse();
         // }, 1000 * 1);
-        // return;
+        return;
         AssetLoader.loadJSON({ url: "https://geojson.cn/api/data/china.json" }).then((json: any) => {
             const positionsArray = [];
             const features = json.features;

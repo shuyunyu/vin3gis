@@ -15,6 +15,7 @@ export type PolygonGeometryOptions = {
     holes?: Cartographic[][];//洞
     extrudedHeight?: number;//挤压高度
     material?: Material;//材质
+    effectedByLight?: boolean;//是否受光的影响
 }
 
 export class PolygonGeometry extends BaseGeometry {
@@ -96,6 +97,17 @@ export class PolygonGeometry extends BaseGeometry {
         this._material = val;
     }
 
+    private _effectedByLight: boolean;
+
+    public get effectedByLight () {
+        return this._effectedByLight;
+    }
+
+    @GeometryUpdateProperty()
+    public set effectedByLight (val: boolean) {
+        this._effectedByLight = val;
+    }
+
     public constructor (options?: PolygonGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.POLYGON });
@@ -106,6 +118,7 @@ export class PolygonGeometry extends BaseGeometry {
         this._holes = Utils.defaultValue(options.holes, null);
         this._extrudedHeight = Math.max(Utils.defaultValue(options.extrudedHeight, 0), 0);
         this._material = options.material;
+        this._effectedByLight = Utils.defaultValue(options.effectedByLight, false);
         this.visualizer = new PolygonGeometryVisualizer();
     }
 
@@ -117,7 +130,8 @@ export class PolygonGeometry extends BaseGeometry {
             height: this.height,
             holes: this.holes.map(item => item.map(coord => coord.clone())),
             extrudedHeight: this.extrudedHeight,
-            material: this.material
+            material: this.material,
+            effectedByLight: this.effectedByLight
         });
     }
 

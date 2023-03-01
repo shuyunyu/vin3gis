@@ -1,4 +1,4 @@
-import { PerspectiveCamera } from "three";
+import { AmbientLight, DirectionalLight, PerspectiveCamera, Vector3 } from "three";
 import { GenericEvent } from "../../../core/event/generic_event";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { EarthCamera } from "../camera/earth_camera";
@@ -9,6 +9,7 @@ import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider
 import { TileNodeRenderer } from "../renderer/tile_node_renderer";
 import { ITerrainProvider } from "../terrain/terrain_provider";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
+import { Transform } from "../transform/transform";
 import { FrameState } from "./frame_state";
 import { GlobeSurfaceTileManager } from "./globe_surface_tile_manager";
 import { QuadtreePrimitive } from "./quad_tree_primitive";
@@ -38,6 +39,12 @@ export class EarthScene {
 
     public readonly dataSourceDisplay: DataSourceDisplay;
 
+    //环境光
+    public readonly ambientLight: AmbientLight = new AmbientLight("#ebebeb");
+
+    //太阳光
+    public readonly sunLight: DirectionalLight = new DirectionalLight("#FFFFFF");
+
     constructor (renderer: FrameRenderer, imageryTileProvider: IImageryTileProvider, terrainProvider: ITerrainProvider, tileCacheSize: number) {
         this._renderer = renderer;
         this.tileNodeRenderer = new TileNodeRenderer();
@@ -53,6 +60,8 @@ export class EarthScene {
         this.dataSourceDisplay = new DataSourceDisplay(this.entities, this.tilingScheme, renderer);
         //将DataSource的渲染根节点添加到场景中
         this._renderer.scene.add(this.dataSourceDisplay.root);
+        //set sunLight position
+        this.sunLight.position.copy(new Vector3(0, Transform.carCoordToWorldCoord(100000000), 0));
         this.ready = true;
     }
 
