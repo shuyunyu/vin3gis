@@ -1,5 +1,6 @@
 //@ts-nocheck
 import {
+    EventDispatcher,
     MOUSE,
     Quaternion,
     Spherical,
@@ -7,7 +8,6 @@ import {
     Vector2,
     Vector3
 } from 'three';
-import { EventDispatcher } from '../event/event_dispatcher';
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
@@ -32,9 +32,6 @@ class OrbitControls extends EventDispatcher {
 
         // Set to false to disable this control
         this.enabled = true;
-
-        //相机是否应该lookAt
-        this.shouldLookAt = true;
 
         // "target" sets the location of focus, where the object orbits around
         this.target = new Vector3();
@@ -125,6 +122,13 @@ class OrbitControls extends EventDispatcher {
 
             domElement.addEventListener('keydown', onKeyDown);
             this._domElementKeyEvents = domElement;
+
+        };
+
+        this.stopListenToKeyEvents = function () {
+
+            this._domElementKeyEvents.removeEventListener('keydown', onKeyDown);
+            this._domElementKeyEvents = null;
 
         };
 
@@ -250,7 +254,7 @@ class OrbitControls extends EventDispatcher {
 
                 position.copy(scope.target).add(offset);
 
-                if (scope.shouldLookAt) scope.object.lookAt(scope.target);
+                scope.object.lookAt(scope.target);
 
                 if (scope.enableDamping === true) {
 
@@ -308,6 +312,7 @@ class OrbitControls extends EventDispatcher {
             if (scope._domElementKeyEvents !== null) {
 
                 scope._domElementKeyEvents.removeEventListener('keydown', onKeyDown);
+                scope._domElementKeyEvents = null;
 
             }
 
@@ -605,22 +610,62 @@ class OrbitControls extends EventDispatcher {
             switch (event.code) {
 
                 case scope.keys.UP:
-                    pan(0, scope.keyPanSpeed);
+
+                    if (event.ctrlKey || event.metaKey || event.shiftKey) {
+
+                        rotateUp(2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight);
+
+                    } else {
+
+                        pan(0, scope.keyPanSpeed);
+
+                    }
+
                     needsUpdate = true;
                     break;
 
                 case scope.keys.BOTTOM:
-                    pan(0, - scope.keyPanSpeed);
+
+                    if (event.ctrlKey || event.metaKey || event.shiftKey) {
+
+                        rotateUp(- 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight);
+
+                    } else {
+
+                        pan(0, - scope.keyPanSpeed);
+
+                    }
+
                     needsUpdate = true;
                     break;
 
                 case scope.keys.LEFT:
-                    pan(scope.keyPanSpeed, 0);
+
+                    if (event.ctrlKey || event.metaKey || event.shiftKey) {
+
+                        rotateLeft(2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight);
+
+                    } else {
+
+                        pan(scope.keyPanSpeed, 0);
+
+                    }
+
                     needsUpdate = true;
                     break;
 
                 case scope.keys.RIGHT:
-                    pan(- scope.keyPanSpeed, 0);
+
+                    if (event.ctrlKey || event.metaKey || event.shiftKey) {
+
+                        rotateLeft(- 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight);
+
+                    } else {
+
+                        pan(- scope.keyPanSpeed, 0);
+
+                    }
+
                     needsUpdate = true;
                     break;
 

@@ -10,7 +10,6 @@ import { DebugTools } from "../../../tools/debug_tools";
 import { MapViewerOptions } from "../../@types/core/gis";
 import { MapStatsMonitor } from "../../monitor/map_stats_monitor";
 import { EarthCamera } from "../camera/earth_camera";
-import { ControlsLimit } from "../extend/controls_limit";
 import { InternalConfig } from "../internal/internal_config";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { EarthScene } from "../scene/earth_scene";
@@ -205,7 +204,6 @@ export class MapViewer {
         this.minDistance = Utils.defaultValue(viewerOptions.minDistance, 0.0);
         this.maxDistance = Utils.defaultValue(viewerOptions.maxDistance, Infinity) / Transform.THREEJS_UNIT_PER_METERS;
         this.scene.camera.setViewPort(viewerOptions.homeViewPort);
-        new ControlsLimit(this.renderer, this.scene).limit();
         //start a monitor
         if (DebugTools.getRendererStats(this.renderer)) {
             this._mapStatsMonitor = new MapStatsMonitor(this.renderer, this.scene);
