@@ -47,6 +47,7 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
         const polygon = entity.polygon;
         return polygon.material || polygon.effectedByLight ? new MeshLambertMaterial({
             color: polygon.color,
+            emissive: polygon.emissive,
             side: DoubleSide,
             transparent: true,
             depthTest: false,
@@ -190,6 +191,10 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
                     this._disposableObjects.push(this._mtl);
                     this._mesh.material = mtl;
                     this._mtl = mtl;
+                }
+            } else if (propertyChangeData.name === "emissive") {
+                if (this._mtl instanceof MeshLambertMaterial) {
+                    this._mtl.emissive = polygon.emissive;
                 }
             }
         }

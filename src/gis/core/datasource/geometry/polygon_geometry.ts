@@ -10,6 +10,7 @@ import { GeometryType } from "./geometry";
 export type PolygonGeometryOptions = {
     positions?: Cartographic[];//取lnglat构建平面,height将会被忽略
     color?: Color;
+    emissive?: Color;//自发光颜色 仅在effectedByLight为true时起效果
     opacity?: number;
     height?: number;//polygon位于空间中的高度
     holes?: Cartographic[][];//洞
@@ -40,6 +41,17 @@ export class PolygonGeometry extends BaseGeometry {
     @GeometryUpdateProperty()
     public set color (val: Color) {
         this._color = val;
+    }
+
+    private _emissive: Color;
+
+    public get emissive () {
+        return this._emissive;
+    }
+
+    @GeometryUpdateProperty()
+    public set emissive (val: Color) {
+        this._emissive = val;
     }
 
     private _opacity: number;
@@ -113,6 +125,7 @@ export class PolygonGeometry extends BaseGeometry {
         super({ type: GeometryType.POLYGON });
         this._positions = Utils.defaultValue(options.positions, []);
         this._color = Utils.defaultValue(options.color, new Color());
+        this._emissive = Utils.defaultValue(options.emissive, new Color(0x000000));
         this._opacity = math.clamp(Utils.defaultValue(options.opacity, 1), 0, 1);
         this._height = Utils.defaultValue(options.height, 0);
         this._holes = Utils.defaultValue(options.holes, null);
@@ -126,6 +139,7 @@ export class PolygonGeometry extends BaseGeometry {
         return new PolygonGeometry({
             positions: this.positions.map(pos => pos.clone()),
             color: this.color.clone(),
+            emissive: this.emissive.clone(),
             opacity: this.opacity,
             height: this.height,
             holes: this.holes.map(item => item.map(coord => coord.clone())),

@@ -143,6 +143,7 @@ export class MultiPolygonGeometry extends BaseGeometry {
         const positions: Cartographic[][] = [];
         const holes: Cartographic[][][] = [];
         const colors: Color[] = [];
+        const emissives: Color[] = [];
         const opacities: number[] = [];
         const extrudedHeights: number[] = [];
         const heights: number[] = [];
@@ -152,6 +153,7 @@ export class MultiPolygonGeometry extends BaseGeometry {
             positions.push(polygon.positions);
             holes.push(polygon.holes);
             colors.push(polygon.color);
+            emissives.push(polygon.emissive);
             opacities.push(polygon.opacity);
             extrudedHeights.push(polygon.extrudedHeight);
             heights.push(polygon.height);
@@ -161,6 +163,7 @@ export class MultiPolygonGeometry extends BaseGeometry {
             positions: positions,
             holes: holes,
             colors: colors,
+            emissives: emissives,
             opacities: opacities,
             extrudedHeights: extrudedHeights,
             heights: heights,

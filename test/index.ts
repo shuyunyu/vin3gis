@@ -126,6 +126,7 @@ class GISTest {
             polygon: new PolygonGeometry({
                 positions: lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0)),
                 color: new Color("#FF0000"),
+                // emissive: new Color("#00FFFF"),
                 height: 0,
                 // holes: [holeslnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0))],
                 extrudedHeight: 10000,
@@ -139,14 +140,14 @@ class GISTest {
                 // })
             })
         });
-        // mapViewer.scene.entities.add(entity);
+        mapViewer.scene.entities.add(entity);
         globalThis.polygonEntity = entity;
 
         // const newLngLats = [].concat(lnglats);
         // setTimeout(() => {
         //     entity.polygon.positions = newLngLats.map(lnglat => Cartographic.fromDegrees(lnglat[0] - 0.1, lnglat[1] - 0.1, 0)).reverse();
         // }, 1000 * 1);
-        // return;
+        return;
         AssetLoader.loadJSON({ url: "https://geojson.cn/api/data/china.json" }).then((json: any) => {
             const positionsArray = [];
             const features = json.features;
