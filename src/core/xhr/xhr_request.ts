@@ -18,6 +18,9 @@ export enum XHRRequestMethod {
     DELETE
 }
 
+type TransformRequestFunc = (data: any, options: XHRRequestOptions) => any;
+type TransformResponseFunc = (response: XHRResponse) => any;
+
 /**
  * XHRRequest请求构造参数
  */
@@ -47,9 +50,9 @@ export interface XHRRequestOptions {
     //参数序列化方法 可自定义参数序列化  args=> 0:params
     paramsSerializer?: Function;
     //发送请求前 可以变化请求参数data 只对非get请求有效 最后一个方法必须返回string  args=> 0:data,1:config
-    transformRequest?: Function[];
+    transformRequest?: TransformRequestFunc[];
     //该方法可以在响应结果被传递给then/catch前调用来转换响应结果  最后一个方法必须返回data
-    transformResponse?: Function[];
+    transformResponse?: TransformResponseFunc[];
 }
 
 /**
@@ -695,7 +698,7 @@ export class XHRRequest {
                 toSendData = this.getSendData(requestOptions);
             }
             //检查 当前请求是否已经被取消
-            if (defined(requestOptions.cancelToken) && !requestOptions.cancelToken!.canceled) {
+            if (!defined(requestOptions.cancelToken) || !requestOptions.cancelToken!.canceled) {
                 request.send(toSendData);
             }
         });
