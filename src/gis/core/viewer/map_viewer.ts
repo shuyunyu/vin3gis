@@ -206,8 +206,8 @@ export class MapViewer {
         this.rotateSpeed = Utils.defaultValue(viewerOptions.rotateSpeed, 1.0);
         this.dampingFactor = Utils.defaultValue(viewerOptions.dampingFactor, 0.05);
         this.enableDamping = Utils.defaultValue(viewerOptions.enableDamping, true);
-        this.minDistance = Utils.defaultValue(viewerOptions.minDistance, 0.0);
-        this.maxDistance = Utils.defaultValue(viewerOptions.maxDistance, Infinity) / Transform.THREEJS_UNIT_PER_METERS;
+        this.minDistance = Transform.carCoordToWorldCoord(Utils.defaultValue(viewerOptions.minDistance, InternalConfig.MIN_DISTANCE));
+        this.maxDistance = Transform.carCoordToWorldCoord(Utils.defaultValue(viewerOptions.maxDistance, InternalConfig.MAX_DISTANCE));
         this.scene.camera.setViewPort(viewerOptions.homeViewPort);
         //start a monitor
         if (DebugTools.getRendererStats(this.renderer)) {

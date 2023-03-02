@@ -19,6 +19,16 @@ export class InternalConfig {
     public static MIN_PITCH = -math.PI_OVER_TWO;
 
     /**
+     * 相机视角最低高度(米)
+     */
+    public static MIN_DISTANCE = 0;
+
+    /**
+     * 相机视角最大高度(米)
+     */
+    public static MAX_DISTANCE = 100000000;
+
+    /**
      * 瓦片mtl texture缓存尺寸
      */
     public static TILE_TEXTURE_MTL_CACHE_SIZE = 100;
