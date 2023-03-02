@@ -197,11 +197,15 @@ class GISTest {
             //     mapViewer.scene.entities.add(e);
             // })
 
+            const colorArray = positionsArray.map(_ => ColorUtils.randomColor());
             const multiPolygonEntity = new Entity({
                 multiPolygon: new MultiPolygonGeometry({
                     positions: positionsArray,
-                    colors: positionsArray.map(_ => ColorUtils.randomColor()),
-                    extrudedHeights: positionsArray.map(_ => 10000)
+                    colors: colorArray,
+                    extrudedHeights: positionsArray.map(_ => 10000),
+                    opacities: positionsArray.map(_ => 0.75),
+                    emissives: colorArray,
+                    effectedByLights: positionsArray.map(_ => true)
                 })
             })
             mapViewer.scene.entities.add(multiPolygonEntity);

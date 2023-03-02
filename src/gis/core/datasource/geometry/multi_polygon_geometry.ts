@@ -11,9 +11,11 @@ export type MultiPolygonGeometryOptions = {
     positions?: Cartographic[][];
     holes?: Cartographic[][][];
     colors?: Color[];
+    emissives?: Color[];//固有色数组
     opacities?: number[];
     extrudedHeights?: number[];
     heights?: number[];
+    effectedByLights?: boolean[];//是否受光照的影响
 }
 
 export class MultiPolygonGeometry extends BaseGeometry {
@@ -51,6 +53,17 @@ export class MultiPolygonGeometry extends BaseGeometry {
         this._colors = val;
     }
 
+    private _emissives: Color[];
+
+    public get emissives () {
+        return this._emissives;
+    }
+
+    @GeometryUpdateProperty()
+    public set emissives (val: Color[]) {
+        this._emissives = val;
+    }
+
     private _opacities: number[];
 
     public get opacities () {
@@ -84,15 +97,28 @@ export class MultiPolygonGeometry extends BaseGeometry {
         this._heights = val;
     }
 
+    private _effectedByLights: boolean[];
+
+    public get effectedByLights () {
+        return this._effectedByLights;
+    }
+
+    @GeometryUpdateProperty()
+    public set effectedByLights (val: boolean[]) {
+        this._effectedByLights = val;
+    }
+
     public constructor (options?: MultiPolygonGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.MULTI_POLYGON });
         this._positions = Utils.defaultValue(options.positions, []);
         this._holes = Utils.defaultValue(options.holes, []);
         this._colors = Utils.defaultValue(options.colors, []);
+        this._emissives = Utils.defaultValue(options.emissives, []);
         this._opacities = Utils.defaultValue(options.opacities, []);
         this._extrudedHeights = Utils.defaultValue(options.extrudedHeights, []);
         this._heights = Utils.defaultValue(options.heights, []);
+        this._effectedByLights = Utils.defaultValue(options.effectedByLights, []);
         this.visualizer = new MultiPolygonGeometryViauzlizer();
     }
 
@@ -101,9 +127,11 @@ export class MultiPolygonGeometry extends BaseGeometry {
             positions: this.positions.map(posArr => posArr.map(pos => pos.clone())),
             holes: this.holes.map(holes => holes.map(hole => hole.map(pos => pos.clone()))),
             colors: this.colors.map(color => color.clone()),
+            emissives: this.emissives.map(emissive => emissive.clone()),
             opacities: this.opacities,
             extrudedHeights: this.extrudedHeights,
-            heights: this.heights
+            heights: this.heights,
+            effectedByLights: this.effectedByLights
         });
     }
 
@@ -118,6 +146,7 @@ export class MultiPolygonGeometry extends BaseGeometry {
         const opacities: number[] = [];
         const extrudedHeights: number[] = [];
         const heights: number[] = [];
+        const effectedByLights: boolean[] = [];
         for (let i = 0; i < polygons.length; i++) {
             const polygon = polygons[i];
             positions.push(polygon.positions);
@@ -126,6 +155,7 @@ export class MultiPolygonGeometry extends BaseGeometry {
             opacities.push(polygon.opacity);
             extrudedHeights.push(polygon.extrudedHeight);
             heights.push(polygon.height);
+            effectedByLights.push(polygon.effectedByLight);
         }
         return new MultiPolygonGeometry({
             positions: positions,
@@ -133,7 +163,8 @@ export class MultiPolygonGeometry extends BaseGeometry {
             colors: colors,
             opacities: opacities,
             extrudedHeights: extrudedHeights,
-            heights: heights
+            heights: heights,
+            effectedByLights: effectedByLights
         });
     }
 

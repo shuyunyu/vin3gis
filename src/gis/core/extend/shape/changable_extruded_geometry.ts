@@ -19,6 +19,8 @@ export type ExtrudedGeometryOptions = {
     instanceOpacities?: number[];
     instanceDepths?: number[];
     instanceHeights?: number[];
+    instanceEmissive?: Color[];
+    instanceEffectByLight?: boolean[];
 }
 
 /**
@@ -59,7 +61,10 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
 
         const instanceColors = [];
         const instanceOpacities = [];
+        const instanceEmissives = [];
+        const instanceEffectByLights = [];
         const defaultColor = new Color();
+        const defaultEmissive = new Color(0x000000);
 
         for (let i = 0, l = shapes.length; i < l; i++) {
 
@@ -68,23 +73,18 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
             addShape(shape, depths[i]);
             const endIndex = verticesArray.length;
 
-            if (isArrayShape && options.instanceColors) {
+            if (isArrayShape) {
                 const color = options.instanceColors[i] || defaultColor;
+                const emissive = options.instanceEmissive[i] || defaultEmissive;
+                const height = Utils.defaultValue(options.instanceHeights[i], 0);
+                const opacity = Utils.defaultValue(options.instanceOpacities[i], 1);
+                const effectByList = Utils.defaultValue(options.instanceEffectByLight[i], false) ? 1 : 0;
                 for (let j = startIndex; j < endIndex; j += 3) {
                     instanceColors.push(color.r, color.g, color.b);
-                }
-            }
-            if (isArrayShape && options.instanceOpacities) {
-                for (let j = startIndex; j < endIndex; j += 3) {
-                    instanceOpacities.push(Utils.defaultValue(options.instanceOpacities[i], 1));
-                }
-
-            }
-
-            if (isArrayShape && options.instanceHeights) {
-                const height = Utils.defaultValue(options.instanceHeights[i], 0);
-                for (let j = startIndex; j < endIndex; j += 3) {
+                    instanceOpacities.push(opacity);
                     verticesArray[j + 2] += height;
+                    instanceEmissives.push(emissive.r, emissive.g, emissive.b);
+                    instanceEffectByLights.push(effectByList);
                 }
             }
 
@@ -99,6 +99,12 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
         }
         if (instanceOpacities) {
             this.setAttribute('instanceOpacity', new Float32BufferAttribute(instanceOpacities, 1));
+        }
+        if (instanceEmissives) {
+            this.setAttribute('instanceEmissive', new Float32BufferAttribute(instanceEmissives, 3));
+        }
+        if (instanceEffectByLights) {
+            this.setAttribute('instanceEffectByLight', new Float32BufferAttribute(instanceEffectByLights, 1));
         }
         this.computeVertexNormals();
 

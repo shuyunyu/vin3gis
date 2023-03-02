@@ -1,4 +1,4 @@
-import { Object3D, Event, Vector2, Path, Vector3, Shape, DoubleSide, Mesh, ShaderMaterial, Color } from "three";
+import { Object3D, Event, Vector2, Path, Vector3, Shape, DoubleSide, Mesh, Color, MeshLambertMaterial } from "three";
 import { VecConstants } from "../../../../core/constants/vec_constants";
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
@@ -26,14 +26,15 @@ export class MultiPolygonGeometryViauzlizer extends BaseGeometryVisualizer {
         const geometry = new ChangableExtrudedGeometry(shapes, this.getExtrudedGeometryOptions(entity, shapes));
         this._geo = geometry;
         const ext = PolygonShaderExt.extShader();
-        const material = new ShaderMaterial({
-            uniforms: ext.uniforms,
-            vertexShader: ext.vertexShader,
-            fragmentShader: ext.fragmentShader,
-            side: DoubleSide,
+        const material = new MeshLambertMaterial({
             transparent: true,
             depthTest: false,
-            opacity: 1,
+            side: DoubleSide,
+            //@ts-ignore
+            onBeforeCompile: (shader: Shader, renderer: WebGLRenderer) => {
+                shader.vertexShader = ext.vertexShader;
+                shader.fragmentShader = ext.fragmentShader;
+            }
         });
         const mesh = new Mesh(geometry, material);
         mesh.position.copy(centerAndPoints.center);
@@ -132,18 +133,25 @@ export class MultiPolygonGeometryViauzlizer extends BaseGeometryVisualizer {
         const opacities = [];
         const heights = [];
         const defaultColor = new Color();
+        const emissives = [];
+        const effectedByLights = [];
+        const defaultEmissive = new Color(0x000000);
         shapes.forEach((_, index) => {
             depths.push(Transform.carCoordToWorldCoord(Math.max(Utils.defaultValue(multiPolygon.extrudedHeights[index], 0))));
             colors.push(Utils.defaultValue(multiPolygon.colors[index], defaultColor));
             opacities.push(math.clamp(Utils.defaultValue(multiPolygon.opacities[index], 1), 0, 1));
             heights.push(Utils.defaultValue(multiPolygon.heights[index], 0));
+            emissives.push(Utils.defaultValue(multiPolygon.emissives[index], defaultEmissive));
+            effectedByLights.push(Utils.defaultValue(multiPolygon.effectedByLights[index], false));
         });
         return {
             bevelEnabled: false,
             instanceDepths: depths,
             instanceColors: colors,
             instanceOpacities: opacities,
-            instanceHeights: heights
+            instanceHeights: heights,
+            instanceEmissive: emissives,
+            instanceEffectByLight: effectedByLights
         }
     }
 

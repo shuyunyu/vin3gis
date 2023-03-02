@@ -18,11 +18,17 @@ attribute vec3 instanceColor;
 varying vec3 v_instanceDiffuseColor;
 attribute float instanceOpacity;
 varying float v_instanceOpacity;
+attribute vec3 instanceEmissive;
+varying vec3 v_instanceEmissive;
+attribute float instanceEffectByLight;
+varying float v_instanceEffectByLight;
 
 void main(){
     
     v_instanceDiffuseColor=instanceColor;
     v_instanceOpacity=instanceOpacity;
+    v_instanceEmissive=instanceEmissive;
+    v_instanceEffectByLight=instanceEffectByLight;
     
     #include<uv_vertex>
     #include<uv2_vertex>
