@@ -39,11 +39,28 @@ export class EarthScene {
 
     public readonly dataSourceDisplay: DataSourceDisplay;
 
+    private _ambientLight: AmbientLight = new AmbientLight("#ebebeb");
+
     //环境光
-    public readonly ambientLight: AmbientLight = new AmbientLight("#ebebeb");
+    public get ambientLight () {
+        return this._ambientLight;
+    }
+
+    public set ambientLight (val: AmbientLight) {
+        this._ambientLight.copy(val);
+    }
+
+    private _sunLight: DirectionalLight = new DirectionalLight("#FFFFFF");
 
     //太阳光
-    public readonly sunLight: DirectionalLight = new DirectionalLight("#FFFFFF");
+    public get sunLight () {
+        return this._sunLight;
+    }
+
+    public set sunLight (val: DirectionalLight) {
+        this.sunLight.copy(val);
+        this.setSunLightPosition();
+    }
 
     constructor (renderer: FrameRenderer, imageryTileProvider: IImageryTileProvider, terrainProvider: ITerrainProvider, tileCacheSize: number) {
         this._renderer = renderer;
@@ -60,11 +77,17 @@ export class EarthScene {
         this.dataSourceDisplay = new DataSourceDisplay(this.entities, this.tilingScheme, renderer);
         //将DataSource的渲染根节点添加到场景中
         this._renderer.scene.add(this.dataSourceDisplay.root);
-        //set sunLight position
-        this.sunLight.position.copy(new Vector3(0, Transform.carCoordToWorldCoord(100000000), 0));
+        this.setSunLightPosition();
         this.ready = true;
     }
 
+    /**
+     * 设置太阳光的位置
+     */
+    private setSunLightPosition () {
+        //set sunLight position
+        this.sunLight.position.copy(new Vector3(0, Transform.carCoordToWorldCoord(100000000), 0));
+    }
 
     //设置最底下的瓦片提供者
     public setBaseImageryTileProvider (provider: IImageryTileProvider, oldProvider: IImageryTileProvider) {
