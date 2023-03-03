@@ -29,7 +29,12 @@ type GeoJSONLoadParams = AssetDefines.LoadAssetParams & {
 export type GeoJSONFeatureLoadResult = {
     feature?: GeoJSONDefines.Feature;
     geometries: BaseGeometry[];
-}
+};
+
+export type GeoJSONLoadResult = {
+    //转换完的features
+    parsedFeatures: GeoJSONFeatureLoadResult[];
+} & Record<string, any>
 
 /**
  * GeoJSON 数据加载器
@@ -51,9 +56,10 @@ export class GeoJSONLoader {
      * @returns 
      */
     public static load (params: GeoJSONLoadParams) {
-        return new Promise<GeoJSONFeatureLoadResult[]>((resolve, reject) => {
+        return new Promise<GeoJSONLoadResult>((resolve, reject) => {
             this.loadSourceData(params).then((geojson: GeoJSONDefines.GeoJSON) => {
-                const res = this.convertToGeometries(geojson, params.coordinateConvertor);
+                const features = this.convertToGeometries(geojson, params.coordinateConvertor);
+                const res = Object.assign({}, geojson, { parsedFeatures: features });
                 resolve(res);
             }).catch(reject);
         });

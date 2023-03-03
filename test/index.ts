@@ -103,7 +103,7 @@ class GISTest {
         // this.testTextGeometry(mapViewer);
         this.testPolygonGeometry(mapViewer);
         // this.testLineGeometry(mapViewer);
-        // this.testLoader(mapViewer);
+        this.testLoader(mapViewer);
     }
 
     private static testLoader (mapViewer: MapViewer) {
