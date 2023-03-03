@@ -600,7 +600,7 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
 
                 }
 
-                scope.addGroup(start, verticesArray.length / 3 - start, 0);
+                // scope.addGroup(start, verticesArray.length / 3 - start, 0);
 
             }
 
@@ -624,7 +624,7 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
                 }
 
 
-                scope.addGroup(start, verticesArray.length / 3 - start, 1);
+                // scope.addGroup(start, verticesArray.length / 3 - start, 1);
 
 
             }

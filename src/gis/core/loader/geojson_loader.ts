@@ -8,6 +8,7 @@ import { MultiPolylineGeometry } from "../datasource/geometry/multi_polyline_geo
 import { PointGeometry } from "../datasource/geometry/point_geometry";
 import { PolygonGeometry } from "../datasource/geometry/polygon_geometry";
 import { PolylineGeometry } from "../datasource/geometry/polyline_geometry";
+import { PolygonShape } from "../datasource/misc/polygon_shape";
 
 //单个坐标处理函数
 export type GeoJOSNCoordinateConvertor = (coordinate: GeoJSONDefines.Position) => Cartographic;
@@ -72,6 +73,13 @@ export class GeoJSONLoader {
         return geometryCollection.geometries.map(geometry => this.convertGeometryObject(geometry, coordinateConvertor));
     }
 
+    /**
+     * 转换 Geometry 
+     * @param geometry 
+     * @param coordinateConvertor 
+     * @param geomtryConvertType 
+     * @returns 
+     */
     private static convertGeometry (geometry: GeoJSONDefines.Geometry, coordinateConvertor?: GeoJOSNCoordinateConvertor, geomtryConvertType?: GeoJSONGeomtryConvertType) {
         coordinateConvertor = coordinateConvertor || this.coordinateConvertor;
         geomtryConvertType = geomtryConvertType || { one: 'LineString', two: 'Polygon' };
@@ -93,14 +101,18 @@ export class GeoJSONLoader {
             }
         } else if (coordinatesDimension === 2) {
             if (geomtryConvertType.two === "Polygon") {
-
+                const psArray = coords as Cartographic[][];
+                const shapes = psArray.map(ps => new PolygonShape(ps));
+                return new PolygonGeometry({ shapes: shapes });
             } else {
-                // return new MultiPolygonGeometry({
-                //     positions: coords as Cartographic[][]
-                // });
+                return new MultiPolylineGeometry({
+                    positions: coords as Cartographic[][]
+                });
             }
         } else {
-
+            const psArrayList = coords as Cartographic[][][];
+            const shapes = psArrayList.map(psArray => psArray.map(ps => new PolygonShape(ps)));
+            return new MultiPolygonGeometry({ shapes: shapes });
         }
     }
 

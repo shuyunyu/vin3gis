@@ -52,7 +52,7 @@ export class ChangableShapeGeometry extends BufferGeometry {
 
                 addShape(shapes[i], Utils.defaultValue(curveSegments[i], 12));
 
-                this.addGroup(groupStart, groupCount, i); // enables MultiMaterial support
+                // this.addGroup(groupStart, groupCount, i); // enables MultiMaterial support
 
                 groupStart += groupCount;
                 groupCount = 0;
