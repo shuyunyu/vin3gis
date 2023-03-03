@@ -166,8 +166,8 @@ export class MultiPolygonGeometry extends BaseGeometry {
         const uvGenerators: ExtrudedGeometryUVGenerator[] = [];
         for (let i = 0; i < polygons.length; i++) {
             const polygon = polygons[i];
-            positions.push(polygon.positions);
-            holes.push(polygon.holes);
+            // positions.push(polygon.positions);
+            // holes.push(polygon.holes);
             colors.push(polygon.color);
             emissives.push(polygon.emissive);
             opacities.push(polygon.opacity);

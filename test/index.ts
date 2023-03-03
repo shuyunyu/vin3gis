@@ -22,6 +22,7 @@ import { PolylineGeometry } from "../src/gis/core/datasource/geometry/polyline_g
 import { MultiPolylineGeometry } from "../src/gis/core/datasource/geometry/multi_polyline_geometry";
 import { PolygonGeometry } from "../src/gis/core/datasource/geometry/polygon_geometry";
 import { GeoJSONLoader } from "../src/gis/core/loader/geojson_loader";
+import { PolygonShape } from "../src/gis/core/datasource/misc/polygon_shape";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -125,11 +126,15 @@ class GISTest {
         ];
         const entity = new Entity({
             polygon: new PolygonGeometry({
-                positions: lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0)),
+                shapes: [new PolygonShape(
+                    lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0)),
+                    // [holeslnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0))]
+                ), new PolygonShape(
+                    lnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0] + 0.5, lnglat[1], 0))
+                )],
                 color: new Color("#FF0000"),
                 // emissive: new Color("#00FFFF"),
                 height: 0,
-                // holes: [holeslnglats.map(lnglat => Cartographic.fromDegrees(lnglat[0], lnglat[1], 0))],
                 extrudedHeight: 10000,
                 effectedByLight: true,
                 // opacity: 0.5

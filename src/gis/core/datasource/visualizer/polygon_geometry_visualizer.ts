@@ -1,7 +1,8 @@
-import { Object3D, Event, Shape, Vector2, Mesh, MeshBasicMaterial, DoubleSide, Vector3, Path, Material, MeshLambertMaterial } from "three";
+import { Object3D, Event, Shape, Vector2, Mesh, MeshBasicMaterial, DoubleSide, Vector3, Path, Material, MeshLambertMaterial, Color } from "three";
 import { VecConstants } from "../../../../core/constants/vec_constants";
 import { math } from "../../../../core/math/math";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
+import { Utils } from "../../../../core/utils/utils";
 import { GeometryPropertyChangeData } from "../../../@types/core/gis";
 import { Cartographic } from "../../cartographic";
 import { ChangableExtrudedGeometry, ExtrudedGeometryOptions } from "../../extend/shape/changable_extruded_geometry";
@@ -27,11 +28,8 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
     protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): Object3D<Event> {
         const polygon = entity.polygon;
         const centerAndPoints = this.getCenterAndPoints(entity, tilingScheme);
-        const shape = new Shape(centerAndPoints.points);
-        if (centerAndPoints.holes) {
-            shape.holes = centerAndPoints.holes;
-        }
-        const geometry = polygon.extrudedHeight ? new ChangableExtrudedGeometry(shape, this.getExtrudedGeometryOptions(entity)) : new ChangableShapeGeometry(shape);
+        const shapes = this.getShapes(entity, centerAndPoints);
+        const geometry = polygon.extrudedHeight ? new ChangableExtrudedGeometry(shapes, this.getExtrudedGeometryOptions(entity, shapes)) : new ChangableShapeGeometry(shapes);
         this._geo = geometry;
         const material = this.getMaterial(entity);
         this._mtl = material;
@@ -67,44 +65,73 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
      * @param tilingScheme 
      * @returns 
      */
-    private getCenterAndPoints (entity: Entity, tilingScheme: ITilingScheme): { center: Vector3, points: Vector2[], holes?: Path[] } {
+    private getCenterAndPoints (entity: Entity, tilingScheme: ITilingScheme): { center: Vector3, points: Vector2[][], holes?: Path[][] } {
         const polygon = entity.polygon;
-        if (polygon.positions.length < 3) {
-            return {
-                center: VecConstants.ZERO_VEC3.clone(),
-                points: []
-            }
-        } else {
-            const points = polygon.positions.map(pos => Transform.cartographicToWorldVec3(pos, tilingScheme));
-            const start = points[0];
-            const pnts = points.map(point => {
-                return new Vector2(point.x - start.x, start.z - point.z);
-            });
+        const holesArray = polygon.shapes.map(shape => shape.holes);
+        const positionsArray = polygon.shapes.map(shape => shape.positions);
+        let start: Vector3;
+        const resPoints: Vector2[][] = [];
+        const resHoles: Path[][] = [];
+        for (let i = 0; i < positionsArray.length; i++) {
+            const positions = positionsArray[i];
+            if (positions.length < 3) {
+                continue;
+            } else {
+                const points = positions.map(pos => Transform.cartographicToWorldVec3(pos, tilingScheme));
+                if (!start) {
+                    start = points[0];
+                }
+                const pnts = points.map(point => {
+                    return new Vector2(point.x - start.x, start.z - point.z);
+                });
 
-            let holes: Path[];
-
-            if (polygon.holes) {
-                const holesPoints = polygon.holes.map(hole => {
-                    return hole.map(pos => {
-                        const point = Transform.cartographicToWorldVec3(pos, tilingScheme);
-                        return new Vector2(point.x - start.x, start.z - point.z);
+                let holes: Path[];
+                const cHoles = holesArray[i];
+                if (cHoles && cHoles.length) {
+                    const holesPoints = cHoles.map(hole => {
+                        return hole.map(pos => {
+                            const point = Transform.cartographicToWorldVec3(pos, tilingScheme);
+                            return new Vector2(point.x - start.x, start.z - point.z);
+                        });
                     });
-                });
-                holes = [];
-                holesPoints.forEach(holePoints => {
-                    if (holePoints.length) {
-                        holes.push(new Path(holePoints));
-                    }
-                });
-            }
+                    holes = [];
+                    holesPoints.forEach(holePoints => {
+                        if (holePoints.length) {
+                            holes.push(new Path(holePoints));
+                        }
+                    });
+                }
 
-            start.y = this.getWorldHeight(entity, tilingScheme);
-            return {
-                center: start,
-                points: pnts,
-                holes: holes && holes.length ? holes : null
+                resPoints[i] = pnts;
+                resHoles[i] = holes && holes.length ? holes : null;
             }
         }
+
+        return start ? {
+            center: start,
+            points: resPoints,
+            holes: resHoles
+        } : {
+            center: VecConstants.ZERO_VEC3,
+            points: [],
+            holes: []
+        }
+    }
+
+    private getShapes (entity: Entity, centerAndPoints: any) {
+        const shapes: Shape[] = [];
+        for (let i = 0; i < centerAndPoints.points.length; i++) {
+            const points = centerAndPoints.points[i];
+            if (points.length) {
+                const shape = new Shape(points);
+                const holes = centerAndPoints.holes[i];
+                if (holes && holes.length) {
+                    shape.holes = holes;
+                }
+                shapes.push(shape);
+            }
+        }
+        return shapes;
     }
 
     /**
@@ -121,14 +148,38 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
     /**
      * 获取ExtrudedGeometry的构成参数
      * @param entity 
+     * @param shapes
      * @returns 
      */
-    private getExtrudedGeometryOptions (entity: Entity): ExtrudedGeometryOptions {
+    private getExtrudedGeometryOptions (entity: Entity, shapes: Shape[]): ExtrudedGeometryOptions {
+        const polygon = entity.polygon;
+        const depths = [];
+        const colors = [];
+        const opacities = [];
+        const heights = [];
+        const defaultColor = new Color();
+        const emissives = [];
+        const effectedByLights = [];
+        const defaultEmissive = new Color(0x000000);
+        const uvGenerators = [];
+        shapes.forEach((_, index) => {
+            depths.push(Transform.carCoordToWorldCoord(Math.max(Utils.defaultValue(polygon.extrudedHeight, 0))));
+            colors.push(Utils.defaultValue(polygon.color, defaultColor));
+            opacities.push(math.clamp(Utils.defaultValue(polygon.opacity, 1), 0, 1));
+            heights.push(Utils.defaultValue(polygon.height, 0));
+            emissives.push(Utils.defaultValue(polygon.emissive, defaultEmissive));
+            effectedByLights.push(Utils.defaultValue(polygon.effectedByLight, false));
+            uvGenerators.push(polygon.uvGenerator);
+        });
         return {
-            depth: Transform.carCoordToWorldCoord(entity.polygon.extrudedHeight),
             bevelEnabled: false,
-            steps: 1,
-            UVGenerator: entity.polygon.uvGenerator
+            instanceDepths: depths,
+            instanceColors: colors,
+            instanceOpacities: opacities,
+            instanceHeights: heights,
+            instanceEmissive: emissives,
+            instanceEffectByLight: effectedByLights,
+            instanceUVGenerators: uvGenerators
         }
     }
 
@@ -144,16 +195,13 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
                 }
             } else if (propertyChangeData.name === "positions" || propertyChangeData.name === "holes" || propertyChangeData.name === "uvGenerator" || propertyChangeData.name === "extrudedHeight") {
                 const centerAndPoints = this.getCenterAndPoints(entity, tilingScheme);
-                const shape = new Shape(centerAndPoints.points);
-                if (centerAndPoints.holes) {
-                    shape.holes = centerAndPoints.holes;
-                }
+                const shapes = this.getShapes(entity, centerAndPoints);
                 let geometryChanged = false;
                 if (propertyChangeData.name === "extrudedHeight") {
                     if (propertyChangeData.nextVal) {
                         if (!(this._geo instanceof ChangableExtrudedGeometry)) {
                             this.manualDisposableObjects([this._geo]);
-                            this._geo = new ChangableExtrudedGeometry(shape, this.getExtrudedGeometryOptions(entity));
+                            this._geo = new ChangableExtrudedGeometry(shapes, this.getExtrudedGeometryOptions(entity, shapes));
                             this._mesh.geometry = this._geo;
                             this._disposableObjects.push(this._geo);
                             geometryChanged = true;
@@ -161,7 +209,7 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
                     } else {
                         if (!(this._geo instanceof ChangableShapeGeometry)) {
                             this.manualDisposableObjects([this._geo]);
-                            this._geo = new ChangableShapeGeometry(shape);
+                            this._geo = new ChangableShapeGeometry(shapes);
                             this._mesh.geometry = this._geo;
                             this._disposableObjects.push(this._geo);
                             geometryChanged = true;
@@ -170,9 +218,9 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
                 }
                 if (!geometryChanged) {
                     if (this._geo instanceof ChangableShapeGeometry) {
-                        this._geo.setShapes(shape, this._geo.parameters.curveSegments);
+                        this._geo.setShapes(shapes, this._geo.parameters.curveSegments);
                     } else {
-                        this._geo.setShapes(shape, this.getExtrudedGeometryOptions(entity));
+                        this._geo.setShapes(shapes, this.getExtrudedGeometryOptions(entity, shapes));
                     }
                 }
                 this._mesh.position.copy(centerAndPoints.center);

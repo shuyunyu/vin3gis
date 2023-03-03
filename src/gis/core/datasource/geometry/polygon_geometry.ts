@@ -2,19 +2,18 @@ import { Color, Material } from "three";
 import { math } from "../../../../core/math/math";
 import { Utils } from "../../../../core/utils/utils";
 import { GeometryUpdateProperty } from "../../../decorator/decorator";
-import { Cartographic } from "../../cartographic";
 import { ExtrudedGeometryUVGenerator } from "../../extend/shape/changable_extruded_geometry";
+import { PolygonShape } from "../misc/polygon_shape";
 import { PolygonGeometryVisualizer } from "../visualizer/polygon_geometry_visualizer";
 import { BaseGeometry } from "./base_geometry";
 import { GeometryType } from "./geometry";
 
 export type PolygonGeometryOptions = {
-    positions?: Cartographic[];//取lnglat构建平面,height将会被忽略
+    shapes?: PolygonShape | PolygonShape[];
     color?: Color;
     emissive?: Color;//自发光颜色 仅在effectedByLight为true时起效果
     opacity?: number;
     height?: number;//polygon位于空间中的高度
-    holes?: Cartographic[][];//洞
     extrudedHeight?: number;//挤压高度
     material?: Material;//材质
     effectedByLight?: boolean;//是否受光的影响
@@ -23,15 +22,15 @@ export type PolygonGeometryOptions = {
 
 export class PolygonGeometry extends BaseGeometry {
 
-    private _positions: Cartographic[];
+    private _shapes: PolygonShape[];
 
-    public get positions () {
-        return this._positions;
+    public get shapes (): PolygonShape[] {
+        return this._shapes;
     }
 
     @GeometryUpdateProperty()
-    public set positions (val: Cartographic[]) {
-        this._positions = val;
+    public set shapes (val: PolygonShape | PolygonShape[]) {
+        this._shapes = this.getShapes(val);
     }
 
     private _color: Color;
@@ -76,17 +75,6 @@ export class PolygonGeometry extends BaseGeometry {
     @GeometryUpdateProperty()
     public set height (val: number) {
         this._height = val;
-    }
-
-    private _holes: Cartographic[][];
-
-    public get holes () {
-        return this._holes;
-    }
-
-    @GeometryUpdateProperty()
-    public set holes (val: Cartographic[][]) {
-        this._holes = val;
     }
 
     private _extrudedHeight: number;
@@ -136,12 +124,11 @@ export class PolygonGeometry extends BaseGeometry {
     public constructor (options?: PolygonGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.POLYGON });
-        this._positions = Utils.defaultValue(options.positions, []);
+        this._shapes = this.getShapes(options.shapes);
         this._color = Utils.defaultValue(options.color, new Color());
         this._emissive = Utils.defaultValue(options.emissive, new Color(0x000000));
         this._opacity = math.clamp(Utils.defaultValue(options.opacity, 1), 0, 1);
         this._height = Utils.defaultValue(options.height, 0);
-        this._holes = Utils.defaultValue(options.holes, null);
         this._extrudedHeight = Math.max(Utils.defaultValue(options.extrudedHeight, 0), 0);
         this._material = options.material;
         this._effectedByLight = Utils.defaultValue(options.effectedByLight, false);
@@ -149,14 +136,19 @@ export class PolygonGeometry extends BaseGeometry {
         this.visualizer = new PolygonGeometryVisualizer();
     }
 
+    private getShapes (shape?: PolygonShape | PolygonShape[]) {
+        if (!shape) return [];
+        if (Array.isArray(shape)) return shape;
+        return [shape];
+    }
+
     public clone () {
         return new PolygonGeometry({
-            positions: this.positions.map(pos => pos.clone()),
+            shapes: this.shapes.map(shape => shape.clone()),
             color: this.color.clone(),
             emissive: this.emissive.clone(),
             opacity: this.opacity,
             height: this.height,
-            holes: this.holes.map(item => item.map(coord => coord.clone())),
             extrudedHeight: this.extrudedHeight,
             material: this.material,
             effectedByLight: this.effectedByLight,
