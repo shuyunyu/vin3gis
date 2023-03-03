@@ -2,6 +2,7 @@ import { Color } from "three";
 import { Utils } from "../../../../core/utils/utils";
 import { GeometryUpdateProperty } from "../../../decorator/decorator";
 import { Cartographic } from "../../cartographic";
+import { ExtrudedGeometryUVGenerator } from "../../extend/shape/changable_extruded_geometry";
 import { MultiPolygonGeometryViauzlizer } from "../visualizer/multi_polygon_geometry_visualizer";
 import { BaseGeometry } from "./base_geometry";
 import { GeometryType } from "./geometry";
@@ -16,6 +17,7 @@ export type MultiPolygonGeometryOptions = {
     extrudedHeights?: number[];
     heights?: number[];
     effectedByLights?: boolean[];//是否受光照的影响
+    uvGenerators?: ExtrudedGeometryUVGenerator[];
 }
 
 export class MultiPolygonGeometry extends BaseGeometry {
@@ -108,6 +110,17 @@ export class MultiPolygonGeometry extends BaseGeometry {
         this._effectedByLights = val;
     }
 
+    private _uvGenerators: ExtrudedGeometryUVGenerator[];
+
+    public get uvGenerators () {
+        return this._uvGenerators;
+    }
+
+    @GeometryUpdateProperty()
+    public set uvGenerators (val: ExtrudedGeometryUVGenerator[]) {
+        this._uvGenerators = val;
+    }
+
     public constructor (options?: MultiPolygonGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.MULTI_POLYGON });
@@ -119,6 +132,7 @@ export class MultiPolygonGeometry extends BaseGeometry {
         this._extrudedHeights = Utils.defaultValue(options.extrudedHeights, []);
         this._heights = Utils.defaultValue(options.heights, []);
         this._effectedByLights = Utils.defaultValue(options.effectedByLights, []);
+        this._uvGenerators = Utils.defaultValue(options.uvGenerators, []);
         this.visualizer = new MultiPolygonGeometryViauzlizer();
     }
 
@@ -131,7 +145,8 @@ export class MultiPolygonGeometry extends BaseGeometry {
             opacities: this.opacities,
             extrudedHeights: this.extrudedHeights,
             heights: this.heights,
-            effectedByLights: this.effectedByLights
+            effectedByLights: this.effectedByLights,
+            uvGenerators: this._uvGenerators
         });
     }
 
@@ -148,6 +163,7 @@ export class MultiPolygonGeometry extends BaseGeometry {
         const extrudedHeights: number[] = [];
         const heights: number[] = [];
         const effectedByLights: boolean[] = [];
+        const uvGenerators: ExtrudedGeometryUVGenerator[] = [];
         for (let i = 0; i < polygons.length; i++) {
             const polygon = polygons[i];
             positions.push(polygon.positions);
@@ -158,6 +174,7 @@ export class MultiPolygonGeometry extends BaseGeometry {
             extrudedHeights.push(polygon.extrudedHeight);
             heights.push(polygon.height);
             effectedByLights.push(polygon.effectedByLight);
+            uvGenerators.push(polygon.uvGenerator);
         }
         return new MultiPolygonGeometry({
             positions: positions,
@@ -167,7 +184,8 @@ export class MultiPolygonGeometry extends BaseGeometry {
             opacities: opacities,
             extrudedHeights: extrudedHeights,
             heights: heights,
-            effectedByLights: effectedByLights
+            effectedByLights: effectedByLights,
+            uvGenerators: uvGenerators
         });
     }
 

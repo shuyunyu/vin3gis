@@ -127,7 +127,8 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
         return {
             depth: Transform.carCoordToWorldCoord(entity.polygon.extrudedHeight),
             bevelEnabled: false,
-            steps: 1
+            steps: 1,
+            UVGenerator: entity.polygon.uvGenerator
         }
     }
 
@@ -141,7 +142,7 @@ export class PolygonGeometryVisualizer extends BaseGeometryVisualizer {
                     //@ts-ignore
                     this._mtl.color = polygon.color;
                 }
-            } else if (propertyChangeData.name === "positions" || propertyChangeData.name === "holes" || propertyChangeData.name === "extrudedHeight") {
+            } else if (propertyChangeData.name === "positions" || propertyChangeData.name === "holes" || propertyChangeData.name === "uvGenerator" || propertyChangeData.name === "extrudedHeight") {
                 const centerAndPoints = this.getCenterAndPoints(entity, tilingScheme);
                 const shape = new Shape(centerAndPoints.points);
                 if (centerAndPoints.holes) {

@@ -136,6 +136,7 @@ export class MultiPolygonGeometryViauzlizer extends BaseGeometryVisualizer {
         const emissives = [];
         const effectedByLights = [];
         const defaultEmissive = new Color(0x000000);
+        const uvGenerators = [];
         shapes.forEach((_, index) => {
             depths.push(Transform.carCoordToWorldCoord(Math.max(Utils.defaultValue(multiPolygon.extrudedHeights[index], 0))));
             colors.push(Utils.defaultValue(multiPolygon.colors[index], defaultColor));
@@ -143,6 +144,7 @@ export class MultiPolygonGeometryViauzlizer extends BaseGeometryVisualizer {
             heights.push(Utils.defaultValue(multiPolygon.heights[index], 0));
             emissives.push(Utils.defaultValue(multiPolygon.emissives[index], defaultEmissive));
             effectedByLights.push(Utils.defaultValue(multiPolygon.effectedByLights[index], false));
+            uvGenerators.push(multiPolygon.uvGenerators[index]);
         });
         return {
             bevelEnabled: false,
@@ -151,7 +153,8 @@ export class MultiPolygonGeometryViauzlizer extends BaseGeometryVisualizer {
             instanceOpacities: opacities,
             instanceHeights: heights,
             instanceEmissive: emissives,
-            instanceEffectByLight: effectedByLights
+            instanceEffectByLight: effectedByLights,
+            instanceUVGenerators: uvGenerators
         }
     }
 

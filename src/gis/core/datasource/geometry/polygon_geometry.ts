@@ -3,6 +3,7 @@ import { math } from "../../../../core/math/math";
 import { Utils } from "../../../../core/utils/utils";
 import { GeometryUpdateProperty } from "../../../decorator/decorator";
 import { Cartographic } from "../../cartographic";
+import { ExtrudedGeometryUVGenerator } from "../../extend/shape/changable_extruded_geometry";
 import { PolygonGeometryVisualizer } from "../visualizer/polygon_geometry_visualizer";
 import { BaseGeometry } from "./base_geometry";
 import { GeometryType } from "./geometry";
@@ -17,6 +18,7 @@ export type PolygonGeometryOptions = {
     extrudedHeight?: number;//挤压高度
     material?: Material;//材质
     effectedByLight?: boolean;//是否受光的影响
+    uvGenerator?: ExtrudedGeometryUVGenerator;//uv 坐标生成器
 }
 
 export class PolygonGeometry extends BaseGeometry {
@@ -120,6 +122,17 @@ export class PolygonGeometry extends BaseGeometry {
         this._effectedByLight = val;
     }
 
+    private _uvGenerator: ExtrudedGeometryUVGenerator;
+
+    public get uvGenerator () {
+        return this._uvGenerator;
+    }
+
+    @GeometryUpdateProperty()
+    public set uvGenerator (val: ExtrudedGeometryUVGenerator) {
+        this._uvGenerator = val;
+    }
+
     public constructor (options?: PolygonGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.POLYGON });
@@ -132,6 +145,7 @@ export class PolygonGeometry extends BaseGeometry {
         this._extrudedHeight = Math.max(Utils.defaultValue(options.extrudedHeight, 0), 0);
         this._material = options.material;
         this._effectedByLight = Utils.defaultValue(options.effectedByLight, false);
+        this._uvGenerator = options.uvGenerator;
         this.visualizer = new PolygonGeometryVisualizer();
     }
 
@@ -145,7 +159,8 @@ export class PolygonGeometry extends BaseGeometry {
             holes: this.holes.map(item => item.map(coord => coord.clone())),
             extrudedHeight: this.extrudedHeight,
             material: this.material,
-            effectedByLight: this.effectedByLight
+            effectedByLight: this.effectedByLight,
+            uvGenerator: this.uvGenerator
         });
     }
 

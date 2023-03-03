@@ -1,6 +1,11 @@
 import { BufferGeometry, Color, Curve, Float32BufferAttribute, Shape, ShapeUtils, Vector2, Vector3 } from "three";
 import { Utils } from "../../../../core/utils/utils";
 
+export type ExtrudedGeometryUVGenerator = {
+    generateTopUV: (geometry: ChangableExtrudedGeometry, vertices: number[], indexA: number, indexB: number, indexC: number) => Vector2[];
+    generateSideWallUV: (geometry: ChangableExtrudedGeometry, vertices: number[], indexA: number, indexB: number, indexC: number, indexD: number) => Vector2[];
+};
+
 export type ExtrudedGeometryOptions = {
     curveSegments?: number;
     steps?: number;
@@ -11,16 +16,14 @@ export type ExtrudedGeometryOptions = {
     bevelOffset?: number;
     bevelSegments?: number;
     extrudePath?: Curve<Vector2>;
-    UVGenerator?: {
-        generateTopUV: Function;
-        generateSideWallUV: Function
-    };
+    UVGenerator?: ExtrudedGeometryUVGenerator;
     instanceColors?: Color[];
     instanceOpacities?: number[];
     instanceDepths?: number[];
     instanceHeights?: number[];
     instanceEmissive?: Color[];
     instanceEffectByLight?: boolean[];
+    instanceUVGenerators?: ExtrudedGeometryUVGenerator[];
 }
 
 /**
@@ -54,6 +57,7 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
         const isArrayShape = Array.isArray(shapes)
         shapes = (isArrayShape ? shapes : [shapes]) as Shape[];
         let depths = isArrayShape ? options.instanceDepths : [options.depth];
+        let ucGenerators = isArrayShape ? options.instanceUVGenerators : [options.UVGenerator]
         const scope = this;
 
         const verticesArray = [];
@@ -70,7 +74,7 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
 
             const shape = shapes[i];
             const startIndex = verticesArray.length;
-            addShape(shape, depths[i]);
+            addShape(shape, depths[i], ucGenerators[i]);
             const endIndex = verticesArray.length;
 
             if (isArrayShape) {
@@ -110,7 +114,7 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
 
         // functions
 
-        function addShape (shape, specDepth) {
+        function addShape (shape, specDepth, specUVGenerator) {
 
             const placeholder = [];
 
@@ -128,7 +132,7 @@ export class ChangableExtrudedGeometry extends BufferGeometry {
 
             const extrudePath = options.extrudePath;
 
-            const uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator;
+            const uvgen = Utils.defined(specUVGenerator) ? specUVGenerator : WorldUVGenerator;
 
             //
 
