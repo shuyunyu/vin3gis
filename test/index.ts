@@ -146,14 +146,14 @@ class GISTest {
                 // })
             })
         });
-        mapViewer.scene.entities.add(entity);
+        // mapViewer.scene.entities.add(entity);
         globalThis.polygonEntity = entity;
 
         // const newLngLats = [].concat(lnglats);
         // setTimeout(() => {
         //     entity.polygon.positions = newLngLats.map(lnglat => Cartographic.fromDegrees(lnglat[0] - 0.1, lnglat[1] - 0.1, 0)).reverse();
         // }, 1000 * 1);
-        return;
+        // return;
         GeoJSONLoader.loadSourceData({ url: "https://geojson.cn/api/data/china.json" }).then((json: any) => {
             const positionsArray = [];
             const features = json.features;
@@ -207,10 +207,11 @@ class GISTest {
             const colorArray = positionsArray.map(_ => ColorUtils.randomColor());
             const multiPolygonEntity = new Entity({
                 multiPolygon: new MultiPolygonGeometry({
-                    positions: positionsArray,
+                    // positions: positionsArray,
+                    shapes: positionsArray.map(positions => new PolygonShape(positions)),
                     colors: colorArray,
                     extrudedHeights: positionsArray.map(_ => 10000),
-                    opacities: positionsArray.map(_ => 0.75),
+                    // opacities: positionsArray.map(_ => 0.75),
                     emissives: colorArray,
                     effectedByLights: positionsArray.map(_ => true)
                 })

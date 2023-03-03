@@ -22,8 +22,12 @@ export class MultiPolygonGeometryViauzlizer extends BaseGeometryVisualizer {
 
     protected createGeometryObject (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer): Object3D<Event> {
         const centerAndPoints = this.getCenterAndPoints(entity, tilingScheme);
-        const shapes = this.getShapes(entity, centerAndPoints);
-        const geometry = new ChangableExtrudedGeometry(shapes, this.getExtrudedGeometryOptions(entity, shapes));
+        const shapesArray = this.getShapes(entity, centerAndPoints);
+        const shapes = [];
+        shapesArray.forEach(sps => {
+            shapes.push(...sps);
+        });
+        const geometry = new ChangableExtrudedGeometry(shapes, this.getExtrudedGeometryOptions(entity, shapesArray));
         this._geo = geometry;
         const ext = PolygonShaderExt.extShader();
         const material = new MeshLambertMaterial({
@@ -49,73 +53,83 @@ export class MultiPolygonGeometryViauzlizer extends BaseGeometryVisualizer {
      * @param tilingScheme 
      * @returns 
      */
-    private getCenterAndPoints (entity: Entity, tilingScheme: ITilingScheme): { center: Vector3, points: Vector2[][], holes: Path[][] } {
-        const multiPolygon = entity.multiPolygon;
-        const holesArray = multiPolygon.holes;
+    private getCenterAndPoints (entity: Entity, tilingScheme: ITilingScheme): { center: Vector3, shapeData: { points: Vector2[][], holes: Path[][] }[] } {
         let start: Vector3;
-        const resPoints: Vector2[][] = [];
-        const resHoles: Path[][] = [];
-        for (let i = 0; i < multiPolygon.positions.length; i++) {
-            const positions = multiPolygon.positions[i];
-            if (positions.length < 3) {
-                continue;
-            } else {
-                const points = positions.map(pos => Transform.cartographicToWorldVec3(pos, tilingScheme));
-                if (!start) {
-                    start = points[0];
-                }
-                const pnts = points.map(point => {
-                    return new Vector2(point.x - start.x, start.z - point.z);
-                });
+        const multiPolygon = entity.multiPolygon;
+        const shapeData = [];
+        multiPolygon.shapes.forEach(shapes => {
+            const positionArray = shapes.map(shape => shape.positions);
+            const holesArray = shapes.map(shape => shape.holes);
+            const resPoints: Vector2[][] = [];
+            const resHoles: Path[][] = [];
+            for (let i = 0; i < positionArray.length; i++) {
+                const positions = positionArray[i];
+                if (positions.length < 3) {
+                    continue;
+                } else {
+                    const points = positions.map(pos => Transform.cartographicToWorldVec3(pos, tilingScheme));
+                    if (!start) {
+                        start = points[0];
+                    }
+                    const pnts = points.map(point => {
+                        return new Vector2(point.x - start.x, start.z - point.z);
+                    });
 
-                let holes: Path[];
-                const cHoles = holesArray[i];
-                if (cHoles && cHoles.length) {
-                    const holesPoints = cHoles.map(hole => {
-                        return hole.map(pos => {
-                            const point = Transform.cartographicToWorldVec3(pos, tilingScheme);
-                            return new Vector2(point.x - start.x, start.z - point.z);
+                    let holes: Path[];
+                    const cHoles = holesArray[i];
+                    if (cHoles && cHoles.length) {
+                        const holesPoints = cHoles.map(hole => {
+                            return hole.map(pos => {
+                                const point = Transform.cartographicToWorldVec3(pos, tilingScheme);
+                                return new Vector2(point.x - start.x, start.z - point.z);
+                            });
                         });
-                    });
-                    holes = [];
-                    holesPoints.forEach(holePoints => {
-                        if (holePoints.length) {
-                            holes.push(new Path(holePoints));
-                        }
-                    });
+                        holes = [];
+                        holesPoints.forEach(holePoints => {
+                            if (holePoints.length) {
+                                holes.push(new Path(holePoints));
+                            }
+                        });
+                    }
+                    resPoints[i] = pnts;
+                    resHoles[i] = holes && holes.length ? holes : null;
                 }
 
-                // start.y = this.getWorldHeight(entity, tilingScheme);
-                resPoints[i] = pnts;
-                resHoles[i] = holes && holes.length ? holes : null;
             }
 
-        }
+            shapeData.push({
+                points: resPoints,
+                holes: resHoles
+            });
+        });
 
         return start ? {
             center: start,
-            points: resPoints,
-            holes: resHoles
+            shapeData: shapeData
         } : {
             center: VecConstants.ZERO_VEC3,
-            points: [],
-            holes: []
+            shapeData: []
         }
 
     }
 
-    private getShapes (entity: Entity, centerAndPoints: any) {
-        const shapes: Shape[] = [];
-        for (let i = 0; i < centerAndPoints.points.length; i++) {
-            const points = centerAndPoints.points[i];
-            if (points.length) {
-                const shape = new Shape(points);
-                const holes = centerAndPoints.holes[i];
-                if (holes && holes.length) {
-                    shape.holes = holes;
+    private getShapes (entity: Entity, centerAndPoints: any): Shape[][] {
+        const shapes: Shape[][] = [];
+        for (let i = 0; i < centerAndPoints.shapeData.length; i++) {
+            const shapeArray = [];
+            const shapeData = centerAndPoints.shapeData[i];
+            for (let i = 0; i < shapeData.points.length; i++) {
+                const points = shapeData.points[i];
+                if (points.length) {
+                    const shape = new Shape(points);
+                    const holes = shapeData.holes[i];
+                    if (holes && holes.length) {
+                        shape.holes = holes;
+                    }
+                    shapeArray.push(shape);
                 }
-                shapes.push(shape);
             }
+            shapes.push(shapeArray);
         }
         return shapes;
     }
@@ -126,7 +140,7 @@ export class MultiPolygonGeometryViauzlizer extends BaseGeometryVisualizer {
      * @param shapes
      * @returns 
      */
-    private getExtrudedGeometryOptions (entity: Entity, shapes: Shape[]): ExtrudedGeometryOptions {
+    private getExtrudedGeometryOptions (entity: Entity, shapes: Shape[][]): ExtrudedGeometryOptions {
         const multiPolygon = entity.multiPolygon;
         const depths = [];
         const colors = [];
@@ -138,13 +152,15 @@ export class MultiPolygonGeometryViauzlizer extends BaseGeometryVisualizer {
         const defaultEmissive = new Color(0x000000);
         const uvGenerators = [];
         shapes.forEach((_, index) => {
-            depths.push(Transform.carCoordToWorldCoord(Math.max(Utils.defaultValue(multiPolygon.extrudedHeights[index], 0))));
-            colors.push(Utils.defaultValue(multiPolygon.colors[index], defaultColor));
-            opacities.push(math.clamp(Utils.defaultValue(multiPolygon.opacities[index], 1), 0, 1));
-            heights.push(Utils.defaultValue(multiPolygon.heights[index], 0));
-            emissives.push(Utils.defaultValue(multiPolygon.emissives[index], defaultEmissive));
-            effectedByLights.push(Utils.defaultValue(multiPolygon.effectedByLights[index], false));
-            uvGenerators.push(multiPolygon.uvGenerators[index]);
+            _.forEach(__ => {
+                depths.push(Transform.carCoordToWorldCoord(Math.max(Utils.defaultValue(multiPolygon.extrudedHeights[index], 0))));
+                colors.push(Utils.defaultValue(multiPolygon.colors[index], defaultColor));
+                opacities.push(math.clamp(Utils.defaultValue(multiPolygon.opacities[index], 1), 0, 1));
+                heights.push(Utils.defaultValue(multiPolygon.heights[index], 0));
+                emissives.push(Utils.defaultValue(multiPolygon.emissives[index], defaultEmissive));
+                effectedByLights.push(Utils.defaultValue(multiPolygon.effectedByLights[index], false));
+                uvGenerators.push(multiPolygon.uvGenerators[index]);
+            })
         });
         return {
             bevelEnabled: false,
@@ -161,8 +177,12 @@ export class MultiPolygonGeometryViauzlizer extends BaseGeometryVisualizer {
     public update (entity: Entity, tilingScheme: ITilingScheme, root: Object3D<Event>, renderer: FrameRenderer, propertyChangeData?: GeometryPropertyChangeData): void {
         if (propertyChangeData) {
             const centerAndPoints = this.getCenterAndPoints(entity, tilingScheme);
-            const shapes = this.getShapes(entity, centerAndPoints);
-            const options = this.getExtrudedGeometryOptions(entity, shapes);
+            const shapesArray = this.getShapes(entity, centerAndPoints);
+            const shapes = [];
+            shapesArray.forEach(sps => {
+                shapes.push(...sps);
+            });
+            const options = this.getExtrudedGeometryOptions(entity, shapesArray);
             this._geo.setShapes(shapes, options);
         }
     }

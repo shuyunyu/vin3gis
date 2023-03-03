@@ -3,14 +3,14 @@ import { Utils } from "../../../../core/utils/utils";
 import { GeometryUpdateProperty } from "../../../decorator/decorator";
 import { Cartographic } from "../../cartographic";
 import { ExtrudedGeometryUVGenerator } from "../../extend/shape/changable_extruded_geometry";
+import { PolygonShape } from "../misc/polygon_shape";
 import { MultiPolygonGeometryViauzlizer } from "../visualizer/multi_polygon_geometry_visualizer";
 import { BaseGeometry } from "./base_geometry";
 import { GeometryType } from "./geometry";
 import { PolygonGeometry } from "./polygon_geometry";
 
 export type MultiPolygonGeometryOptions = {
-    positions?: Cartographic[][];
-    holes?: Cartographic[][][];
+    shapes?: PolygonShape[] | PolygonShape[][];
     colors?: Color[];
     emissives?: Color[];//固有色数组
     opacities?: number[];
@@ -22,26 +22,15 @@ export type MultiPolygonGeometryOptions = {
 
 export class MultiPolygonGeometry extends BaseGeometry {
 
-    private _positions: Cartographic[][];
+    private _shapes: PolygonShape[][];
 
-    public get positions () {
-        return this._positions;
+    public get shapes (): PolygonShape[][] {
+        return this._shapes;
     }
 
     @GeometryUpdateProperty()
-    public set positions (val: Cartographic[][]) {
-        this._positions = val;
-    }
-
-    private _holes: Cartographic[][][];
-
-    public get holes () {
-        return this._holes;
-    }
-
-    @GeometryUpdateProperty()
-    public set holes (val: Cartographic[][][]) {
-        this._holes = val;
+    public set shapes (val: PolygonShape[] | PolygonShape[][]) {
+        this._shapes = this.getShapes(val);
     }
 
     private _colors: Color[];
@@ -124,8 +113,7 @@ export class MultiPolygonGeometry extends BaseGeometry {
     public constructor (options?: MultiPolygonGeometryOptions) {
         options = options || {};
         super({ type: GeometryType.MULTI_POLYGON });
-        this._positions = Utils.defaultValue(options.positions, []);
-        this._holes = Utils.defaultValue(options.holes, []);
+        this._shapes = this.getShapes(options.shapes);
         this._colors = Utils.defaultValue(options.colors, []);
         this._emissives = Utils.defaultValue(options.emissives, []);
         this._opacities = Utils.defaultValue(options.opacities, []);
@@ -136,10 +124,20 @@ export class MultiPolygonGeometry extends BaseGeometry {
         this.visualizer = new MultiPolygonGeometryViauzlizer();
     }
 
+    private getShapes (shapes?: PolygonShape[] | PolygonShape[][]): PolygonShape[][] {
+        if (!shapes || !Array.isArray(shapes)) return [];
+        const firstEle = shapes[0];
+        if (!Array.isArray(firstEle)) {
+            return shapes.map(s => [s]);
+        } else {
+            //@ts-ignore
+            return shapes;
+        }
+    }
+
     public clone () {
         return new MultiPolygonGeometry({
-            positions: this.positions.map(posArr => posArr.map(pos => pos.clone())),
-            holes: this.holes.map(holes => holes.map(hole => hole.map(pos => pos.clone()))),
+            shapes: this.shapes.map(shapeArr => shapeArr.map(shape => shape.clone())),
             colors: this.colors.map(color => color.clone()),
             emissives: this.emissives.map(emissive => emissive.clone()),
             opacities: this.opacities,
@@ -155,8 +153,7 @@ export class MultiPolygonGeometry extends BaseGeometry {
      * @param polygons 
      */
     public static fromPolygons (polygons: PolygonGeometry[]) {
-        const positions: Cartographic[][] = [];
-        const holes: Cartographic[][][] = [];
+        const shapes: PolygonShape[][] = [];
         const colors: Color[] = [];
         const emissives: Color[] = [];
         const opacities: number[] = [];
@@ -166,8 +163,7 @@ export class MultiPolygonGeometry extends BaseGeometry {
         const uvGenerators: ExtrudedGeometryUVGenerator[] = [];
         for (let i = 0; i < polygons.length; i++) {
             const polygon = polygons[i];
-            // positions.push(polygon.positions);
-            // holes.push(polygon.holes);
+            shapes.push(polygon.shapes);
             colors.push(polygon.color);
             emissives.push(polygon.emissive);
             opacities.push(polygon.opacity);
@@ -177,8 +173,7 @@ export class MultiPolygonGeometry extends BaseGeometry {
             uvGenerators.push(polygon.uvGenerator);
         }
         return new MultiPolygonGeometry({
-            positions: positions,
-            holes: holes,
+            shapes: shapes,
             colors: colors,
             emissives: emissives,
             opacities: opacities,

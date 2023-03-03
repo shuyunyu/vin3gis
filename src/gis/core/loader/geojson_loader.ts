@@ -95,9 +95,9 @@ export class GeoJSONLoader {
             if (geomtryConvertType.two === "Polygon") {
 
             } else {
-                return new MultiPolygonGeometry({
-                    positions: coords as Cartographic[][]
-                });
+                // return new MultiPolygonGeometry({
+                //     positions: coords as Cartographic[][]
+                // });
             }
         } else {
 
