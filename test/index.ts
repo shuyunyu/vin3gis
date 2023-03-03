@@ -21,6 +21,7 @@ import { LabelGeometry } from "../src/gis/core/datasource/geometry/label_geometr
 import { PolylineGeometry } from "../src/gis/core/datasource/geometry/polyline_geometry";
 import { MultiPolylineGeometry } from "../src/gis/core/datasource/geometry/multi_polyline_geometry";
 import { PolygonGeometry } from "../src/gis/core/datasource/geometry/polygon_geometry";
+import { GeoJSONLoader } from "../src/gis/core/loader/geojson_loader";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -148,7 +149,7 @@ class GISTest {
         //     entity.polygon.positions = newLngLats.map(lnglat => Cartographic.fromDegrees(lnglat[0] - 0.1, lnglat[1] - 0.1, 0)).reverse();
         // }, 1000 * 1);
         return;
-        AssetLoader.loadJSON({ url: "https://geojson.cn/api/data/china.json" }).then((json: any) => {
+        GeoJSONLoader.loadSourceData({ url: "https://geojson.cn/api/data/china.json" }).then((json: any) => {
             const positionsArray = [];
             const features = json.features;
             for (let i = 0; i < features.length; i++) {

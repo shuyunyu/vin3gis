@@ -48,6 +48,8 @@ export * from "./core/datasource/geometry/multi_polyline_geometry";
 export * from "./core/datasource/geometry/polygon_geometry";
 export * from "./core/datasource/geometry/multi_polygon_geometry";
 
+export * from "./core/loader/geojson_loader";
+
 export * from "./core/viewer/map_viewer";
 export * from "./core/camera/earth_camera";
 export * from "./core/scene/earth_scene";

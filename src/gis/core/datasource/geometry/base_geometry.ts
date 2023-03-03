@@ -27,6 +27,16 @@ export class BaseGeometry implements IGeometry {
         this._entity = val;
     }
 
+    private _userData?: any;
+
+    public get userData () {
+        return this._userData;
+    }
+
+    public set userData (val: any) {
+        this._userData = val;
+    }
+
     public constructor (options: GeometryOptions) {
         this.type = options.type;
         this.id = `Geometry.${geometryCount++}`;

@@ -31,6 +31,8 @@ export interface IGeometry {
     visualizer: IGeometryVisualizer;
     //所属的Entity
     entity?: Entity;
+    //用户自定义数据
+    userData?: any;
     //copy func
     clone: () => IGeometry;
 }
