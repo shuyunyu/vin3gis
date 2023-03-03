@@ -2,6 +2,7 @@ import { AssetDefines } from "../../../@types/core/asset/asset";
 import { AssetLoader } from "../../../core/asset/asset_loader";
 import { GeoJSONDefines } from "../../@types/core/geojson";
 import { Cartographic } from "../cartographic";
+import { BaseGeometry } from "../datasource/geometry/base_geometry";
 import { MultiPointGeometry } from "../datasource/geometry/multi_point_geometry";
 import { MultiPolygonGeometry } from "../datasource/geometry/multi_polygon_geometry";
 import { MultiPolylineGeometry } from "../datasource/geometry/multi_polyline_geometry";
@@ -25,6 +26,14 @@ type GeoJSONLoadParams = AssetDefines.LoadAssetParams & {
     geomtryConvertType?: GeoJSONGeomtryConvertType;
 }
 
+export type GeoJSONFeatureLoadResult = {
+    feature?: GeoJSONDefines.Feature;
+    geometries: BaseGeometry[];
+}
+
+/**
+ * GeoJSON 数据加载器
+ */
 export class GeoJSONLoader {
 
     /**
@@ -36,37 +45,85 @@ export class GeoJSONLoader {
         return AssetLoader.loadJSON<GeoJSONDefines.GeoJSON>(params);
     }
 
+    /**
+     * 加载数据并转换成内置Geometry对象
+     * @param params 
+     * @returns 
+     */
     public static load (params: GeoJSONLoadParams) {
-        return new Promise<any>((resolve, reject) => {
+        return new Promise<GeoJSONFeatureLoadResult[]>((resolve, reject) => {
             this.loadSourceData(params).then((geojson: GeoJSONDefines.GeoJSON) => {
-                this.convertToGeometries(geojson, params.coordinateConvertor)
+                const res = this.convertToGeometries(geojson, params.coordinateConvertor);
+                resolve(res);
             }).catch(reject);
         });
     }
 
-    public static convertToGeometries (geojson: GeoJSONDefines.GeoJSON, coordinateConvertor?: GeoJOSNCoordinateConvertor, geomtryConvertType?: GeoJSONGeomtryConvertType) {
+    /**
+     * 转换为内置Geometry对象
+     * @param geojson 
+     * @param coordinateConvertor 
+     * @param geomtryConvertType 
+     */
+    public static convertToGeometries (geojson: GeoJSONDefines.GeoJSON, coordinateConvertor?: GeoJOSNCoordinateConvertor, geomtryConvertType?: GeoJSONGeomtryConvertType): GeoJSONFeatureLoadResult[] {
         if (geojson.type === "Feature") {
-            this.convertFeature(geojson as GeoJSONDefines.Feature, coordinateConvertor);
+            return [this.convertFeature(geojson as GeoJSONDefines.Feature, coordinateConvertor)];
         } else if (geojson.type === "FeatureCollection") {
-            this.convertFeatrueCollection(geojson as GeoJSONDefines.FeatureCollection, coordinateConvertor);
+            return this.convertFeatrueCollection(geojson as GeoJSONDefines.FeatureCollection, coordinateConvertor);
         } else if (geojson.type === "GeometryCollection") {
-            this.convertGeometryCollection(geojson as GeoJSONDefines.GeometryCollection, coordinateConvertor);
+            const res = this.convertGeometryCollection(geojson as GeoJSONDefines.GeometryCollection, coordinateConvertor);
+            const geometries: BaseGeometry[] = [];
+            res.forEach(item => {
+                if (Array.isArray(item)) {
+                    geometries.push(...item);
+                } else {
+                    geometries.push(item);
+                }
+            });
+            return [{
+                feature: null,
+                geometries: geometries
+            }]
         } else {
-            this.convertGeometry(geojson as GeoJSONDefines.Geometry, coordinateConvertor, geomtryConvertType);
+            const geometry = this.convertGeometry(geojson as GeoJSONDefines.Geometry, coordinateConvertor, geomtryConvertType);
+            return [{
+                feature: null,
+                geometries: [geometry]
+            }];
         }
     }
 
-    private static convertFeature (feature: GeoJSONDefines.Feature, coordinateConvertor?: GeoJOSNCoordinateConvertor, geomtryConvertType?: GeoJSONGeomtryConvertType) {
+    /**
+     * 转换单个Feature
+     * @param feature 
+     * @param coordinateConvertor 
+     * @param geomtryConvertType 
+     * @returns 
+     */
+    private static convertFeature (feature: GeoJSONDefines.Feature, coordinateConvertor?: GeoJOSNCoordinateConvertor, geomtryConvertType?: GeoJSONGeomtryConvertType): GeoJSONFeatureLoadResult {
         const g = feature.geometry;
+        const res: BaseGeometry[] = [];
         if (g.type === "GeometryCollection") {
-            return this.convertGeometryCollection(g as GeoJSONDefines.GeometryCollection, coordinateConvertor);
+            const r = this.convertGeometryCollection(g as GeoJSONDefines.GeometryCollection, coordinateConvertor);
+            r.forEach(item => {
+                if (Array.isArray(item)) {
+                    res.push(...item);
+                } else {
+                    res.push(item);
+                }
+            });
         } else {
-            return this.convertGeometry(g as GeoJSONDefines.Geometry, coordinateConvertor, geomtryConvertType);
+            const r = this.convertGeometry(g as GeoJSONDefines.Geometry, coordinateConvertor, geomtryConvertType);
+            res.push(r);
+        }
+        return {
+            feature: feature,
+            geometries: res
         }
     }
 
     private static convertFeatrueCollection (featureCollection: GeoJSONDefines.FeatureCollection, coordinateConvertor?: GeoJOSNCoordinateConvertor) {
-        return featureCollection.features.forEach(feature => this.convertFeature(feature, coordinateConvertor));
+        return featureCollection.features.map(feature => this.convertFeature(feature, coordinateConvertor));
     }
 
     private static convertGeometryCollection (geometryCollection: GeoJSONDefines.GeometryCollection, coordinateConvertor?: GeoJOSNCoordinateConvertor) {
@@ -80,7 +137,7 @@ export class GeoJSONLoader {
      * @param geomtryConvertType 
      * @returns 
      */
-    private static convertGeometry (geometry: GeoJSONDefines.Geometry, coordinateConvertor?: GeoJOSNCoordinateConvertor, geomtryConvertType?: GeoJSONGeomtryConvertType) {
+    private static convertGeometry (geometry: GeoJSONDefines.Geometry, coordinateConvertor?: GeoJOSNCoordinateConvertor, geomtryConvertType?: GeoJSONGeomtryConvertType): BaseGeometry {
         coordinateConvertor = coordinateConvertor || this.coordinateConvertor;
         geomtryConvertType = geomtryConvertType || { one: 'LineString', two: 'Polygon' };
         const coordinates = geometry.coordinates;
@@ -116,8 +173,44 @@ export class GeoJSONLoader {
         }
     }
 
-    private static convertGeometryObject (geometry: GeoJSONDefines.GeometryObject, coordinateConvertor?: GeoJOSNCoordinateConvertor) {
-
+    /**
+     * 转换单个geometryObject数据
+     * @param geometry 
+     * @param coordinateConvertor 
+     * @returns 
+     */
+    private static convertGeometryObject (geometry: GeoJSONDefines.GeometryObject, coordinateConvertor?: GeoJOSNCoordinateConvertor): BaseGeometry | BaseGeometry[] {
+        coordinateConvertor = coordinateConvertor || this.coordinateConvertor;
+        if (geometry.type === "Point") {
+            const geo = geometry as GeoJSONDefines.Point;
+            const coords = this.convertCoordinates(geo.coordinates, coordinateConvertor) as Cartographic;
+            return new PointGeometry({ position: coords });
+        } else if (geometry.type === "MultiPoint") {
+            const geo = geometry as GeoJSONDefines.MultiPoint;
+            const coords = this.convertCoordinates(geo.coordinates, coordinateConvertor) as Cartographic[];
+            return new MultiPointGeometry({ positions: coords });
+        } else if (geometry.type === "LineString") {
+            const geo = geometry as GeoJSONDefines.LineString;
+            const coords = this.convertCoordinates(geo.coordinates, coordinateConvertor) as Cartographic[];
+            return new PolylineGeometry({ positions: coords });
+        } else if (geometry.type === "MultiLineString") {
+            const geo = geometry as GeoJSONDefines.MultiLineString;
+            const coords = this.convertCoordinates(geo.coordinates, coordinateConvertor) as Cartographic[][];
+            return new MultiPolylineGeometry({ positions: coords });
+        } else if (geometry.type === "Polygon") {
+            const geo = geometry as GeoJSONDefines.Polygon;
+            const coords = this.convertCoordinates(geo.coordinates, coordinateConvertor) as Cartographic[][];
+            const shapes = coords.map(coordArray => new PolygonShape(coordArray));
+            return new PolygonGeometry({ shapes: shapes });
+        } else if (geometry.type === "MultiPolygon") {
+            const geo = geometry as GeoJSONDefines.MultiPolygon;
+            const coords = this.convertCoordinates(geo.coordinates, coordinateConvertor) as Cartographic[][][];
+            const shapesArray = coords.map(coordArray => coordArray.map(array => new PolygonShape(array)));
+            return new MultiPolygonGeometry({ shapes: shapesArray });
+        } else if (geometry.type === "GeometryCollection") {
+            const geo = geometry as GeoJSONDefines.GeometryCollection;
+            return geo.geometries.map(g => this.convertGeometryObject(g, coordinateConvertor)) as BaseGeometry[];
+        }
     }
 
     /**

@@ -103,6 +103,13 @@ class GISTest {
         // this.testTextGeometry(mapViewer);
         this.testPolygonGeometry(mapViewer);
         // this.testLineGeometry(mapViewer);
+        // this.testLoader(mapViewer);
+    }
+
+    private static testLoader (mapViewer: MapViewer) {
+        GeoJSONLoader.load({ url: "https://geojson.cn/api/data/china.json" }).then(res => {
+
+        });
     }
 
     private static testPolygonGeometry (mapViewer: MapViewer) {
@@ -143,14 +150,14 @@ class GISTest {
                 // })
             })
         });
-        // mapViewer.scene.entities.add(entity);
+        mapViewer.scene.entities.add(entity);
         globalThis.polygonEntity = entity;
 
         // const newLngLats = [].concat(lnglats);
         // setTimeout(() => {
         //     entity.polygon.positions = newLngLats.map(lnglat => Cartographic.fromDegrees(lnglat[0] - 0.1, lnglat[1] - 0.1, 0)).reverse();
         // }, 1000 * 1);
-        // return;
+        return;
         GeoJSONLoader.loadSourceData({ url: "https://geojson.cn/api/data/china.json" }).then((json: any) => {
             const positionsArray = [];
             const features = json.features;
