@@ -1,6 +1,6 @@
 import { MathUtils } from "three";
 import { RectangleRange } from "../../../../@types/global/global";
-import { Size } from "../../../../core/msic/size";
+import { Size } from "../../../../core/misc/size";
 import { Cartographic } from "../../cartographic";
 import { pointGeometryCanvasProvider } from "../../misc/provider/point_geometry_canvas_provider";
 import { Entity } from "../entity";

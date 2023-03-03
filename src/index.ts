@@ -21,7 +21,7 @@ export * from "./core/input/input";
 
 export * from "./core/renderer/frame_renderer";
 
-export * from "./core/msic/tiled_texture";
+export * from "./core/misc/tiled_texture";
 
 export * from "./core/system/system";
 export * from "./core/system/event_system";

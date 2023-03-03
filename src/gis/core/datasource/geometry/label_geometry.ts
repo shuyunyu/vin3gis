@@ -1,5 +1,5 @@
 import { Color, Vector2 } from "three";
-import { CanvasTextBuilder, CanvasTextBuildResult } from "../../../../core/msic/canvas_text_builder";
+import { CanvasTextBuilder, CanvasTextBuildResult } from "../../../../core/misc/canvas_text_builder";
 import { ColorUtils } from "../../../../core/utils/color_utils";
 import { Utils } from "../../../../core/utils/utils";
 import { ICartesian2Like } from "../../../@types/core/gis";

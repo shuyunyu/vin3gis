@@ -1,7 +1,7 @@
 import { Mesh, Object3D, OrthographicCamera, PerspectiveCamera, Scene, WebGLRenderer, WebGLRendererParameters } from "three";
 import { OrthographicCameraProps, PerspectiveCameraProps } from "../../@types/global/global";
 import { GenericEvent } from "../event/generic_event";
-import { Size } from "../msic/size";
+import { Size } from "../misc/size";
 import { GeometryUtils } from "../utils/geometry_utils";
 import { Object3Utils } from "../utils/object3_utils";
 import { Utils } from "../utils/utils";

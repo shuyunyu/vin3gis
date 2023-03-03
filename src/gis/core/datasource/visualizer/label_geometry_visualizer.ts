@@ -1,5 +1,5 @@
 import { RectangleRange } from "../../../../@types/global/global";
-import { Size } from "../../../../core/msic/size";
+import { Size } from "../../../../core/misc/size";
 import { ICartesian2Like } from "../../../@types/core/gis";
 import { Cartographic } from "../../cartographic";
 import { Entity } from "../entity";

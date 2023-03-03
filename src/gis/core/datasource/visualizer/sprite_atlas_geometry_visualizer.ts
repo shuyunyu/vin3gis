@@ -1,6 +1,6 @@
 import { Event, Object3D, Vector2 } from "three";
 import { RectangleRange } from "../../../../@types/global/global";
-import { Size } from "../../../../core/msic/size";
+import { Size } from "../../../../core/misc/size";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
 import { ICartesian2Like } from "../../../@types/core/gis";
 import { Cartographic } from "../../cartographic";

@@ -1,8 +1,8 @@
 import { BufferGeometry, InstancedMesh, InterleavedBuffer, InterleavedBufferAttribute, Matrix4, PerspectiveCamera, SpriteMaterial, Vector2, Vector3 } from "three";
 import { RectangleRange } from "../../../../@types/global/global";
 import { math } from "../../../../core/math/math";
-import { Size } from "../../../../core/msic/size";
-import { TiledTexture, TiledTextureResult } from "../../../../core/msic/tiled_texture";
+import { Size } from "../../../../core/misc/size";
+import { TiledTexture, TiledTextureResult } from "../../../../core/misc/tiled_texture";
 import { FrameRenderer } from "../../../../core/renderer/frame_renderer";
 import { disposeSystem } from "../../../../core/system/dispose_system";
 import { Utils } from "../../../../core/utils/utils";

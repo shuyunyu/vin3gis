@@ -16,7 +16,7 @@ import { PointCloudGeometry } from "../src/gis/core/datasource/geometry/point_cl
 import { ColorUtils } from "../src/core/utils/color_utils";
 import { ImageClipper } from "../src/gis/core/misc/image_clipper";
 import { MultiBillboardGeometry } from "../src/gis/core/datasource/geometry/multi_billboard_geometry";
-import { CanvasTextBuilder } from "../src/core/msic/canvas_text_builder";
+import { CanvasTextBuilder } from "../src/core/misc/canvas_text_builder";
 import { LabelGeometry } from "../src/gis/core/datasource/geometry/label_geometry";
 import { PolylineGeometry } from "../src/gis/core/datasource/geometry/polyline_geometry";
 import { MultiPolylineGeometry } from "../src/gis/core/datasource/geometry/multi_polyline_geometry";
