@@ -5,6 +5,7 @@ import tileVtShader from "../shader/tile.vt.glsl";
 import tileFsShader from "../shader/tile.fs.glsl";
 import { disposeSystem } from "../../../core/system/dispose_system";
 import { Utils } from "../../../core/utils/utils";
+import { Shaderhandler } from "../extend/shader_handler";
 
 type MtlParams = {
     texture: Texture,
@@ -45,8 +46,8 @@ class TileMaterialPool extends BasePool<ShaderMaterial, MtlParams[]>{
 
     public constructor () {
         super(ShaderMaterial, InternalConfig.TILE_TEXTURE_MTL_CACHE_SIZE);
-        this._tileVtShader = Utils.base64Decode(tileVtShader);
-        this._tileFsShader = Utils.base64Decode(tileFsShader);
+        this._tileVtShader = Shaderhandler.handleShaderChunk(Utils.base64Decode(tileVtShader));
+        this._tileFsShader = Shaderhandler.handleShaderChunk(Utils.base64Decode(tileFsShader));
     }
 
     protected onConstructor (p?: MtlParams[]): ShaderMaterial {
@@ -57,7 +58,8 @@ class TileMaterialPool extends BasePool<ShaderMaterial, MtlParams[]>{
             vertexShader: this._tileVtShader,
             fragmentShader: this._tileFsShader,
             transparent: true,
-            side: BackSide
+            side: BackSide,
+            fog: false
         });
         mtl.needsUpdate = true;
         return mtl;

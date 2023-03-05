@@ -1,4 +1,4 @@
-import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, FrontSide, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector2, Vector3 } from "three";
+import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Fog, FogExp2, FrontSide, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector2, Vector3 } from "three";
 import { AssetLoader, FrameRenderer, math, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, AnchorConstant, ArcGISImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
@@ -36,12 +36,12 @@ window.onload = () => {
         //EmptyImageryTileProvider
         //AMapImageryTileProvider
         //TdtImageryTileProvider
-        // imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
+        imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
         // imageryTileProivder: new BaiduImageryTileProvider({ correction: true }),
         // imageryTileProivder: new OSMImageryTileProvider(),
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
-        imageryTileProivder: new EmptyImageryTileProvider(),
+        // imageryTileProivder: new EmptyImageryTileProvider(),
         // imageryTileProivder: new ArcGISImageryTileProvider({ url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer" }),
         // imageryTileProivder: new TdtImageryTileProvider({
         //     style: "street",
@@ -63,6 +63,9 @@ window.onload = () => {
     // mapViewer.scene.imageryProviders.add(new GridImageryTileProvider());
     global.mapViewer = mapViewer;
     GISTest.run(mapViewer.renderer, mapViewer);
+
+    mapViewer.renderer.scene.fog = new FogExp2(0xFF0000, 0.02);
+
 }
 
 class GISTest {
@@ -101,9 +104,9 @@ class GISTest {
         // this.testPointEntity(mapViewer);
         // this.testBillboardEntity(mapViewer);
         // this.testTextGeometry(mapViewer);
-        this.testPolygonGeometry(mapViewer);
+        // this.testPolygonGeometry(mapViewer);
         // this.testLineGeometry(mapViewer);
-        this.testLoader(mapViewer);
+        // this.testLoader(mapViewer);
     }
 
     private static testLoader (mapViewer: MapViewer) {
