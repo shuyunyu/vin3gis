@@ -60,6 +60,12 @@ export class InternalConfig {
     //sprite贴图集最大瓦片贴图尺寸
     public static SPRITE_TEXTURE_ATLAS_MAX_TILE_SIZE = 512;
 
+    //默认雾的颜色
+    public static DEFAULT_FOG_COLOR = 0x000000;
+
+    //默认雾的密度
+    public static DEFAULT_FOG_DENSITY = 0.002;
+
     /**
      * 校验相机的pitch是否有效
      * @param pitch 

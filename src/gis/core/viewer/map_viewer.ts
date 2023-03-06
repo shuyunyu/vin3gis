@@ -193,10 +193,6 @@ export class MapViewer {
         this._imageryTileProvider = viewerOptions.imageryTileProivder;
         this.scene = new EarthScene(this.renderer, this.imageryTileProivder, this._terrainProvider, Utils.defaultValue(viewerOptions.tileCacheSize, InternalConfig.DEFAUTL_MAX_TILE_CACHE_COUNT));
 
-        //add light to renderer scene
-        this.renderer.scene.add(this.scene.ambientLight);
-        this.renderer.scene.add(this.scene.sunLight);
-
         this.camera = this.scene.camera;
         this.enablePan = Utils.defaultValue(viewerOptions.enablePan, true);
         this.panSpeed = Utils.defaultValue(viewerOptions.panSpeed, 1.5);

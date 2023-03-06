@@ -5,6 +5,7 @@ import { ImageryTileRenderParam } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
 import { InternalConfig } from "../internal/internal_config";
 import { TILE_NODE_EFFECT_RENDER_ORDER, TILE_NODE_RENDER_ORDER } from "../misc/render_order";
+import { Fog } from "../scene/fog";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { TileNode } from "./tile_node";
 
@@ -38,7 +39,12 @@ export class TileNodeRenderer {
     //当前正在fadeout的瓦片节点
     private _fadeoutTiles: FadeoutTile[] = [];
 
-    public constructor () { }
+    private _fog: Fog;
+
+    public constructor (fog: Fog) {
+        this._fog = fog;
+        this._fog.changedEvent.addEventListener(this.updateByFog, this);
+    }
 
     /**
      * 渲染瓦片贴图
@@ -76,6 +82,13 @@ export class TileNodeRenderer {
             delete this._tileNodeRecord[tile.id];
             this._renderTileNodeCount--;
         }
+    }
+
+    /**
+     * 根据fog来更新瓦片的渲染效果
+     */
+    private updateByFog (fog: Fog) {
+
     }
 
     /**

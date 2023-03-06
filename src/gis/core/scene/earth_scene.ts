@@ -1,15 +1,17 @@
-import { AmbientLight, DirectionalLight, PerspectiveCamera, Vector3 } from "three";
+import { AmbientLight, Color, DirectionalLight, PerspectiveCamera, Vector3 } from "three";
 import { GenericEvent } from "../../../core/event/generic_event";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { EarthCamera } from "../camera/earth_camera";
 import { DataSourceDisplay } from "../datasource/datasource_display";
 import { EntityCollection } from "../datasource/entity_collection";
+import { InternalConfig } from "../internal/internal_config";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { ImageryTileProviderCollection } from "../provider/imagery_tile_provider_collection";
 import { TileNodeRenderer } from "../renderer/tile_node_renderer";
 import { ITerrainProvider } from "../terrain/terrain_provider";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { Transform } from "../transform/transform";
+import { Fog } from "./fog";
 import { FrameState } from "./frame_state";
 import { GlobeSurfaceTileManager } from "./globe_surface_tile_manager";
 import { QuadtreePrimitive } from "./quad_tree_primitive";
@@ -62,9 +64,13 @@ export class EarthScene {
         this.setSunLightPosition();
     }
 
+    public readonly fog: Fog;
+
     constructor (renderer: FrameRenderer, imageryTileProvider: IImageryTileProvider, terrainProvider: ITerrainProvider, tileCacheSize: number) {
         this._renderer = renderer;
-        this.tileNodeRenderer = new TileNodeRenderer();
+        //add fog to renderer scene
+        this.fog = new Fog(this._renderer.scene, new Color(InternalConfig.DEFAULT_FOG_COLOR), InternalConfig.DEFAULT_FOG_DENSITY);
+        this.tileNodeRenderer = new TileNodeRenderer(this.fog);
         //将渲染根节点添加到场景中
         this._renderer.scene.add(this.tileNodeRenderer.root);
         this.imageryProviders = new ImageryTileProviderCollection();
@@ -78,6 +84,9 @@ export class EarthScene {
         //将DataSource的渲染根节点添加到场景中
         this._renderer.scene.add(this.dataSourceDisplay.root);
         this.setSunLightPosition();
+        //add light to renderer scene
+        this._renderer.scene.add(this.ambientLight);
+        this._renderer.scene.add(this.sunLight);
         this.ready = true;
     }
 
