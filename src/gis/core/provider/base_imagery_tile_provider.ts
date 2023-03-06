@@ -1,4 +1,3 @@
-import { Frustum } from "three";
 import { GenericEvent } from "../../../core/event/generic_event";
 import { math } from "../../../core/math/math";
 import { IntersectUtils } from "../../../core/utils/intersect_utils";
@@ -7,9 +6,11 @@ import { IScheduleRequestTask, RequestTaskStatus } from "../../../core/xhr/sched
 import { ImageRequestResult } from "../../@types/core/gis";
 import { Rectangle } from "../geometry/rectangle";
 import { InternalConfig } from "../internal/internal_config";
+import { FrameState } from "../scene/frame_state";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { WebMercatorTilingScheme } from "../tilingscheme/web_mercator_tiling_scheme";
+import { Transform } from "../transform/transform";
 import { IImageryTileProvider } from "./imagery_tile_provider";
 import { ImageryTileProviderOptions } from "./imagery_tile_provider_options";
 
@@ -122,8 +123,14 @@ export class BaseImageryTileProvider implements IImageryTileProvider {
     /**
      * 检查瓦片可见性
      */
-    public computeTileVisibility (tile: QuadtreeTile, frustum: Frustum): boolean {
-        return IntersectUtils.intersectBoxFrustum(tile.aabb, frustum);
+    public computeTileVisibility (tile: QuadtreeTile, frameState: FrameState): boolean {
+        if (frameState.fog.enable) {
+            const fogFacotr = math.fog(Transform.carCoordToWorldCoord(tile.distanceToCamera), frameState.fog.density);
+            if (fogFacotr >= 1.0) {
+                return false;
+            }
+        }
+        return IntersectUtils.intersectBoxFrustum(tile.aabb, frameState.frustum);
     }
 
     /**

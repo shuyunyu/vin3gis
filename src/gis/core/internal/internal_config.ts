@@ -64,7 +64,7 @@ export class InternalConfig {
     public static DEFAULT_FOG_COLOR = 0xFFFFFF;
 
     //默认雾的密度
-    public static DEFAULT_FOG_DENSITY = 0.002;
+    public static DEFAULT_FOG_DENSITY = 0.0002;
 
     /**
      * 校验相机的pitch是否有效

@@ -132,4 +132,9 @@ export class math {
         return ((m % n) + n) % n;
     }
 
+    public static fog (distanceToCamera: number, density: number) {
+        const scalar = distanceToCamera * density;
+        return 1.0 - Math.exp(-(scalar * scalar));
+    }
+
 }

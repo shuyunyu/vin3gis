@@ -84,9 +84,10 @@ export class GlobeSurfaceTileManager {
         } else {//已经创建 
             for (let i = 0; i < this._quadtreePrimitive.levelZeroTiles!.length; i++) {
                 const rootTile = this._quadtreePrimitive.levelZeroTiles![i];
+                rootTile.updateDistanceToCamera(frameState);
                 this._quadtreePrimitive.tileReplacementQueue.markTileRendered(rootTile);
                 //如果可以渲染 并且可见  将其加入 遍历队列
-                if (rootTile.renderable && this._quadtreePrimitive.tileProvider.computeTileVisibility(rootTile, frameState.frustum)) {
+                if (rootTile.renderable && this._quadtreePrimitive.tileProvider.computeTileVisibility(rootTile, frameState)) {
                     this._traversalQueue.enqueue(rootTile);
                 }
             }
@@ -149,7 +150,7 @@ export class GlobeSurfaceTileManager {
             tile.updateDistanceToCamera(frameState);
             //满足sse 并且满足最小缩放等级
             if (Transform.validateSpaceError(tile, this._quadtreePrimitive.tileProvider, frameState) && tile.level >= this._quadtreePrimitive.minimumLevel) {
-                if (this._quadtreePrimitive.tileProvider.computeTileVisibility(tile, frameState.frustum)) {
+                if (this._quadtreePrimitive.tileProvider.computeTileVisibility(tile, frameState)) {
                     this.addTileToRenderQueue(tile);
                     this._quadtreePrimitive.tileReplacementQueue.markTileRendered(tile);
                 }
@@ -157,7 +158,7 @@ export class GlobeSurfaceTileManager {
                 let children = tile.children;
                 for (let i = 0; i < children.length; i++) {
                     const child = children[i];
-                    if (this._quadtreePrimitive.tileProvider.computeTileVisibility(child, frameState.frustum)) {
+                    if (this._quadtreePrimitive.tileProvider.computeTileVisibility(child, frameState)) {
                         this._traversalQueue.enqueue(child);
                     }
                 }

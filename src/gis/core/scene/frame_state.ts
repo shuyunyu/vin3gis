@@ -7,6 +7,7 @@ import { CameraUtils } from "../../../core/utils/camera_utils";
 import { Utils } from "../../../core/utils/utils";
 import { Cartesian3 } from "../cartesian/cartesian3";
 import { Transform } from "../transform/transform";
+import { Fog } from "./fog";
 
 const vec3_1 = new Vector3();
 const vec3_2 = new Vector3();
@@ -70,9 +71,11 @@ export class FrameState {
 
     public sseDenominator: number;
 
-    public frustum: Frustum;
+    public readonly frustum: Frustum;
 
-    constructor (camera: PerspectiveCamera, size: Size) {
+    public readonly fog: Fog;
+
+    constructor (camera: PerspectiveCamera, size: Size, fog: Fog) {
         this.camera = camera;
         this.drawContextHeihgt = size.height;
         this.cameraWorldRTS.position = camera.getWorldPosition(vec3_1);
@@ -83,6 +86,7 @@ export class FrameState {
         this.cameraDirection = vec3_2.copy(viewLineRay.direction).normalize();
         this.cameraDirectionWC = Transform.worldCar3ToEarthVec3(this.cameraDirection, scratchDirectionWC).normalize();
         this.frustum = CameraUtils.getFrustum(this.camera);
+        this.fog = fog;
         this.cameraChanged = FrameState.renderedFrameCount === 0 || !Utils.equalsRTS(this.cameraWorldRTS, FrameState.preCameraState);
         const aspectRatio = camera.aspect;
         //仅在fov和aspectRatio改变时计算此值
