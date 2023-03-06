@@ -47,6 +47,7 @@ export class Fog {
         this._scene = scene;
         this._color = color;
         this._density = density;
+        this._enable = true;
         this._fog = new FogExp2(ColorUtils.toCSSHexString(this._color), this._density);
         this._scene.fog = this._fog;
     }

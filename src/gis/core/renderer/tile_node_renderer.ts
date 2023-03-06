@@ -62,6 +62,7 @@ export class TileNodeRenderer {
         let tileNode = new TileNode(tile.id);
         this._tileNodeRecord[tile.id] = tileNode;
         const mesh = tileNode.createTileMesh(tile, baseImagery, overlayImagery);
+        tileNode.useFog(this._fog);
         mesh.renderOrder = TILE_NODE_RENDER_ORDER;
         this.root.add(mesh);
         this._renderTileNodeCount++;
@@ -88,7 +89,10 @@ export class TileNodeRenderer {
      * 根据fog来更新瓦片的渲染效果
      */
     private updateByFog (fog: Fog) {
-
+        for (const tileId in this._tileNodeRecord) {
+            const tileNode = this._tileNodeRecord[tileId];
+            tileNode.useFog(fog);
+        }
     }
 
     /**

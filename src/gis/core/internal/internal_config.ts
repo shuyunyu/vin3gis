@@ -61,7 +61,7 @@ export class InternalConfig {
     public static SPRITE_TEXTURE_ATLAS_MAX_TILE_SIZE = 512;
 
     //默认雾的颜色
-    public static DEFAULT_FOG_COLOR = 0x000000;
+    public static DEFAULT_FOG_COLOR = 0xFFFFFF;
 
     //默认雾的密度
     public static DEFAULT_FOG_DENSITY = 0.002;

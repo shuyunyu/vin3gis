@@ -64,7 +64,7 @@ window.onload = () => {
     global.mapViewer = mapViewer;
     GISTest.run(mapViewer.renderer, mapViewer);
 
-    mapViewer.renderer.scene.fog = new FogExp2(0xFF0000, 0.02);
+    // mapViewer.renderer.scene.fog = new FogExp2(0xFF0000, 0.02);
 
 }
 
