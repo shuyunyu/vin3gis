@@ -44,6 +44,13 @@ export class FrameState {
     public static renderedFrameCount: number = 0;
 
     /**
+     * 当前帧数
+     */
+    public get frameNumber () {
+        return FrameState.renderedFrameCount;
+    }
+
+    /**
      * 摄像机的世界RTS
      * 
      */

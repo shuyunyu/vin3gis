@@ -1,4 +1,5 @@
 import { RTS } from "../../@types/global/global";
+import { URI } from "../misc/uri";
 
 export class Utils {
 
@@ -192,6 +193,18 @@ export class Utils {
     public static createElementNS (name: string) {
         return document.createElementNS('http://www.w3.org/1999/xhtml', name);
 
+    }
+
+    /**
+     * 获取绝对uri地址
+     * @param baseUrl 
+     * @param relativeUrl 
+     * @returns 
+     */
+    public static getAbsouteUri (baseUrl: string, relativeUrl?: string) {
+        let baseUri = new URI(baseUrl);
+        let relativeUri = new URI(relativeUrl);
+        return relativeUri.resolve(baseUri).toString();
     }
 
 }

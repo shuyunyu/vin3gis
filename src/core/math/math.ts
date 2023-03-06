@@ -137,4 +137,8 @@ export class math {
         return 1.0 - Math.exp(-(scalar * scalar));
     }
 
+    public static lerp (p: number, q: number, time: number) {
+        return (1.0 - time) * p + time * q;
+    }
+
 }

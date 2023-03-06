@@ -14,6 +14,7 @@ import { Transform } from "../transform/transform";
 import { Fog } from "./fog";
 import { FrameState } from "./frame_state";
 import { GlobeSurfaceTileManager } from "./globe_surface_tile_manager";
+import { PrimitiveCollection } from "./primitive_collection";
 import { QuadtreePrimitive } from "./quad_tree_primitive";
 
 export class EarthScene {
@@ -29,6 +30,8 @@ export class EarthScene {
     public readonly imageryProviders: ImageryTileProviderCollection;
 
     public readonly entities: EntityCollection;
+
+    public readonly primitives: PrimitiveCollection;
 
     public readonly tilingScheme: ITilingScheme;
 
@@ -76,6 +79,7 @@ export class EarthScene {
         this.imageryProviders = new ImageryTileProviderCollection();
         this.imageryProviders.add(imageryTileProvider);
         this.entities = new EntityCollection();
+        this.primitives = new PrimitiveCollection();
         this.quadtreePrimitive = new QuadtreePrimitive(this.imageryProviders.get(0)!, tileCacheSize);
         this.tilingScheme = this.quadtreePrimitive.tileProvider.tilingScheme;
         this.camera = new EarthCamera(this._renderer, this.tilingScheme);
@@ -106,10 +110,19 @@ export class EarthScene {
         this.quadtreePrimitive.tileProvider = provider;
     }
 
+    //渲染基元
+    private renderPrimitive (frameState: FrameState) {
+        for (let i = 0; i < this.primitives.size; i++) {
+            const primitive = this.primitives.get(i);
+            primitive.render(this, frameState);
+        }
+    }
+
     public postRender (delay: number) {
         if (!this.ready) return;
         let frameState = new FrameState(this._renderer.camera as PerspectiveCamera, this._renderer.size, this.fog);
         this.globleSurfaceManager.render(delay, frameState);
+        this.renderPrimitive(frameState);
         this.camera.postRender(delay, frameState);
         frameState.endFrame();
     }

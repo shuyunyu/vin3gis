@@ -41,6 +41,14 @@ export enum QuadtreeTileLoadState {
     FAILED
 }
 
+/**
+ * 坐标偏移方案
+ */
+export enum CoordinateOffsetType {
+    NONE = 1, //无偏移  标准WGS84
+    GCJ02,   //火星坐标偏移
+    BD09     //百度90偏移
+}
 
 export type MapViewerOptions = {
     //没threejs单位距离代表实际的多少米
