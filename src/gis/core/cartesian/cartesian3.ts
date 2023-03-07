@@ -795,6 +795,13 @@ export class Cartesian3 implements ICartesian2Like, ICartesian3Like {
         return car3.toVec3(out);
     }
 
+    public static divideComponents (left: Cartesian3, right: Cartesian3, result: Cartesian3) {
+        result.x = left.x / right.x;
+        result.y = left.y / right.y;
+        result.z = left.z / right.z;
+        return result;
+    }
+
 }
 
 const v3_1 = new Cartesian3();

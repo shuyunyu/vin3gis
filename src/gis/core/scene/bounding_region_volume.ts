@@ -1,5 +1,9 @@
-import { Sphere, Vector3 } from "three";
+import { Box3, Sphere, Vector3 } from "three";
+import { math } from "../../../core/math/math";
+import { IntersectUtils } from "../../../core/utils/intersect_utils";
+import { Utils } from "../../../core/utils/utils";
 import { CoordinateOffsetType } from "../../@types/core/gis";
+import { GeometryUtils } from "../../utils/geometry_utils";
 import { Cartesian3 } from "../cartesian/cartesian3";
 import { Cartographic } from "../cartographic";
 import { Rectangle } from "../geometry/rectangle";
@@ -8,6 +12,9 @@ import { WebMercatorTilingScheme } from "../tilingscheme/web_mercator_tiling_sch
 import { Transform } from "../transform/transform";
 import { IBoundingVolume } from "./bounding_volume";
 import { FrameState } from "./frame_state";
+
+const scratchVec3 = new Vector3();
+const volumeConstant = (4.0 / 3.0) * math.PI;
 
 export class BoundingRegionVolume implements IBoundingVolume {
 
@@ -22,7 +29,7 @@ export class BoundingRegionVolume implements IBoundingVolume {
 
     private _tilingScheme: ITilingScheme;
 
-    private _aabb: geometry.AABB | undefined;
+    private _aabb: Box3 | undefined;
 
     private _boundingSphere: Sphere | undefined;
 
@@ -65,44 +72,44 @@ export class BoundingRegionVolume implements IBoundingVolume {
     }
 
     constructor (southWest: Cartographic, northEast: Cartographic, minimumHeight: number, maximumHeight: number, coordinateOffsetType: CoordinateOffsetType, tilingScheme?: ITilingScheme) {
-        this._tilingScheme = Util.defaultValue(tilingScheme, BoundingRegionVolume.defaultTilingScheme);
+        this._tilingScheme = Utils.defaultValue(tilingScheme, BoundingRegionVolume.defaultTilingScheme);
         this.update(southWest, northEast, minimumHeight, maximumHeight, coordinateOffsetType);
     }
     public distanceToCamera (frameState: FrameState): number {
         let metersPerUnit = Transform.getMetersPerUnit();
-        return Math.max(0, (Cartesian3.distance(this.boundingSphereCenter, frameState.cameraWorldPosition) - this.boundingSphereRadius) * metersPerUnit);
+        return Math.max(0, (Cartesian3.distance(this.boundingSphereCenter, frameState.cameraWorldRTS.position) - this.boundingSphereRadius) * metersPerUnit);
     }
 
     public computeVisible (frameState: FrameState) {
-        return GeometryEngine.intersectAABBFrustum(this.aabb, frameState.frustum);
+        return IntersectUtils.intersectBoxFrustum(this.aabb, frameState.frustum);
     }
 
     public update (southWest: Cartographic, northEast: Cartographic, minimumHeight: number, maximumHeight: number, coordinateOffsetType: CoordinateOffsetType) {
         let projectedSW = this._tilingScheme.projection.project(southWest);
         let projectedNE = this._tilingScheme.projection.project(northEast);
-        Transform.transformWGS84Cartesian(this._tilingScheme.projection, projectedSW, coordinateOffsetType, projectedSW);
-        Transform.transformWGS84Cartesian(this._tilingScheme.projection, projectedNE, coordinateOffsetType, projectedNE);
+        Transform.wgs84ToCartesian(this._tilingScheme.projection, projectedSW, coordinateOffsetType, projectedSW);
+        Transform.wgs84ToCartesian(this._tilingScheme.projection, projectedNE, coordinateOffsetType, projectedNE);
         this._rectangle = new Rectangle(projectedSW.x, projectedSW.y, projectedNE.x, projectedNE.y);
         this._minimumHeight = minimumHeight;
         this._maximumHeight = maximumHeight;
-        this._aabb = this.createAABB(this._rectangle, minimumHeight, maximumHeight, this._tilingScheme);
-        this._boundingSphere = geometry.AABB.toBoundingSphere(new geometry.Sphere(), this._aabb);
+        this._aabb = this.createAABB(this._rectangle, minimumHeight, maximumHeight);
+        this._boundingSphere = this._aabb.getBoundingSphere(new Sphere());
         this._boundingSphereCenter = this._boundingSphere.center.clone();
         this._boundingSphereRadius = this._boundingSphere.radius;
-        let metersPerUnit = Transform.getMetersPerUnit(this._tilingScheme);
+        let metersPerUnit = Transform.getMetersPerUnit();
         let radius = this._boundingSphereRadius * metersPerUnit;
         this._boundingSphereVolume = volumeConstant * radius * radius * radius;
     }
 
-    public createAABB (rectangle: Rectangle, minimumHeight: number, maximumHeight: number, tilingScheme: TilingScheme) {
-        let metersPerUnit = Transform.getMetersPerUnit(tilingScheme);
+    public createAABB (rectangle: Rectangle, minimumHeight: number, maximumHeight: number) {
+        let metersPerUnit = Transform.getMetersPerUnit();
         let y = (minimumHeight + maximumHeight) / 2;
         let halfW = rectangle.width / 2;
         let halfH = (maximumHeight - minimumHeight) / 2;
         let halfL = rectangle.height / 2;
         let centerCar = new Cartesian3(rectangle.center.x, rectangle.center.y, y);
-        let centerVec = Transform.cartesian3ToWorldVec3(centerCar, tilingScheme, scratchVec3);
-        return geometry.AABB.create(centerVec.x, centerVec.y, centerVec.z, halfW / metersPerUnit, halfH / metersPerUnit, halfL / metersPerUnit);
+        let centerVec = Transform.earthCar3ToWorldVec3(centerCar, scratchVec3);
+        return GeometryUtils.createBox3(centerVec, halfW / metersPerUnit, halfH / metersPerUnit, halfL / metersPerUnit);
     }
 
 }

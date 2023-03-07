@@ -1,16 +1,33 @@
-import { Matrix4 } from "three";
+import { Matrix3, Matrix4, Vector3 } from "three";
 import { MatConstants } from "../../../../core/constants/mat_constants";
 import { math } from "../../../../core/math/math";
 import { Utils } from "../../../../core/utils/utils";
 import { Earth3DTileContentState, Earth3DTileOptimizationHint, Earth3DTileOptions, Earth3DTileRefine, has3DTilesExtension } from "../../../@types/core/earth_3dtileset";
+import { BoundingShpereUtils } from "../../../utils/bounding_shpere_utils";
+import { Matrix4Utils } from "../../../utils/matrix4_utils";
+import { Cartesian3 } from "../../cartesian/cartesian3";
 import { Cartographic } from "../../cartographic";
 import { DoubleLinkedListNode } from "../../misc/double_linked_list";
 import { Transform } from "../../transform/transform";
+import { BoundingOrientedBoxVolume } from "../bounding_oriented_box_bolume";
 import { BoundingRegionVolume } from "../bounding_region_volume";
+import { BoundingSphereVolume } from "../bounding_sphere_volume";
 import { IBoundingVolume } from "../bounding_volume";
 import { FrameState } from "../frame_state";
 import { Earth3DTileset } from "./earth_3dtileset";
 import { IEarth3DTileContent } from "./earth_3dtile_content";
+import { Earth3DTileContentFactory } from "./earth_3dtile_content_factory";
+import { Earth3DTileContentType } from "./earth_3dtile_content_type";
+import { EarthEmpty3DTileContent } from "./earth_empty_3dtile_content";
+import { preprocess3DTileContent } from "./preprocess_3dtile_content";
+
+const scratchTransform = new Matrix4();
+const scratchToTileCenter = new Vector3();
+const scratchCartesian = new Cartesian3();
+const scratchScale = new Cartesian3();
+
+const scratchMatrix = new Matrix3();
+const scratchWorldCartesian3 = new Cartesian3();
 
 export class Earth3DTile {
 
@@ -487,10 +504,10 @@ export class Earth3DTile {
         let contentHeader = options.header.content;
         this._transform = Utils.defined(options.header.transform) ? new Matrix4().fromArray(options.header.transform, 0) : MatConstants.Mat4_IDENTITY.clone();
         let parentTransform = Utils.defined(this._parent) ? this._parent!.computedTransform : this._tileset.modelMatrix;
-        let computedTransform = Mat4.multiply(new Mat4(), parentTransform, this._transform);
+        let computedTransform = new Matrix4().copy(parentTransform).multiply(this._transform);
         this._computedTransform = computedTransform;
         let parentInitialTransform = Utils.defined(this._parent) ? this._parent.initialTransform : MatConstants.Mat4_IDENTITY;
-        this._initialTransform = Mat4.multiply(new Mat4(), parentInitialTransform, this._transform);
+        this._initialTransform = new Matrix4().copy(parentInitialTransform).multiply(this._transform);
 
         this._boundingVolume = this.createBoundingVolume(options.header.boundingVolume, computedTransform);
 
@@ -551,9 +568,9 @@ export class Earth3DTile {
     public distanceToTileCenter (frameState: FrameState) {
         let boundingVolume = this.getBoundingVolume();
         let metersPerUnit = Transform.getMetersPerUnit();
-        let cameraWC = frameState.camera.node.worldPosition;
-        let toCenter = Vec3.subtract(scratchToTileCenter, boundingVolume!.boundingSphereCenter, cameraWC);
-        return Vec3.dot(frameState.cameraDirection, toCenter) * metersPerUnit;
+        let cameraWC = frameState.cameraWorldRTS.position;
+        let toCenter = Cartesian3.subtract(scratchToTileCenter, boundingVolume!.boundingSphereCenter, cameraWC);
+        return Cartesian3.dot(frameState.cameraDirection, toCenter) * metersPerUnit;
     }
 
     public getBoundingVolume () {
@@ -640,12 +657,12 @@ export class Earth3DTile {
      */
     public updateTransform (parentTransform?: Matrix4) {
         parentTransform = Utils.defaultValue(parentTransform, MatConstants.Mat4_IDENTITY);
-        let computedTransform = Mat4.multiply(scratchTransform, parentTransform!, this._transform);
-        let transformChanged = !Mat4.equals(computedTransform, this._computedTransform);
+        let computedTransform = scratchTransform.copy(parentTransform).multiply(this._transform);
+        let transformChanged = !computedTransform.equals(this._computedTransform);
         if (!transformChanged) {
             return;
         }
-        Matrix4.clone(computedTransform, this._computedTransform);
+        computedTransform.copy(this._computedTransform);
         // Update the bounding volumes
         let header = this._header;
         let content = this._header.content;
@@ -666,8 +683,8 @@ export class Earth3DTile {
      */
     private updateGeometricErrorScale () {
         if (!Utils.defined(this._geometricError)) return;
-        let scale = Matrix4.getScale(this._computedTransform, scratchScale);
-        let uniformScale = scale.maximumComponent();
+        let scale = Matrix4Utils.getScale(this._computedTransform, scratchScale);
+        let uniformScale = scale.max();
         this._geometricError = this._geometricError! * uniformScale;
     }
 
@@ -716,12 +733,12 @@ export class Earth3DTile {
      * @param transform 
      * @param out 
      */
-    private createBox (box: any, transform: Mat4, out?: BoundingVolume): BoundingVolume {
+    private createBox (box: any, transform: Matrix4, out?: IBoundingVolume): IBoundingVolume {
         let center = new Cartesian3(Number(box[0]), Number(box[1]), Number(box[2]));
-        let halfAxes = Mat3.fromArray(new Mat3(), box, 3);
+        let halfAxes = new Matrix3().fromArray(box, 3);
         center = Matrix4.multiplyByPoint(transform, center, center);
-        let rotationScale = Matrix4.getMatrix3(transform, scratchMatrix);
-        halfAxes = Mat3.multiply(halfAxes, rotationScale, halfAxes);
+        let rotationScale = Matrix4Utils.getMatrix3(transform, scratchMatrix);
+        halfAxes = halfAxes.copy(rotationScale.multiply(halfAxes));
         if (Utils.defined(out) && out instanceof BoundingOrientedBoxVolume) {
             out.update(center, halfAxes, this.tileset.coordinateOffsetType);
             return out;
@@ -733,7 +750,7 @@ export class Earth3DTile {
     /**
      * 创建边界球
      */
-    private createSphere (sphere: any, transform: Mat4, out?: BoundingVolume): BoundingVolume {
+    private createSphere (sphere: any, transform: Matrix4, out?: IBoundingVolume): IBoundingVolume {
         let x = Number(sphere[0]);
         let y = Number(sphere[1]);
         let z = Number(sphere[2]);
@@ -742,8 +759,8 @@ export class Earth3DTile {
 
         //计算变换后的中心点
         center = Matrix4.multiplyByPoint(transform, center, center);
-        let scale = Matrix4.getScale(transform, center);
-        let uniformScale = scale.maximumComponent();
+        let scale = Matrix4Utils.getScale(transform, center);
+        let uniformScale = scale.max();
         radius *= uniformScale;
         if (Utils.defined(out) && out instanceof BoundingSphereVolume) {
             out.update(center, radius, this.tileset.coordinateOffsetType);
@@ -807,14 +824,14 @@ export class Earth3DTile {
     private isPriorityDeferred (tile: Earth3DTile, frameState: FrameState) {
         let tileset = tile.tileset;
         // If closest point on line is inside the sphere then set foveatedFactor to 0. Otherwise, the dot product is with the line from camera to the point on the sphere that is closest to the line.
-        let sphereCenter = Transform.worldVec3ToCartesian3(tile.boundingVolume.boundingSphereCenter, frameState.tilingScheme, scratchWorldCartesian3);
-        let metersPerUnit = Transform.getMetersPerUnit(frameState.tilingScheme);
+        let sphereCenter = Transform.worldCar3ToEarthVec3(tile.boundingVolume.boundingSphereCenter, scratchWorldCartesian3);
+        let metersPerUnit = Transform.getMetersPerUnit();
         let radius = tile.boundingVolume.boundingSphereRadius * metersPerUnit;
-        let scaledCameraDirection = Vec3.multiplyScalar(scratchCartesian, frameState.cameraDirectionWC, tile.centerZDepth);
-        let closestPointOnLine = Vec3.add(scratchCartesian, frameState.cameraPositionWC, scaledCameraDirection);
+        let scaledCameraDirection = Cartesian3.multiplyScalar(scratchCartesian, frameState.cameraDirectionWC, tile.centerZDepth);
+        let closestPointOnLine = Cartesian3.add(scratchCartesian, frameState.cameraPositionWC, scaledCameraDirection);
         // The distance from the camera's view direction to the tile.
-        let toLine = Vec3.subtract(scratchCartesian, closestPointOnLine, sphereCenter);
-        let distanceToCenterLine = Vec3.len(toLine);
+        let toLine = Cartesian3.subtract(scratchCartesian, closestPointOnLine, sphereCenter);
+        let distanceToCenterLine = Cartesian3.len(toLine);
         let notTouchingSphere = distanceToCenterLine > radius;
 
         // If camera's direction vector is inside the bounding sphere then consider
@@ -822,12 +839,12 @@ export class Earth3DTile {
         // Otherwise,_foveatedFactor is one minus the dot product of the camera's direction
         // and the vector between the camera and the point on the bounding sphere closest to the view line.
         if (notTouchingSphere) {
-            let toLineNormalized = Vec3.normalize(scratchCartesian, toLine);
-            let scaledToLine = Vec3.multiplyScalar(scratchCartesian, toLineNormalized, radius);
-            let closestOnSphere = Vec3.add(scratchCartesian, sphereCenter, scaledToLine);
-            let toClosestOnSphere = Vec3.subtract(scratchCartesian, closestOnSphere, frameState.cameraPositionWC);
-            let toClosestOnSphereNormalize = Vec3.normalize(scratchCartesian, toClosestOnSphere);
-            tile._foveatedFactor = 1 - Math.abs(Vec3.dot(frameState.cameraDirectionWC, toClosestOnSphereNormalize));
+            let toLineNormalized = Cartesian3.normalize(scratchCartesian, toLine);
+            let scaledToLine = Cartesian3.multiplyScalar(scratchCartesian, toLineNormalized, radius);
+            let closestOnSphere = Cartesian3.add(scratchCartesian, sphereCenter, scaledToLine);
+            let toClosestOnSphere = Cartesian3.subtract(scratchCartesian, closestOnSphere, frameState.cameraPositionWC);
+            let toClosestOnSphereNormalize = Cartesian3.normalize(scratchCartesian, toClosestOnSphere);
+            tile._foveatedFactor = 1 - Math.abs(Cartesian3.dot(frameState.cameraDirectionWC, toClosestOnSphereNormalize));
         } else {
             this._foveatedFactor = 0.0;
         }
@@ -847,7 +864,7 @@ export class Earth3DTile {
         }
 
         // 0.14 for fov = 60. NOTE very hard to defer vertically foveated tiles since max is based on fovy (which is fov). Lowering the 0.5 to a smaller fraction of the screen height will start to defer vertically foveated tiles.
-        let maximumFovatedFactor = 1.0 - Math.cos(frameState.camera.camera.fov * 0.5);
+        let maximumFovatedFactor = 1.0 - Math.cos(frameState.camera.fov * 0.5);
         let foveatedConeFactor = tileset.foveatedConeSize * maximumFovatedFactor;
         // If it's inside the user-defined view cone, then it should not be deferred.
         if (tile._foveatedFactor <= foveatedConeFactor) {
@@ -882,7 +899,7 @@ export class Earth3DTile {
 
     private priorityNormalizeAndClamp (value: number, minimum: number, maximum: number) {
         return Math.max(
-            EarthMath.normalize(value, minimum, maximum) - EarthMath.EPSILON7,
+            math.normalize(value, minimum, maximum) - math.EPSILON7,
             0.0
         ); // Subtract epsilon since we only want decimal digits present in the output.
     }
@@ -1068,7 +1085,7 @@ export class Earth3DTile {
             }
             let content = tile.makeContent(tile, arrayBuffer);
             tile._contentState = Earth3DTileContentState.PROCESSING;
-            content.readyPromise.then((content: Earth3DTileContent) => {
+            content.readyPromise.then((content: IEarth3DTileContent) => {
                 if (tile.isDestroyed()) {
                     //Tile is unloaded before the content finishes processing
                     tile.singleContentFailed(tileset, tile, "tile has been destroy.");
@@ -1106,7 +1123,7 @@ export class Earth3DTile {
      * @param tile 
      * @param arrayBuffer 
      */
-    private makeContent (tile: Earth3DTile, arrayBuffer: any) {
+    private makeContent (tile: Earth3DTile, arrayBuffer: any): IEarth3DTileContent {
         let preprocessed = preprocess3DTileContent(arrayBuffer);
 
         // Vector and Geometry tile rendering do not support the skip LOD optimization.

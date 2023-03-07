@@ -2,16 +2,19 @@ import { Plane, Vector3 } from "three";
 import { VecConstants } from "../../../core/constants/vec_constants";
 import { math } from "../../../core/math/math";
 import { Utils } from "../../../core/utils/utils";
-import { ICartesian3Like } from "../../@types/core/gis";
+import { CoordinateOffsetType, ICartesian3Like } from "../../@types/core/gis";
 import { Cartesian3 } from "../cartesian/cartesian3";
 import { Cartographic } from "../cartographic";
 import { InternalConfig } from "../internal/internal_config";
+import { CoordinateTransform } from "../misc/crs/coordinate_transform";
+import { IProjection } from "../projection/projection";
 import { IImageryTileProvider } from "../provider/imagery_tile_provider";
 import { FrameState } from "../scene/frame_state";
 import { QuadtreeTile } from "../scene/quad_tree_tile";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 
 const scratchCartesian3 = new Cartesian3();
+const scratchCartographic = new Cartographic();
 
 export class Transform {
     //每一个threejs单位 代表实际的多少米
@@ -91,7 +94,7 @@ export class Transform {
      * @param cartesian3 
      * @returns 
      */
-    public static geoCart3ToWorldCar3 (cartesian3: Cartesian3, out?: Cartesian3) {
+    public static geoCar3ToWorldCar3 (cartesian3: Cartesian3, out?: Cartesian3) {
         let metersPerUnit = this.getMetersPerUnit();
         let result = this.earthCar3ToWorldCar3(cartesian3, out);
         result.multiplyScalar(1 / metersPerUnit);
@@ -119,7 +122,7 @@ export class Transform {
      */
     public static cartographicToWorldCar3 (cartographic: Cartographic, tilingScheme: ITilingScheme, out?: Cartesian3) {
         let cartesian3 = tilingScheme.projection.project(cartographic);
-        return this.geoCart3ToWorldCar3(cartesian3, out);
+        return this.geoCar3ToWorldCar3(cartesian3, out);
     }
 
     /**
@@ -142,6 +145,48 @@ export class Transform {
     public static worldCar3ToCartographic (worldVec3: ICartesian3Like, tilingScheme: ITilingScheme, out?: Cartographic) {
         let cartesian3 = this.worldCar3ToEarthVec3(worldVec3, scratchCartesian3);
         return tilingScheme.projection.unproject(cartesian3, out);
+    }
+
+    /**
+     * 转换WGS84坐标
+     * @param projection 
+     * @param cartesian 
+     * @param coordinateOffsetType 
+     * @param out 
+     * @returns 
+     */
+    public static wgs84ToCartesian (projection: IProjection, cartesian: Cartesian3, coordinateOffsetType: CoordinateOffsetType, out?: Cartesian3) {
+        let cartographic = projection.unproject(cartesian, scratchCartographic);
+        let transformed = this.wgs84ToCartographic(cartographic, coordinateOffsetType, cartographic);
+        return projection.project(transformed, out);
+    }
+
+    /**
+     * 转换WGS84坐标
+     * @param cartographic 
+     * @param coordinateOffsetType 
+     * @param out
+     */
+    public static wgs84ToCartographic (cartographic: Cartographic, coordinateOffsetType: CoordinateOffsetType, out?: Cartographic) {
+        if (coordinateOffsetType === CoordinateOffsetType.NONE) return cartographic;
+        let lng = math.toDegree(cartographic.longitude);
+        let lat = math.toDegree(cartographic.latitude);
+        out = out || new Cartographic();
+        let resLng: number = 0;
+        let resLat: number = 0;
+        if (coordinateOffsetType === CoordinateOffsetType.GCJ02) {
+            let res = CoordinateTransform.wgs84togcj02(lng, lat);
+            resLng = res[0];
+            resLat = res[1];
+        } else if (coordinateOffsetType === CoordinateOffsetType.BD09) {
+            let res = CoordinateTransform.wgs84tobd09(lng, lat);
+            resLng = res[0];
+            resLat = res[1];
+        }
+        out.longitude = math.toRadian(resLng);
+        out.latitude = math.toRadian(resLat);
+        out.height = cartographic.height;
+        return out;
     }
 
     /**

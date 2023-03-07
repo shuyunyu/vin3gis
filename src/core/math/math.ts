@@ -141,4 +141,11 @@ export class math {
         return (1.0 - time) * p + time * q;
     }
 
+    public static normalize (value: number, rangeMinimum: number, rangeMaximum: number) {
+        rangeMaximum = Math.max(rangeMaximum - rangeMinimum, 0.0);
+        return rangeMaximum === 0.0
+            ? 0.0
+            : math.clamp((value - rangeMinimum) / rangeMaximum, 0.0, 1.0);
+    }
+
 }
