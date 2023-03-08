@@ -101,9 +101,6 @@ export class Earth3DTileset implements IPrimitive {
 
     private _pointCloudShading: PointCloudShading;
 
-    //是否合并网格
-    private _mergeMesh: boolean;
-
     //标识  是否root下的所有tile都是add类型
     private _allTilesAdditive: boolean = true;
 
@@ -370,10 +367,6 @@ export class Earth3DTileset implements IPrimitive {
         this._show = val;
     }
 
-    public get mergeMesh () {
-        return this._mergeMesh;
-    }
-
     public get pointCloudShading () {
         return this._pointCloudShading;
     }
@@ -444,7 +437,6 @@ export class Earth3DTileset implements IPrimitive {
         this._show = Utils.defaultValue(options.show, true);
         this._statistics = new Earth3DTilesetStatistics();
         this._maximumMemoryUsage = Utils.defaultValue(options.maximumMemoryUsage, 1024);
-        this._mergeMesh = Utils.defaultValue(options.mergeMesh, false);
         this._modelMatrix = Utils.defaultValue(options.modelMatrix, new Matrix4());
         this._maximumScreenSpaceError = Utils.defaultValue(options.maximumScreenSpaceError, 512);
         this._preloadFlightDestinations = Utils.defaultValue(options.preloadFlightDestinations, true);

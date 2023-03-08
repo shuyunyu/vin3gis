@@ -1,3 +1,4 @@
+import { Batched3DModel3DTileContent } from "./batched_3dmodel_3dtile_content";
 import { Earth3DTile } from "./earth_3dtile";
 import { Earth3DTileset } from "./earth_3dtileset";
 import { EarthTileset3DTileContent } from "./earth_tileset_3dtile_content";

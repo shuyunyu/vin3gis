@@ -19,8 +19,6 @@ export interface Earth3DTilesetOptions {
     modelMatrix?: Matrix4;
     //是否显示 defalt true
     show?: boolean;
-    //是否合并网格
-    mergeMesh?: boolean;
     //最大屏幕空间误差
     maximumScreenSpaceError?: number;
     //是否在隐藏的时候进行资源加载 default false

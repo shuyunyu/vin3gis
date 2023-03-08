@@ -20,31 +20,30 @@ export class Matrix3Utils {
         let sinAngle = Math.sin(angle);
 
         if (!Utils.defined(result)) {
-            return new Matrix3(
-            ).set(
-                1.0,
-                0.0,
-                0.0,
-                0.0,
-                cosAngle,
-                -sinAngle,
-                0.0,
-                sinAngle,
-                cosAngle
-            );
+            const result = new Matrix3();
+            result.elements[0] = 1.0;
+            result.elements[1] = 0.0;
+            result.elements[2] = 0.0;
+            result.elements[3] = 0.0;
+            result.elements[4] = cosAngle;
+            result.elements[5] = -sinAngle;
+            result.elements[6] = 0.0;
+            result.elements[7] = sinAngle;
+            result.elements[8] = cosAngle;
+            return result;
         }
 
-        result!.elements[0] = 1.0;
-        result!.elements[1] = 0.0;
-        result!.elements[2] = 0.0;
-        result!.elements[3] = 0.0;
-        result!.elements[4] = cosAngle;
-        result!.elements[5] = sinAngle;
-        result!.elements[6] = 0.0;
-        result!.elements[7] = -sinAngle;
-        result!.elements[8] = cosAngle;
+        result.elements[0] = 1.0;
+        result.elements[1] = 0.0;
+        result.elements[2] = 0.0;
+        result.elements[3] = 0.0;
+        result.elements[4] = cosAngle;
+        result.elements[5] = sinAngle;
+        result.elements[6] = 0.0;
+        result.elements[7] = -sinAngle;
+        result.elements[8] = cosAngle;
 
-        return result!;
+        return result;
     }
 
 }

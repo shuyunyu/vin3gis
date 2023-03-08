@@ -19,10 +19,8 @@ const scratchCartesian3 = new Cartesian3();
 const scratchCartographic = new Cartographic();
 
 const scratchCenter = new Cartesian3();
-const scratchCartographic1 = new Cartographic();
-const scratchMat4 = new Matrix4();
 
-const swizzleMatrix = new Matrix4().set(
+const swizzleMatrix = new Matrix4().fromArray([
     0.0,
     0.0,
     1.0,
@@ -39,7 +37,7 @@ const swizzleMatrix = new Matrix4().set(
     0.0,
     0.0,
     1.0
-);
+]);
 
 const vectorProductLocalFrame: Record<string, Record<string, string>> = {
     up: {
@@ -355,6 +353,18 @@ export class Transform {
         result.multiply(result);
         Matrix4Utils.setTranslation(result, projectedPosition, result);
 
+        return result;
+    }
+
+    public static wgs84To2DModelMatrix (projection: IProjection, center: Cartesian3, result: Matrix4) {
+        let ellipsoid = projection.ellipsoid;
+        let fromENU = this.eastNorthUpToFixedFrame(center, ellipsoid, scratchFromENU);
+        let toENU = Matrix4Utils.inverseTransformation(fromENU, scratchToENU);
+        let cartographic = ellipsoid.cartesianToCartographic(center, scratchCartographic);
+        let projectedPosition = projection.project(cartographic!);
+        let translation = scratchFromENU.identity().makeTranslation(projectedPosition.x, projectedPosition.y, projectedPosition.z);
+        result.copy(swizzleMatrix).multiply(toENU);
+        Matrix4Utils.multiply(translation, result, result);
         return result;
     }
 

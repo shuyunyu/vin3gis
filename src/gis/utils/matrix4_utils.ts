@@ -171,25 +171,24 @@ export class Matrix4Utils {
         translation = Utils.defaultValue(translation, new Cartesian3());
 
         if (!Utils.defined(result)) {
-            return new Matrix4()
-                .set(
-                    rotation.elements[0],
-                    rotation.elements[3],
-                    rotation.elements[6],
-                    translation!.x,
-                    rotation.elements[1],
-                    rotation.elements[4],
-                    rotation.elements[7],
-                    translation!.y,
-                    rotation.elements[2],
-                    rotation.elements[5],
-                    rotation.elements[8],
-                    translation!.z,
-                    0.0,
-                    0.0,
-                    0.0,
-                    1.0
-                );
+            result = new Matrix4();
+            result.elements[0] = rotation.elements[0];
+            result.elements[1] = rotation.elements[3];
+            result.elements[2] = rotation.elements[6];
+            result.elements[3] = translation!.x;
+            result.elements[4] = rotation.elements[1];
+            result.elements[5] = rotation.elements[4];
+            result.elements[6] = rotation.elements[7];
+            result.elements[7] = translation!.y;
+            result.elements[8] = rotation.elements[2];
+            result.elements[9] = rotation.elements[5];
+            result.elements[10] = rotation.elements[8];
+            result.elements[11] = translation!.z;
+            result.elements[12] = 0.0;
+            result.elements[13] = 0.0;
+            result.elements[14] = 0.0;
+            result.elements[15] = 1.0;
+            return result;
         }
 
         result.elements[0] = rotation.elements[0];
