@@ -8,16 +8,20 @@ import { gltfCache } from "../../cache/gltf_cache";
 import { Cartesian3 } from "../../cartesian/cartesian3";
 import { Cartesian4 } from "../../cartesian/cartesian4";
 import { Cartographic } from "../../cartographic";
+import { GltfLoader } from "../../loader/gltf_loader";
 import { Axis } from "../../misc/axis";
 import { ComponentDatatype } from "../../misc/component_data_type";
 import { getJsonFromTypedArray } from "../../misc/get_json_from_typed_array";
 import { Transform } from "../../transform/transform";
 import { FrameState } from "../frame_state";
+import { GltfConvert } from "../model/gltf/gltf_convert";
 import { Earth3DTile } from "./earth_3dtile";
 import { Earth3DTileset } from "./earth_3dtileset";
 import { Earth3DTileBatchTable } from "./earth_3dtile_batch_table";
 import { IEarth3DTileContent } from "./earth_3dtile_content";
 import { Earth3DTileFeatureTable } from "./earth_3dtile_feature_table";
+const buffer = require("buffer/");
+
 
 const sizeOfUint32 = Uint32Array.BYTES_PER_ELEMENT;
 let scratchComputedMatrixIn2D = new Matrix4();
@@ -301,7 +305,7 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
 
         //转换gltf
         // let gltf = parseGlb(gltfView);
-        let gltf = GlbToGltfConvert.convertGlbToGltf(new buffer.Buffer(gltfView), true);
+        let gltf = GltfConvert.convertGlbToGltf(new buffer.Buffer(gltfView), true);
 
         this._rtcCenterTransform = MatConstants.Mat4_IDENTITY;
         var rtcCenter = featureTable.getGlobalProperty(
@@ -322,11 +326,7 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
         this.updateContentMatrix(this.tile, gltf);
 
 
-        GltfLoader.loadByJson(this.tileset.tilingScheme.projection, this._contentModelMatrix, this.tileset.coordinateOffsetType, this.tileset.gltfUpAxis, gltf, node, this.getLoadOptions(this._computedMartix, this.tile.id),
-            (err: any, n: Node) => {
-                // console.log(n);
-                // this._readyPromise_resolve!(this);
-            });
+        GltfLoader.loadByJson(this.tileset.tilingScheme.projection, this._contentModelMatrix, this.tileset.coordinateOffsetType, this.tileset.gltfUpAxis, gltf);
     }
 
     private updateContentMatrix (tile: Earth3DTile, gltf: any) {
