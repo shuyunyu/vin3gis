@@ -199,4 +199,60 @@ export class AssetLoader {
         });
     }
 
+    /**
+     * 请求ArrayBuffer数据
+     * @param params 
+     */
+    public static requestArrayBuffer (params: AssetDefines.LoadAssetParams, cb: (res: { buffer: ArrayBuffer, result: RequestTaskResult }) => void) {
+        return requestSystem.request({
+            url: params.url,
+            imageTask: false,
+            taskType: SystemDefines.RequestTaskeType.ARRAYBUFFER,
+            params: params.params,
+            priority: params.priority,
+            responseType: XHRResponseType.ARRAYBUFFER,
+            throttle: params.throttle,
+            throttleServer: params.throttleServer,
+            onComplete: (result: RequestTaskResult) => {
+                if (result.status === RequestTaskStatus.SUCCESS) {
+                    cb({
+                        buffer: result.response.data,
+                        result: result
+                    });
+                } else {
+                    cb({
+                        buffer: null,
+                        result: result
+                    });
+                }
+            }
+        })
+    }
+
+    /**
+     * 加载ArrayBuffer数据
+     * @param params 
+     */
+    public static loadArrayBuffer (params: AssetDefines.LoadAssetParams) {
+        return new Promise<ArrayBuffer>((resolve, reject) => {
+            requestSystem.request({
+                url: params.url,
+                imageTask: false,
+                taskType: SystemDefines.RequestTaskeType.ARRAYBUFFER,
+                params: params.params,
+                priority: params.priority,
+                responseType: XHRResponseType.ARRAYBUFFER,
+                throttle: params.throttle,
+                throttleServer: params.throttleServer,
+                onComplete: (result: RequestTaskResult) => {
+                    if (result.status === RequestTaskStatus.SUCCESS) {
+                        resolve(result.response.data as ArrayBuffer);
+                    } else {
+                        reject(result.error);
+                    }
+                }
+            })
+        });
+    }
+
 }

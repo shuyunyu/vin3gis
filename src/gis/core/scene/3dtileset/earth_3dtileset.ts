@@ -92,6 +92,10 @@ export class Earth3DTileset implements IPrimitive {
     //发送 3dtile请求时的 请求配置
     private _assetLoadParams: XHRRequestOptions;
 
+    public get assetLoadParams () {
+        return this._assetLoadParams;
+    }
+
     //gltf up axis
     private _gltfUpAxis?: Earth3DTilesetGltfUpAxis;
 

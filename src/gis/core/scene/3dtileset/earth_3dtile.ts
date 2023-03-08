@@ -1,7 +1,9 @@
 import { Matrix3, Matrix4, Vector3 } from "three";
+import { AssetLoader } from "../../../../core/asset/asset_loader";
 import { MatConstants } from "../../../../core/constants/mat_constants";
 import { math } from "../../../../core/math/math";
 import { Utils } from "../../../../core/utils/utils";
+import { IScheduleRequestTask, RequestTaskResult, RequestTaskStatus } from "../../../../core/xhr/scheduler/@types/request";
 import { Earth3DTileContentState, Earth3DTileOptimizationHint, Earth3DTileOptions, Earth3DTileRefine, has3DTilesExtension } from "../../../@types/core/earth_3dtileset";
 import { BoundingShpereUtils } from "../../../utils/bounding_shpere_utils";
 import { Matrix4Utils } from "../../../utils/matrix4_utils";
@@ -179,7 +181,7 @@ export class Earth3DTile {
 
     private _selectionDepth: number = 0;
 
-    private _requestTask: RequestTask;
+    private _requestTask: IScheduleRequestTask;
 
     public get id () {
         return this._id;
@@ -736,7 +738,7 @@ export class Earth3DTile {
     private createBox (box: any, transform: Matrix4, out?: IBoundingVolume): IBoundingVolume {
         let center = new Cartesian3(Number(box[0]), Number(box[1]), Number(box[2]));
         let halfAxes = new Matrix3().fromArray(box, 3);
-        center = Matrix4.multiplyByPoint(transform, center, center);
+        center = Matrix4Utils.multiplyByPoint(transform, center, center);
         let rotationScale = Matrix4Utils.getMatrix3(transform, scratchMatrix);
         halfAxes = halfAxes.copy(rotationScale.multiply(halfAxes));
         if (Utils.defined(out) && out instanceof BoundingOrientedBoxVolume) {
@@ -758,7 +760,7 @@ export class Earth3DTile {
         let center = new Cartesian3(x, y, z);
 
         //计算变换后的中心点
-        center = Matrix4.multiplyByPoint(transform, center, center);
+        center = Matrix4Utils.multiplyByPoint(transform, center, center);
         let scale = Matrix4Utils.getScale(transform, center);
         let uniformScale = scale.max();
         radius *= uniformScale;
@@ -1023,7 +1025,7 @@ export class Earth3DTile {
      */
     public cancelRequest () {
         if (Utils.defined(this._requestTask)) {
-            this._requestTask!.cancel();
+            this._requestTask.abort();
         }
     }
 
@@ -1053,18 +1055,22 @@ export class Earth3DTile {
      * 创建 获取 content 二进制 数据的 promise
      */
     private createFetchContentArrayBufferPromise (tile: Earth3DTile) {
-        return new Promise<any>((resolve, reject) => {
+        return new Promise<ArrayBuffer>((resolve, reject) => {
             let tileset = tile.tileset;
             let absoluteUri = Utils.getAbsouteUri(tile.tilesetRecourceUri || "", tile.resourceUri!);
-            this._requestTask = GISResLoader.instance.loadRemoteArrayBuffer(absoluteUri, tile.id, tileset.id, tile.priority, (err: any, arrayBuffer: any) => {
-                if (err) {
-                    reject(err)
+            this._requestTask = AssetLoader.requestArrayBuffer({
+                url: absoluteUri,
+                priority: tile.priority,
+                params: Object.assign({}, tileset.assetLoadParams, {
+                    url: absoluteUri
+                })
+            }, (res: { buffer: ArrayBuffer, result: RequestTaskResult }) => {
+                if (res.buffer) {
+                    resolve(res.buffer);
                 } else {
-                    resolve(arrayBuffer);
+                    reject(res.result);
                 }
-            }, Object.assign({}, tileset.requestConfig, {
-                url: absoluteUri
-            }));
+            });
         });
     }
 
@@ -1097,9 +1103,9 @@ export class Earth3DTile {
                 tile._contentState = Earth3DTileContentState.READY;
                 tile._contentReadyPromise_resolve!(content);
             });
-        }).catch((err: RequestTaskResponse) => {
+        }).catch((err: RequestTaskResult) => {
             //TODO Cancelled due to low priority - try again later.
-            if (err && err.state === RequestTaskState.CANCELED) {
+            if (err && err.status === RequestTaskStatus.ABORT) {
                 tile._contentState = previousState;
             } else {
                 tile.singleContentFailed(tileset, tile, err);
