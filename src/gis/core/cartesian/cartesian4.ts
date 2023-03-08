@@ -10,6 +10,7 @@ export class Cartesian4 implements ICartesian2Like, ICartesian3Like, ICartesian4
     public static ZERO = Object.freeze(new Cartesian4(0, 0, 0, 0));
     public static ONE = Object.freeze(new Cartesian4(1, 1, 1, 1));
     public static NEG_ONE = Object.freeze(new Cartesian4(-1, -1, -1, -1));
+    public static UNIT_W = Object.freeze(new Cartesian4(0, 0, 0, 1));
 
     public x: number = 0;
 

@@ -148,4 +148,9 @@ export class math {
             : math.clamp((value - rangeMinimum) / rangeMaximum, 0.0, 1.0);
     }
 
+    public static cbrt (num: number) {
+        var result = Math.pow(Math.abs(num), 1.0 / 3.0);
+        return num < 0.0 ? -result : result;
+    }
+
 }

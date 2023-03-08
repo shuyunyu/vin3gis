@@ -1,10 +1,12 @@
-import { Plane, Vector3 } from "three";
+import { Matrix3, Matrix4, Plane, Vector3 } from "three";
 import { VecConstants } from "../../../core/constants/vec_constants";
 import { math } from "../../../core/math/math";
 import { Utils } from "../../../core/utils/utils";
 import { CoordinateOffsetType, ICartesian3Like } from "../../@types/core/gis";
+import { Matrix4Utils } from "../../utils/matrix4_utils";
 import { Cartesian3 } from "../cartesian/cartesian3";
 import { Cartographic } from "../cartographic";
+import { Ellipsoid, EllipsoidWGS84 } from "../ellipsoid/ellipsoid";
 import { InternalConfig } from "../internal/internal_config";
 import { CoordinateTransform } from "../misc/crs/coordinate_transform";
 import { IProjection } from "../projection/projection";
@@ -15,6 +17,99 @@ import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 
 const scratchCartesian3 = new Cartesian3();
 const scratchCartographic = new Cartographic();
+
+const scratchCenter = new Cartesian3();
+const scratchCartographic1 = new Cartographic();
+const scratchMat4 = new Matrix4();
+
+const swizzleMatrix = new Matrix4().set(
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+);
+
+const vectorProductLocalFrame: Record<string, Record<string, string>> = {
+    up: {
+        south: "east",
+        north: "west",
+        west: "south",
+        east: "north",
+    },
+    down: {
+        south: "west",
+        north: "east",
+        west: "north",
+        east: "south",
+    },
+    south: {
+        up: "west",
+        down: "east",
+        west: "down",
+        east: "up",
+    },
+    north: {
+        up: "east",
+        down: "west",
+        west: "up",
+        east: "down",
+    },
+    west: {
+        up: "north",
+        down: "south",
+        north: "down",
+        south: "up",
+    },
+    east: {
+        up: "south",
+        down: "north",
+        north: "up",
+        south: "down",
+    },
+};
+
+const localFrameToFixedFrameCache: Record<string, Function> = {};
+
+const degeneratePositionLocalFrame: Record<string, number[]> = {
+    north: [-1, 0, 0],
+    east: [0, 1, 0],
+    up: [0, 0, 1],
+    south: [1, 0, 0],
+    west: [0, -1, 0],
+    down: [0, 0, -1],
+};
+
+
+const scratchFirstCartesian = new Cartesian3();
+const scratchSecondCartesian = new Cartesian3();
+const scratchThirdCartesian = new Cartesian3();
+
+const scratchFromENU = new Matrix4();
+const scratchRotation = new Matrix3();
+const scratchToENU = new Matrix4();
+
+const scratchCalculateCartesian: Record<string, Cartesian3> = {
+    east: new Cartesian3(),
+    north: new Cartesian3(),
+    up: new Cartesian3(),
+    west: new Cartesian3(),
+    south: new Cartesian3(),
+    down: new Cartesian3(),
+};
+
+let METERS_SCALE: Vector3;
 
 export class Transform {
     //每一个threejs单位 代表实际的多少米
@@ -29,6 +124,18 @@ export class Transform {
      */
     public static getMetersPerUnit () {
         return this.THREEJS_UNIT_PER_METERS;
+    }
+
+    /**
+     * 获取 缩放比例矢量
+     */
+    public static getMetersScale () {
+        if (METERS_SCALE !== undefined) {
+            return METERS_SCALE;
+        }
+        let scale = 1 / this.getMetersPerUnit();
+        METERS_SCALE = new Vector3(scale, scale, scale);
+        return METERS_SCALE;
     }
 
     /**
@@ -223,6 +330,136 @@ export class Transform {
     public static validateSpaceError (tile: QuadtreeTile, imageryTileProvider: IImageryTileProvider, frameState: FrameState) {
         let error = this.computeSpaceError(imageryTileProvider, tile, frameState);
         return error < InternalConfig.SPACE_ERROR;
+    }
+
+
+
+    /**
+     * 基础2d变换
+     * @param projection 
+     * @param matrix 
+     * @param result 
+     */
+    public static basisTo2D (projection: IProjection, matrix: Matrix4, result: Matrix4) {
+        let rtcCenter = Matrix4Utils.getTranslation(matrix, scratchCenter);
+        let ellipsoid = projection.ellipsoid;
+        // Get the 2D Center
+        let cartographic = ellipsoid.cartesianToCartographic(rtcCenter, scratchCartographic);
+        let projectedPosition = projection.project(cartographic!);
+        // Assuming the instance are positioned in WGS84, invert the WGS84 transform to get the local transform and then convert to 2D
+        let fromENU = this.eastNorthUpToFixedFrame(rtcCenter, ellipsoid, scratchFromENU);
+        let toENU = Matrix4Utils.inverseTransformation(fromENU, scratchToENU);
+        let rotation = Matrix4Utils.getMatrix3(matrix, scratchRotation);
+        let local = Matrix4Utils.multiplyByMatrix3(toENU, rotation, result);
+        // Mat4.multiply(result, local, result);
+        result.multiply(result);
+        Matrix4Utils.setTranslation(result, projectedPosition, result);
+
+        return result;
+    }
+
+    public static eastNorthUpToFixedFrame (origin: Cartesian3, ellipsoid?: Ellipsoid, result?: Matrix4) {
+        return this.localFrameToFixedFrameGenerator("east", "north").apply(this, [origin, ellipsoid, result]);
+    }
+
+    public static northEastDownToFixedFrame (origin: Cartesian3, ellipsoid?: Ellipsoid, result?: Matrix4) {
+        return this.localFrameToFixedFrameGenerator("north", "east").apply(this, [origin, ellipsoid, result]);
+    }
+
+    public static northUpEastToFixedFrame (origin: Cartesian3, ellipsoid?: Ellipsoid, result?: Matrix4) {
+        return this.localFrameToFixedFrameGenerator("north", "up").apply(this, [origin, ellipsoid, result]);
+    }
+
+    public static northWestUpToFixedFrame (origin: Cartesian3, ellipsoid?: Ellipsoid, result?: Matrix4) {
+        return this.localFrameToFixedFrameGenerator("north", "west").apply(this, [origin, ellipsoid, result]);
+    }
+
+    /**
+     * Generates a function that computes a 4x4 transformation matrix from a reference frame
+     * centered at the provided origin to the provided ellipsoid's fixed reference frame.
+     * @param firstAxis 
+     * @param secondAxis 
+     */
+    private static localFrameToFixedFrameGenerator (firstAxis: string, secondAxis: string): Function {
+        let thirdAxis = vectorProductLocalFrame[firstAxis][secondAxis];
+        let resultat;
+        let hashAxis = firstAxis + secondAxis;
+        if (Utils.defined(localFrameToFixedFrameCache[hashAxis])) {
+            resultat = localFrameToFixedFrameCache[hashAxis];
+        } else {
+            resultat = function (origin: Cartesian3, ellipsoid?: Ellipsoid, result?: Matrix4) {
+                if (
+                    Cartesian3.equalsEpsilon(origin, Cartesian3.ZERO, math.EPSILON14)
+                ) {
+                    // If x, y, and z are zero, use the degenerate local frame, which is a special case
+                    Cartesian3.unpack(degeneratePositionLocalFrame[firstAxis], 0, scratchFirstCartesian);
+                    Cartesian3.unpack(degeneratePositionLocalFrame[secondAxis], 0, scratchSecondCartesian);
+                    Cartesian3.unpack(degeneratePositionLocalFrame[thirdAxis], 0, scratchThirdCartesian);
+                } else if (
+                    math.equalsEpsilon(origin.x, 0.0, math.EPSILON14) &&
+                    math.equalsEpsilon(origin.y, 0.0, math.EPSILON14)
+                ) {
+                    // If x and y are zero, assume origin is at a pole, which is a special case.
+                    let sign = Math.sign(origin.z);
+
+                    Cartesian3.unpack(degeneratePositionLocalFrame[firstAxis], 0, scratchFirstCartesian);
+                    if (firstAxis !== "east" && firstAxis !== "west") {
+                        Cartesian3.multiplyScalar(
+                            scratchFirstCartesian, scratchFirstCartesian, sign);
+                    }
+
+                    Cartesian3.unpack(degeneratePositionLocalFrame[secondAxis], 0, scratchSecondCartesian);
+                    if (secondAxis !== "east" && secondAxis !== "west") {
+                        Cartesian3.multiplyScalar(scratchSecondCartesian, scratchSecondCartesian, sign);
+                    }
+
+                    Cartesian3.unpack(degeneratePositionLocalFrame[thirdAxis], 0, scratchThirdCartesian);
+                    if (thirdAxis !== "east" && thirdAxis !== "west") {
+                        Cartesian3.multiplyScalar(scratchThirdCartesian, scratchThirdCartesian, sign
+                        );
+                    }
+                } else {
+                    ellipsoid = Utils.defaultValue(ellipsoid, EllipsoidWGS84);
+                    ellipsoid!.geodeticSurfaceNormal(origin, scratchCalculateCartesian.up);
+
+                    let up = scratchCalculateCartesian.up;
+                    let east = scratchCalculateCartesian.east;
+                    east.x = -origin.y;
+                    east.y = origin.x;
+                    east.z = 0.0;
+                    Cartesian3.normalize(scratchCalculateCartesian.east, east);
+                    Cartesian3.cross(scratchCalculateCartesian.north, up, east);
+
+                    Cartesian3.multiplyScalar(scratchCalculateCartesian.down, scratchCalculateCartesian.up, -1,
+                    );
+                    Cartesian3.multiplyScalar(scratchCalculateCartesian.west, scratchCalculateCartesian.east, -1);
+                    Cartesian3.multiplyScalar(scratchCalculateCartesian.south, scratchCalculateCartesian.north, -1);
+
+                    scratchFirstCartesian.set(scratchCalculateCartesian[firstAxis]);
+                    scratchSecondCartesian.set(scratchCalculateCartesian[secondAxis]);
+                    scratchThirdCartesian.set(scratchCalculateCartesian[thirdAxis]);
+                }
+                result.elements[0] = scratchFirstCartesian.x;
+                result.elements[1] = scratchFirstCartesian.y;
+                result.elements[2] = scratchFirstCartesian.z;
+                result.elements[3] = 0.0;
+                result.elements[4] = scratchSecondCartesian.x;
+                result.elements[5] = scratchSecondCartesian.y;
+                result.elements[6] = scratchSecondCartesian.z;
+                result.elements[7] = 0.0;
+                result.elements[8] = scratchThirdCartesian.x;
+                result.elements[9] = scratchThirdCartesian.y;
+                result.elements[10] = scratchThirdCartesian.z;
+                result.elements[11] = 0.0;
+                result.elements[12] = origin.x;
+                result.elements[13] = origin.y;
+                result.elements[14] = origin.z;
+                result.elements[15] = 1.0;
+                return result;
+            };
+            localFrameToFixedFrameCache[hashAxis] = resultat;
+        }
+        return resultat;
     }
 
 }

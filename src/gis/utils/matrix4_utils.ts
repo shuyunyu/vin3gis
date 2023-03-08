@@ -357,6 +357,13 @@ export class Matrix4Utils {
         return result;
     }
 
+    public static getTranslation (matrix: Matrix4, result: Cartesian3) {
+        result.x = matrix.elements[12];
+        result.y = matrix.elements[13];
+        result.z = matrix.elements[14];
+        return result;
+    }
+
     public static clone (matrix: Matrix4, result?: Matrix4) {
         if (!Utils.defined(matrix)) {
             return undefined;

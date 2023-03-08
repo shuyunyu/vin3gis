@@ -1,5 +1,7 @@
 import { Earth3DTile } from "./earth_3dtile";
 import { Earth3DTileset } from "./earth_3dtileset";
+import { EarthTileset3DTileContent } from "./earth_tileset_3dtile_content";
+import { PointCloud3DTileContent } from "./pointcloud_3dtile_content";
 
 /**
  * 3d tile content 工厂
