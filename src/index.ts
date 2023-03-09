@@ -16,6 +16,7 @@ export * from "./core/event/generic_event";
 export * from "./core/extend/unique_list";
 
 export * from "./core/math/math";
+export * from "./core/math/obb";
 
 export * from "./core/input/input";
 
