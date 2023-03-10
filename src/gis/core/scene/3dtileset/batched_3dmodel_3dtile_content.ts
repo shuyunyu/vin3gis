@@ -20,7 +20,6 @@ import { Earth3DTileset } from "./earth_3dtileset";
 import { Earth3DTileBatchTable } from "./earth_3dtile_batch_table";
 import { IEarth3DTileContent } from "./earth_3dtile_content";
 import { Earth3DTileFeatureTable } from "./earth_3dtile_feature_table";
-const buffer = require("buffer/");
 
 
 const sizeOfUint32 = Uint32Array.BYTES_PER_ELEMENT;
