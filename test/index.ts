@@ -1,5 +1,5 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Fog, FogExp2, FrontSide, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector2, Vector3 } from "three";
-import { AssetLoader, FrameRenderer, math, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
+import { AssetLoader, FrameRenderer, math, requestSystem, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, AnchorConstant, ArcGISImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
@@ -23,6 +23,7 @@ import { MultiPolylineGeometry } from "../src/gis/core/datasource/geometry/multi
 import { PolygonGeometry } from "../src/gis/core/datasource/geometry/polygon_geometry";
 import { GeoJSONLoader } from "../src/gis/core/loader/geojson_loader";
 import { PolygonShape } from "../src/gis/core/datasource/misc/polygon_shape";
+import { SystemDefines } from "../src/@types/core/system/system";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -611,6 +612,20 @@ class GISTest {
             }).catch(err => {
                 console.error(err);
             });
+        }
+        globalThis.testXHRArrayBuffer = () => {
+            requestSystem.request({
+                url: "https://threejs.org/examples/models/draco/bunny.drc?t=" + Date.now(),
+                responseType: XHRResponseType.ARRAYBUFFER,
+                taskType: SystemDefines.RequestTaskeType.ARRAYBUFFER,
+                onComplete: () => {
+                    console.log("onComplete");
+                },
+                requestInWorker: true,
+                onProgress: (total: number, loaded: number) => {
+                    console.log("onProgress: total: " + total + " loaded: " + loaded);
+                }
+            })
         }
     }
 

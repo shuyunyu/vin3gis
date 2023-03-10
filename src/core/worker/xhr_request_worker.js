@@ -238,6 +238,11 @@ var XHRRequest = /** @class */ (function () {
                 }
             }
         };
+        if (options.onProgress) {
+            httpRequest.onprogress = function (e) {
+                options.onProgress.call(null, e.total, e.loaded);
+            }
+        }
         httpRequest.ontimeout = function () {
             httpRequest.onreadystatechange = XHRRequest.falseFn;
             callback.call(null, 'XMLHttpRequest timeout', null);
@@ -638,6 +643,10 @@ globalThis.onmessage = function (event) {
     var requestId = data.params.requestId;
     // execute | abort (执行请求|终止请求)
     var taskType = data.params.taskType;
+    //set onProgress
+    options.onProgress = function (total, loaded) {
+        sendCompleteMessage(data, { total: total, loaded: loaded }, requestId, 'onprogress');
+    }
     if (taskType === "execute") {
         executeRequest(requestId, options, data);
     } else if (taskType === "abort") {
@@ -718,6 +727,9 @@ var findRequestIndex = function (requestId) {
 
 //发送完成消息
 var sendCompleteMessage = function (data, response, requestId, stats, transferObjs) {
+    if (response && response.config) {
+        response.config = Object.assign({}, response.config, { onProgress: null });
+    }
     postMessage({
         id: data.id,
         error: null,

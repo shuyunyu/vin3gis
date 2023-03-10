@@ -5,6 +5,9 @@ import TransferTypedArrayTestScript from "./transfer_typed_array_test_worker.js"
 let testing: boolean = false;
 let testAwiters: Record<string, Function>[] = [];
 
+//定义worker任务消息处理对象
+export type WorkerTaskMessageHandler = <P, R> (processor: TaskProcessor<P, R>, data: any) => void;
+
 const callTestAwiterResolve = function (result: boolean) {
     for (let i = 0; i < testAwiters.length; i++) {
         const awiter = testAwiters[i];
@@ -70,7 +73,7 @@ const createWorker = <P, R> (workerScriptstr: string, processor?: TaskProcessor<
         let worker = new Worker(URL.createObjectURL(jsBlob));
         if (Utils.defined(processor)) {
             worker.onmessage = function (event) {
-                completeTask(processor, event.data);
+                processor.taskMessageHanlder(processor, event.data);
             }
         }
         resolve(worker);
@@ -98,7 +101,7 @@ const completeTask = <P, R> (processor: TaskProcessor<P, R>, data: any) => {
     }
 
     delete processor.promiseMap[id];
-
+    delete processor.userDataMap[id];
 }
 
 
@@ -110,11 +113,15 @@ export class TaskProcessor<P, R> {
 
     private workerScriptstr: string;
 
+    public readonly taskMessageHanlder: WorkerTaskMessageHandler;
+
     private _maxmiumActiveTasks: number;
 
     public activeTasks = 0;
 
     public promiseMap: Record<string, Record<string, Function>> = {};
+
+    public userDataMap: Record<string, any> = {};
 
     public taskCompletedEvent = new GenericEvent<any>;
 
@@ -128,8 +135,9 @@ export class TaskProcessor<P, R> {
 
     public static canTransferArrayBuffer: boolean | undefined;
 
-    constructor (workerScriptstr: string, maxmiumActiveTasks?: number) {
+    constructor (workerScriptstr: string, taskMessageHanlder?: WorkerTaskMessageHandler, maxmiumActiveTasks?: number) {
         this.workerScriptstr = workerScriptstr;
+        this.taskMessageHanlder = taskMessageHanlder || completeTask;
         this._maxmiumActiveTasks = Utils.defaultValue(maxmiumActiveTasks, Number.POSITIVE_INFINITY);
     }
 
@@ -172,7 +180,7 @@ export class TaskProcessor<P, R> {
         });
     }
 
-    public scheduleTask (params: P, transferableObjects: Transferable[]) {
+    public scheduleTask (params: P, transferableObjects: Transferable[], useData?: any) {
         return new Promise<R>((resolve, reject) => {
             this.ready().then(() => {
                 if (this.activeTasks >= this._maxmiumActiveTasks) {
@@ -188,6 +196,7 @@ export class TaskProcessor<P, R> {
                         resolve: resolve,
                         reject: reject
                     }
+                    this.userDataMap[id] = useData;
                     this._worker.postMessage({
                         id: id,
                         params: params,
