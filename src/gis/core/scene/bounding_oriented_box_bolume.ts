@@ -1,5 +1,6 @@
-import { Box3, Matrix3, Sphere, Vector3 } from "three";
+import { Euler, Matrix3, Matrix4, Sphere, Vector3 } from "three";
 import { math } from "../../../core/math/math";
+import { OBB } from "../../../core/math/obb";
 import { IntersectUtils } from "../../../core/utils/intersect_utils";
 import { Utils } from "../../../core/utils/utils";
 import { Earth3DTilesetGltfUpAxis } from "../../@types/core/earth_3dtileset";
@@ -27,7 +28,7 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
     private _halfAxes: Matrix3 | undefined;
 
     //obb
-    private _obb: Box3 | undefined;
+    private _obb: OBB | undefined;
 
     private _boundingSphere: Sphere | undefined;
 
@@ -49,7 +50,7 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
     }
 
     public get obb () {
-        return this._obb!;
+        return this._obb;
     }
 
     public get boundingSphere () {
@@ -80,7 +81,7 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
     }
 
     public computeVisible (frameState: FrameState) {
-        return IntersectUtils.intersectBoxFrustum(this.obb, frameState.frustum);
+        return IntersectUtils.intersectOBBFrustum(this.obb, frameState.frustum);
     }
 
     public update (center: Cartesian3, halfAxes: Matrix3, coordinateOffsetType: CoordinateOffsetType) {
@@ -104,7 +105,7 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
         Cartesian3.add(u, u, v);
         Cartesian3.add(u, u, w);
         let radius = u.length();
-        let center = this.obb.getCenter(new Vector3());
+        let center = this.obb.center.clone();
         return new Sphere(center, radius);
     }
 
@@ -116,12 +117,10 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
         let hy = yV.length();
         let hz = zV.length();
         let centerVec = Transform.earthCar3ToWorldVec3(center, scratchVec3);
-        xV.normalize();
-        yV.normalize();
-        zV.normalize();
-        let obb = geometry.OBB.create(centerVec.x, centerVec.y, centerVec.z, hx, hz, hy, halfAxes.elements[0], halfAxes.elements[1], halfAxes.elements[2], halfAxes.elements[3], halfAxes.elements[4], halfAxes.elements[5], halfAxes.elements[6], halfAxes.elements[7], halfAxes.elements[8]);
+        let obb = new OBB(centerVec, new Vector3(hx, hy, hz), halfAxes);
         if (this._upAxis == Earth3DTilesetGltfUpAxis.Z) {
-            obb.translateAndRotate(Mat4.IDENTITY, Quat.fromEuler(new Quat(), -math.PI_OVER_TWO, 0, 0), obb);
+            const mat4 = new Matrix4().makeRotationFromEuler(new Euler(-math.PI_OVER_TWO, 0, 0));
+            obb.applyMatrix4(mat4)
         }
         return obb;
     }

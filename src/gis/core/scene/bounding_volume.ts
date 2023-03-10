@@ -5,7 +5,7 @@ import { FrameState } from "./frame_state";
  * 定义边界体
  */
 export interface IBoundingVolume {
-    //边界球
+    //包围球
     boundingSphere: Sphere;
     //边界球中心点  避免实时计算
     boundingSphereCenter: Vector3;
