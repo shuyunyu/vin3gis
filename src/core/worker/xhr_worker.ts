@@ -1,5 +1,6 @@
 import { Utils } from "../utils/utils";
 import { XHRCancelable, XHRRequestOptions, XHRResponse } from "../xhr/xhr_request";
+import { BaseWorker } from "./base_worker";
 import { TaskProcessor } from "./task_processor";
 import XHRRequestWorkerScriptStr from "./xhr_request_worker.js";
 
@@ -35,17 +36,20 @@ type OutputParams = {
 
 class XHRWorkerCancelToken implements XHRCancelable {
 
+    private _xhrWorker: XHRWorker;
+
     private _requestId: number;
 
     private _options: XHRRequestOptions;
 
-    public constructor (requestId: number, options: XHRRequestOptions) {
+    public constructor (xhrWorker: XHRWorker, requestId: number, options: XHRRequestOptions) {
+        this._xhrWorker = xhrWorker;
         this._requestId = requestId;
         this._options = options;
     }
 
     public abort () {
-        xhrWorker.abort(this._requestId, this._options);
+        this._xhrWorker.abort(this._requestId, this._options);
     }
 
 }
@@ -79,11 +83,11 @@ const taskMessageHandler = <P, R> (processor: TaskProcessor<P, R>, data: any) =>
 /**
  * 在worker中运行的XMLHttpRequest
  */
-class XHRWorker {
+export class XHRWorker extends BaseWorker {
 
     private _init: boolean = false;
 
-    private _taskProcessor: TaskProcessor<InputParams, OutputParams>;
+    protected _taskProcessor: TaskProcessor<InputParams, OutputParams>;
 
     private _requestId: number = 0;
 
@@ -120,7 +124,7 @@ class XHRWorker {
             const requestId = ++this._requestId;
             let canceled = false;
             if (options.cancelToken) {
-                options.cancelToken.httpRequest = new XHRWorkerCancelToken(requestId, options);
+                options.cancelToken.httpRequest = new XHRWorkerCancelToken(this, requestId, options);
                 canceled = options.cancelToken.canceled;
             }
             if (!canceled) {
@@ -188,5 +192,3 @@ class XHRWorker {
     }
 
 }
-
-export const xhrWorker = new XHRWorker();

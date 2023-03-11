@@ -1,5 +1,6 @@
-import { imageDecoder } from "./image_decoder";
+import { BaseWorker } from "./base_worker";
 import ImageMergerWorkerScriptStr from "./image_merger_worker.js";
+import { imageDecoderPool } from "./pool/image_decoder_pool";
 import { TaskProcessor } from "./task_processor";
 
 type InputParams = {
@@ -13,13 +14,14 @@ type InputParams = {
     options?: ImageBitmapOptions[];
 }
 
-class ImageMerger {
+export class ImageMerger extends BaseWorker {
 
     private _inited: boolean;
 
-    private _taskProcessor: TaskProcessor<InputParams, ImageBitmap[]>;
+    protected _taskProcessor: TaskProcessor<InputParams, ImageBitmap[]>;
 
     public constructor () {
+        super();
         this._inited = false;
     }
 
@@ -70,7 +72,7 @@ class ImageMerger {
         return new Promise<ImageBitmap>((resolve, reject) => {
             const isBlob = imageDatas[0] instanceof Blob;
             if (isBlob) {
-                imageDecoder.imageBlobToImageBitMapMulti(imageDatas as Blob[], options).then(images => {
+                imageDecoderPool.getInstance().imageBlobToImageBitMapMulti(imageDatas as Blob[], options).then(images => {
                     this.mergeImages(images, colCount, rowCount, imageWidth, imageHeight, options).then(resolve).catch(reject);
                 }).catch(reject);
             } else {
@@ -103,5 +105,3 @@ class ImageMerger {
     }
 
 }
-
-export const imageMerger = new ImageMerger();

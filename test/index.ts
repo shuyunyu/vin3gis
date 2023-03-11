@@ -4,7 +4,6 @@ import { AMapImageryTileProvider, AnchorConstant, ArcGISImageryTileProvider, Bil
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
-import { xhrWorker } from "../src/core/worker/xhr_worker";
 import { GridImageryTileProvider } from "../src/gis/core/provider/grid_imagery_tile_provider";
 import { createScheduler, removeScheduler } from "../src/core/utils/schedule_utils";
 import { BaiduImageryTileProvider } from "../src/gis/core/provider/baidu_imagery_tile_provider";
@@ -24,6 +23,7 @@ import { PolygonGeometry } from "../src/gis/core/datasource/geometry/polygon_geo
 import { GeoJSONLoader } from "../src/gis/core/loader/geojson_loader";
 import { PolygonShape } from "../src/gis/core/datasource/misc/polygon_shape";
 import { SystemDefines } from "../src/@types/core/system/system";
+import { xhrWorkerPool } from "../src/core/worker/pool/xhr_worker_pool";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -600,7 +600,7 @@ class GISTest {
     private static testXHRWorker () {
         globalThis.testXHRWorker = () => {
             const url = "https://webst04.is.autonavi.com/appmaptile?style=6&x=33&y=30&z=6";
-            xhrWorker.create({
+            xhrWorkerPool.getInstance().create({
                 url: url,
                 params: {},
                 responseType: XHRResponseType.BLOB,

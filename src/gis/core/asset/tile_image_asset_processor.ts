@@ -1,4 +1,4 @@
-import { imageDecoder } from "../../../core/worker/image_decoder";
+import { imageDecoderPool } from "../../../core/worker/pool/image_decoder_pool";
 import { ImageRequestResult } from "../../@types/core/gis";
 
 /**
@@ -20,7 +20,7 @@ export class TileImageAssetProcessor {
             if (this._image instanceof ImageBitmap) {
                 if (!this._abort) resolve(this._image);
             } else if (this._image instanceof Blob) {
-                imageDecoder.imageBlobToImageBitMap(this._image, { imageOrientation: 'flipY' }).then(imageBitMap => {
+                imageDecoderPool.getInstance().imageBlobToImageBitMap(this._image, { imageOrientation: 'flipY' }).then(imageBitMap => {
                     if (!this._abort) resolve(imageBitMap);
                 });
             } else {

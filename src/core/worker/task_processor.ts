@@ -209,4 +209,11 @@ export class TaskProcessor<P, R> {
         });
     }
 
+    public dispose () {
+        if (this._worker) {
+            this._worker.terminate();
+            this._worker = null;
+        }
+    }
+
 }

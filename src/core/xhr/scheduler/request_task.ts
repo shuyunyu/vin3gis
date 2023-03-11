@@ -1,4 +1,4 @@
-import { xhrWorker } from "../../worker/xhr_worker";
+import { xhrWorkerPool } from "../../worker/pool/xhr_worker_pool";
 import { XHRCancelToken, XHRRequest, XHRResponse } from "../xhr_request";
 import { RequestTaskOptions, RequestTaskPriority, RequestTaskStatus, RequestTaskType } from "./@types/request";
 import { RequestServer } from "./request_server";
@@ -152,7 +152,7 @@ export class RequestTask {
      * 执行一般请求
      */
     private executeNormalTask () {
-        (this._options.requestInWorker ? xhrWorker : XHRRequest).create(this._options).then((response: XHRResponse) => {
+        (this._options.requestInWorker ? xhrWorkerPool.getInstance() : XHRRequest).create(this._options).then((response: XHRResponse) => {
             if (!response.abort) {
                 this._options.onComplete({
                     response: response,

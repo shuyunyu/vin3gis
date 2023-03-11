@@ -1,5 +1,6 @@
 import { TaskProcessor } from "./task_processor";
 import ImageDecoderWorkerScriptStr from "./image_decoder_worker.js";
+import { BaseWorker } from "./base_worker";
 
 enum TaskType {
     BUFFER = "base64BufferToImageBitMap",
@@ -19,13 +20,14 @@ type OutpuParams = ImageBitmap[];
 /**
  * 图片解码器
  */
-class ImageDecoder {
+export class ImageDecoder extends BaseWorker {
 
     private _inited: boolean;
 
-    private _taskProcessor: TaskProcessor<InputParams, OutpuParams>;
+    protected _taskProcessor: TaskProcessor<InputParams, OutpuParams>;
 
     public constructor () {
+        super();
         this._inited = false;
     }
 
@@ -98,5 +100,3 @@ class ImageDecoder {
     }
 
 }
-
-export const imageDecoder = new ImageDecoder();

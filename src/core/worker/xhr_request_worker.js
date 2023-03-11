@@ -638,7 +638,7 @@ var requests = [];
 globalThis.onmessage = function (event) {
     var data = event.data;
     //XHRRequest.create的参数
-    var options = data.params.options;
+    var options = data.params.options || {};
     //the request's uuid
     var requestId = data.params.requestId;
     // execute | abort (执行请求|终止请求)
