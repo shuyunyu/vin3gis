@@ -99,7 +99,7 @@ class GISTest {
 
         const dracoLoader = new DRACOLoader();
         dracoLoader.setPath("https://threejs.org/examples/");
-        dracoLoader.setDecoderPath("https://threejs.org/examples/jsm/libs/draco/");
+        dracoLoader.setDecoderPath("http://124.223.202.45/Vin3GIS/v0.0.1/libs/draco/");
         dracoLoader.setDecoderConfig({ type: "wasm" });
         dracoLoader.load('models/draco/bunny.drc', function (geometry) {
 
