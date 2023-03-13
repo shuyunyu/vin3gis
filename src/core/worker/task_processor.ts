@@ -27,11 +27,11 @@ const canTransferArrayBuffer = function () {
             });
             if (!testing) {
                 testing = true;
-                createWorker(TransferTypedArrayTestScript).then((worker: Worker) => {
+                createWorker(TransferTypedArrayTestScript).then(res => {
                     let value = 99;
                     let array = new Int8Array([value]);
                     try {
-                        worker.postMessage({
+                        res.worker.postMessage({
                             array: array,
                         },
                             [array.buffer]);
@@ -39,7 +39,7 @@ const canTransferArrayBuffer = function () {
                         TaskProcessor.canTransferArrayBuffer = false;
                         callTestAwiterResolve(false);
                     }
-                    worker.onmessage = (event) => {
+                    res.worker.onmessage = (event) => {
                         var array = event.data.array;
 
                         // some versions of Firefox silently fail to transfer typed arrays.
@@ -48,7 +48,8 @@ const canTransferArrayBuffer = function () {
                         var result = Utils.defined(array) && array[0] === value;
 
                         TaskProcessor.canTransferArrayBuffer = result;
-                        worker.terminate();
+                        res.worker.terminate();
+                        URL.revokeObjectURL(res.workerSourceURL);
                         callTestAwiterResolve(result);
                     }
                 }).catch((err: any) => {
@@ -68,15 +69,16 @@ const canTransferArrayBuffer = function () {
  * @returns 
  */
 const createWorker = <P, R> (workerScriptstr: string, processor?: TaskProcessor<P, R>) => {
-    return new Promise<Worker>((resolve, reject) => {
+    return new Promise<{ worker: Worker, workerSourceURL: string }>((resolve, reject) => {
         const jsBlob = Utils.createScriptBlob(workerScriptstr);
-        let worker = new Worker(URL.createObjectURL(jsBlob));
+        const workerSourceURL = URL.createObjectURL(jsBlob);
+        let worker = new Worker(workerSourceURL);
         if (Utils.defined(processor)) {
             worker.onmessage = function (event) {
                 processor.taskMessageHanlder(processor, event.data);
             }
         }
-        resolve(worker);
+        resolve({ worker: worker, workerSourceURL: workerSourceURL });
     });
 
 }
@@ -127,13 +129,15 @@ export class TaskProcessor<P, R> {
 
     private _nextId: number = 0;
 
-    private _worker: Worker | undefined;
+    private _worker?: Worker;
+
+    private _workerSourceURL?: string;
 
     private _workerWaiters: Record<string, Function>[] = [];
 
     private _creatingWorker: boolean = false;
 
-    public static canTransferArrayBuffer: boolean | undefined;
+    public static canTransferArrayBuffer?: boolean;
 
     constructor (workerScriptstr: string, taskMessageHanlder?: WorkerTaskMessageHandler, maxmiumActiveTasks?: number) {
         this.workerScriptstr = workerScriptstr;
@@ -165,8 +169,9 @@ export class TaskProcessor<P, R> {
                 if (!this._creatingWorker) {
                     this._creatingWorker = true;
                     canTransferArrayBuffer().then(() => {
-                        createWorker(this.workerScriptstr, this).then((w: Worker) => {
-                            this._worker = w;
+                        createWorker(this.workerScriptstr, this).then(res => {
+                            this._worker = res.worker;
+                            this._workerSourceURL = res.workerSourceURL;
                             this.callAwiters(undefined, this._worker);
                         }).catch((err: any) => {
                             this.callAwiters(err, undefined);
@@ -213,6 +218,10 @@ export class TaskProcessor<P, R> {
         if (this._worker) {
             this._worker.terminate();
             this._worker = null;
+        }
+        if (this._workerSourceURL) {
+            URL.revokeObjectURL(this._workerSourceURL);
+            this._workerSourceURL = null;
         }
     }
 
