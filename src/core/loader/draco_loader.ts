@@ -3,11 +3,10 @@ import {
     BufferGeometry,
     Color,
     Loader,
-    LinearSRGBColorSpace,
-    SRGBColorSpace,
     LoadingManager
 } from 'three';
 import { Utils } from '../utils/utils';
+import { DracoGeometry, DracoWorker } from '../worker/draco_worker';
 import { DracokWorkerPool } from '../worker/pool/draco_worker_pool';
 import { XHRResponseType } from '../xhr/xhr_request';
 import { FileLoader } from './file_loader';
@@ -31,17 +30,11 @@ export class DRACOLoader extends Loader {
 
     private decoderConfig: Record<string, any> = {};
 
-    private decoderBinary: any = null;
-
-    private decoderPending: any = null;
+    private decoderPending: Promise<any> = null;
 
     private workerLimit: number = 4;
 
     private _workerPool?: DracokWorkerPool;
-
-    private workerNextTaskID: number = 1;
-
-    private workerSourceURL: string = '';
 
     private defaultAttributeIDs = {
         position: 'POSITION',
@@ -57,7 +50,7 @@ export class DRACOLoader extends Loader {
         uv: 'Float32Array'
     };
 
-    public constructor (manager: LoadingManager) {
+    public constructor (manager?: LoadingManager) {
 
         super(manager);
 
@@ -158,31 +151,19 @@ export class DRACOLoader extends Loader {
 
         }
 
-        //
-
-        let worker;
-        const taskID = this.workerNextTaskID++;
-        const taskCost = buffer.byteLength;
 
         // Obtain a worker and assign a task, and construct a geometry instance
         // when the task completes.
-        const geometryPending = this._getWorker(taskID, taskCost)
-            .then((_worker) => {
+        const geometryPending = this._getWorker()
+            .then(worker => {
 
-                worker = _worker;
+                return worker.decode(buffer, taskConfig);
 
-                return new Promise((resolve, reject) => {
-
-                    worker._callbacks[taskID] = { resolve, reject };
-
-                    worker.postMessage({ type: 'decode', id: taskID, taskConfig, buffer }, [buffer]);
-
-                    // this.debug();
-
-                });
 
             })
-            .then((message) => this._createGeometry(message.geometry));
+            .then((geometry) => {
+                return this._createGeometry(geometry);
+            });
 
         // Remove task from the task list.
         // Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
@@ -190,13 +171,13 @@ export class DRACOLoader extends Loader {
             .catch(() => true)
             .then(() => {
 
-                if (worker && taskID) {
+                // if (worker && taskID) {
 
-                    this._releaseTask(worker, taskID);
+                //     this._releaseTask(worker, taskID);
 
-                    // this.debug();
+                //     // this.debug();
 
-                }
+                // }
 
             });
 
@@ -212,7 +193,7 @@ export class DRACOLoader extends Loader {
 
     }
 
-    _createGeometry (geometryData) {
+    private _createGeometry (geometryData: DracoGeometry) {
 
         const geometry = new BufferGeometry();
 
@@ -318,17 +299,21 @@ export class DRACOLoader extends Loader {
 
                 }
 
-                const fn = DRACOWorker.toString();
+                //init wokerPool
+                this._workerPool = new DracokWorkerPool(jsContent, this.decoderConfig, this.workerLimit);
 
-                const body = [
-                    '/* draco decoder */',
-                    jsContent,
-                    '',
-                    '/* worker */',
-                    fn.substring(fn.indexOf('{') + 1, fn.lastIndexOf('}'))
-                ].join('\n');
 
-                this.workerSourceURL = URL.createObjectURL(new Blob([body]));
+                // const fn = DRACOWorker.toString();
+
+                // const body = [
+                //     '/* draco decoder */',
+                //     jsContent,
+                //     '',
+                //     '/* worker */',
+                //     fn.substring(fn.indexOf('{') + 1, fn.lastIndexOf('}'))
+                // ].join('\n');
+
+                // this.workerSourceURL = URL.createObjectURL(new Blob([body]));
 
             });
 
@@ -336,60 +321,12 @@ export class DRACOLoader extends Loader {
 
     }
 
-    _getWorker (taskID, taskCost) {
-
-        return this._initDecoder().then(() => {
-
-            if (this.workerPool.length < this.workerLimit) {
-
-                const worker = new Worker(this.workerSourceURL);
-
-                worker._callbacks = {};
-                worker._taskCosts = {};
-                worker._taskLoad = 0;
-
-                worker.postMessage({ type: 'init', decoderConfig: this.decoderConfig });
-
-                worker.onmessage = function (e) {
-
-                    const message = e.data;
-
-                    switch (message.type) {
-
-                        case 'decode':
-                            worker._callbacks[message.id].resolve(message);
-                            break;
-
-                        case 'error':
-                            worker._callbacks[message.id].reject(message);
-                            break;
-
-                        default:
-                            console.error('THREE.DRACOLoader: Unexpected message, "' + message.type + '"');
-
-                    }
-
-                };
-
-                this.workerPool.push(worker);
-
-            } else {
-
-                this.workerPool.sort(function (a, b) {
-
-                    return a._taskLoad > b._taskLoad ? - 1 : 1;
-
-                });
-
-            }
-
-            const worker = this.workerPool[this.workerPool.length - 1];
-            worker._taskCosts[taskID] = taskCost;
-            worker._taskLoad += taskCost;
-            return worker;
-
+    private _getWorker () {
+        return new Promise<DracoWorker>((resolve, reject) => {
+            this._initDecoder().then(() => {
+                resolve(this._workerPool.getInstance());
+            }).catch(reject);
         });
-
     }
 
     _releaseTask (worker, taskID) {
@@ -400,26 +337,12 @@ export class DRACOLoader extends Loader {
 
     }
 
-    public debug () {
-
-        console.log('Task load: ', this.workerPool.map((worker) => worker._taskLoad));
-
-    }
 
     public dispose () {
 
-        for (let i = 0; i < this.workerPool.length; ++i) {
-
-            this.workerPool[i].terminate();
-
-        }
-
-        this.workerPool.length = 0;
-
-        if (this.workerSourceURL !== '') {
-
-            URL.revokeObjectURL(this.workerSourceURL);
-
+        if (this._workerPool) {
+            this._workerPool.dispose();
+            this._workerPool = null;
         }
 
         return this;

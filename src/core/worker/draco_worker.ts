@@ -8,13 +8,21 @@ type InputParams = {
     taskConfig?: Record<string, any>;
 }
 
-type OutputParams = {
-    geometry: any;
+export type DracoGeometry = {
+    index: {
+        array: number[];
+    };
+    attributes: {
+        name: string;
+        array: number[];
+        itemSize: number;
+        vertexColorSpace: number;
+    }[]
 }
 
 export class DracoWorker extends BaseWorker {
 
-    protected _taskProcessor: TaskProcessor<InputParams, OutputParams>;
+    protected _taskProcessor: TaskProcessor<InputParams, DracoGeometry>;
 
     private _jsContent: string;
 
@@ -50,12 +58,13 @@ export class DracoWorker extends BaseWorker {
     }
 
     public decode (buffer: ArrayBuffer, taskConfig: Record<string, any>) {
-        return new Promise<OutputParams>((resolve, reject) => {
+        this.init();
+        return new Promise<DracoGeometry>((resolve, reject) => {
             this._taskProcessor.scheduleTask({
                 type: 'decode',
                 buffer: buffer,
                 taskConfig: taskConfig
-            }, [buffer]).then(res => {
+            }, [buffer]).then((res: DracoGeometry) => {
                 resolve(res);
             }).catch(reject);
         });
@@ -74,7 +83,13 @@ function DRACOWorkerFunc () {
     onmessage = function (event) {
         const data = event.data;
         const params = event.data.params;
+        // debugger
 
+        handleMessage(data, params);
+
+    };
+
+    function handleMessage (data, params) {
         switch (params.type) {
 
             case 'init':
@@ -138,8 +153,7 @@ function DRACOWorkerFunc () {
                 break;
 
         }
-
-    };
+    }
 
     function decodeGeometry (draco, decoder, array, taskConfig) {
 

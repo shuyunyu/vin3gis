@@ -3,10 +3,19 @@ import { WorkerPool } from "./worker_pool";
 
 export class DracokWorkerPool extends WorkerPool<DracoWorker>{
 
-    public constructor () {
-        super(DracoWorker, 1);
+    private _jsContent: string;
+
+    private _decoderConfig: Record<string, any>;
+
+    public constructor (jsContent: string, decoderConfig: Record<string, any>, poolSize: number) {
+        super(DracoWorker, poolSize);
+        this._jsContent = jsContent;
+        this._decoderConfig = decoderConfig;
+    }
+
+    public getInstance (): DracoWorker {
+        //@ts-ignore
+        return super.getInstance(this._jsContent, this._decoderConfig);
     }
 
 }
-
-export const dracoWorkerPool = new DracokWorkerPool();

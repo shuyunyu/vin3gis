@@ -37,4 +37,14 @@ export class WorkerPool<T extends BaseWorker> {
         instance.dispose();
     }
 
+    public dispose () {
+        for (let i = 0; i < this._pool.length; i++) {
+            const instance = this._pool[i];
+            if (instance) {
+                instance.dispose();
+            }
+            this._pool[i] = null;
+        }
+    }
+
 }
