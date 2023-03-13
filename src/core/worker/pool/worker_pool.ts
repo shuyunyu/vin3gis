@@ -19,7 +19,12 @@ export class WorkerPool<T extends BaseWorker> {
         const index = Math.floor(Math.random() * this.poolSize);
         let ins = this._pool[index];
         if (!ins) {
-            ins = this._pool[index] = new this._ctor();
+            let args = [];
+            for (let i = 0; i < arguments.length; i++) {
+                const arg = arguments[i];
+                args.push(arg);
+            }
+            ins = this._pool[index] = new this._ctor(...args);
         }
         return ins;
     }
