@@ -1,5 +1,5 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Fog, FogExp2, FrontSide, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector2, Vector3 } from "three";
-import { AssetLoader, FrameRenderer, math, requestSystem, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
+import { AssetLoader, FileLoader, FrameRenderer, math, requestSystem, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, AnchorConstant, ArcGISImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
@@ -37,12 +37,12 @@ window.onload = () => {
         //EmptyImageryTileProvider
         //AMapImageryTileProvider
         //TdtImageryTileProvider
-        imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
+        // imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
         // imageryTileProivder: new BaiduImageryTileProvider({ correction: true }),
         // imageryTileProivder: new OSMImageryTileProvider(),
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
-        // imageryTileProivder: new EmptyImageryTileProvider(),
+        imageryTileProivder: new EmptyImageryTileProvider(),
         // imageryTileProivder: new ArcGISImageryTileProvider({ url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer" }),
         // imageryTileProivder: new TdtImageryTileProvider({
         //     style: "street",
@@ -84,6 +84,18 @@ class GISTest {
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
+        this.testEngineLoader();
+    }
+
+    private static testEngineLoader () {
+        const fileLoader = new FileLoader();
+        fileLoader.setResponseType(XHRResponseType.ARRAYBUFFER);
+        fileLoader.setLoadInWorker(true);
+        fileLoader.load("https://threejs.org/examples/models/draco/bunny.drc", (res: any) => {
+            console.log("loaded: ", res);
+        }, (total, loaded) => {
+            console.log("progress: ", total, loaded);
+        });
     }
 
     private static textDrawText () {

@@ -34,6 +34,7 @@ export class RequestSystem extends System {
         RequestScheduler.setTaskTypeCompareFn(SystemDefines.RequestTaskeType.JSON, RequestSystem.descCompareFn);
         RequestScheduler.setTaskTypeCompareFn(SystemDefines.RequestTaskeType.BLOB, RequestSystem.descCompareFn);
         RequestScheduler.setTaskTypeCompareFn(SystemDefines.RequestTaskeType.ARRAYBUFFER, RequestSystem.descCompareFn);
+        RequestScheduler.setTaskTypeCompareFn(SystemDefines.RequestTaskeType.FILE_LOADER, RequestSystem.descCompareFn);
         RequestScheduler.setTaskTypeCompareFn(SystemDefines.RequestTaskeType.OTHER, RequestSystem.descCompareFn);
     }
 

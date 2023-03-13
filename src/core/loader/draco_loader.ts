@@ -12,12 +12,6 @@ import {
 
 const _taskCache = new WeakMap();
 
-type onLoad = (geometry: BufferGeometry) => void;
-
-type onProgress = (event: { total: number, loaded: number }) => void;
-
-type onError = (err: ErrorEvent) => void;
-
 enum VertexColorSpace {
     SRGBColorSpace,
     LinearSRGBColorSpace

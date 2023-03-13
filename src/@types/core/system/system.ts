@@ -40,6 +40,8 @@ export namespace SystemDefines {
         JSON = "json",
         BLOB = "blob",
         ARRAYBUFFER = "arraybuffer",
+        //FileLoader中专用的类型
+        FILE_LOADER = "file_loader",
         OTHER = "other"
     }
 
