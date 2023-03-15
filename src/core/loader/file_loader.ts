@@ -1,9 +1,10 @@
-import { Cache, Loader, LoadingManager } from "three";
+import { Cache, LoadingManager } from "three";
 import { SystemDefines } from "../../@types/core/system/system";
 import { requestSystem } from "../system/request_system";
 import { Utils } from "../utils/utils";
 import { RequestTaskResult, RequestTaskStatus } from "../xhr/scheduler/@types/request";
 import { XHRResponseType } from "../xhr/xhr_request";
+import { BaseLoader } from "./base_loader";
 
 export namespace FileLoaderDefines {
     export type OnLoad = (result: any) => void;
@@ -22,11 +23,9 @@ const loading: Record<string, {
 /**
  * 接入requestSystem的FileLoader
  */
-export class FileLoader extends Loader {
+export class FileLoader extends BaseLoader {
 
     private _responseType: XHRResponseType;
-
-    private _loadInWorker: boolean;
 
     public constructor (manager?: LoadingManager) {
         super(manager);
@@ -35,10 +34,6 @@ export class FileLoader extends Loader {
 
     public setResponseType (responseType: XHRResponseType) {
         this._responseType = responseType;
-    }
-
-    public setLoadInWorker (val: boolean) {
-        this._loadInWorker = val;
     }
 
     public load (url: string, onLoad?: FileLoaderDefines.OnLoad, onProgress?: FileLoaderDefines.OnProgress, onError?: FileLoaderDefines.OnError) {
@@ -80,6 +75,10 @@ export class FileLoader extends Loader {
             responseType: this._responseType,
             taskType: SystemDefines.RequestTaskeType.FILE_LOADER,
             requestInWorker: this._loadInWorker,
+            priority: this._loadParams.priority,
+            throttle: this._loadParams.throttle,
+            throttleServer: this._loadParams.throttleServer,
+            params: this._loadParams.params,
             onProgress: (totalBytes: number, loadedBytes: number) => {
                 if (onProgress) onProgress(totalBytes, loadedBytes);
             },

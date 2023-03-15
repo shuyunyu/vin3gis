@@ -1,5 +1,5 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Fog, FogExp2, FrontSide, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, MeshStandardMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector2, Vector3 } from "three";
-import { AssetLoader, DRACOLoader, FileLoader, FrameRenderer, math, requestSystem, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
+import { AssetLoader, DRACOLoader, FileLoader, FrameRenderer, ImageLoader, math, requestSystem, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, AnchorConstant, ArcGISImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
@@ -84,44 +84,57 @@ class GISTest {
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
-        // this.testEngineLoader(mapViewer);
+        this.testEngineLoader(mapViewer);
     }
 
     private static testEngineLoader (mapViewer: MapViewer) {
+
+        //FileLoader
+
         // const fileLoader = new FileLoader();
         // fileLoader.setResponseType(XHRResponseType.ARRAYBUFFER);
         // fileLoader.setLoadInWorker(true);
+        // fileLoader.setLoadParams({ params: { t: Date.now() } });
         // fileLoader.load("https://threejs.org/examples/models/draco/bunny.drc", (res: any) => {
         //     console.log("loaded: ", res);
         // }, (total, loaded) => {
         //     console.log("progress: ", total, loaded);
         // });
 
-        const dracoLoader = new DRACOLoader();
-        dracoLoader.setPath("https://threejs.org/examples/");
-        dracoLoader.setDecoderPath("http://124.223.202.45/Vin3GIS/v0.0.1/libs/draco/");
-        dracoLoader.setDecoderConfig({ type: "wasm" });
-        dracoLoader.load('models/draco/bunny.drc', function (geometry) {
 
-            geometry.computeVertexNormals();
+        //DRACOLoader
 
-            const material = new MeshStandardMaterial({ color: 0x606060 });
-            const mesh = new Mesh(geometry, material);
-            mesh.scale.copy(new Vector3(10, 10, 10))
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
-            mapViewer.renderer.scene.add(mesh);
+        // const dracoLoader = new DRACOLoader();
+        // dracoLoader.setPath("https://threejs.org/examples/");
+        // dracoLoader.setDecoderPath("http://124.223.202.45/Vin3GIS/v0.0.1/libs/draco/");
+        // dracoLoader.setDecoderConfig({ type: "wasm" });
+        // dracoLoader.load('models/draco/bunny.drc', function (geometry) {
 
-            // Release decoder resources.
-            dracoLoader.dispose();
+        //     geometry.computeVertexNormals();
 
-            mapViewer.renderer.camera.position.set(3, 0.25, 3);
-            mapViewer.renderer.camera.lookAt(0, 0.1, 0);
-            mapViewer.renderer.camera.updateMatrixWorld();
+        //     const material = new MeshStandardMaterial({ color: 0x606060 });
+        //     const mesh = new Mesh(geometry, material);
+        //     mesh.scale.copy(new Vector3(10, 10, 10))
+        //     mesh.castShadow = true;
+        //     mesh.receiveShadow = true;
+        //     mapViewer.renderer.scene.add(mesh);
 
-        });
+        //     // Release decoder resources.
+        //     dracoLoader.dispose();
 
+        //     mapViewer.renderer.camera.position.set(3, 0.25, 3);
+        //     mapViewer.renderer.camera.lookAt(0, 0.1, 0);
+        //     mapViewer.renderer.camera.updateMatrixWorld();
 
+        // });
+
+        //ImageLoader
+
+        // const imageLoader = new ImageLoader();
+        // imageLoader.setLoadParams({ params: { t: Date.now() } });
+        // imageLoader.load('http://124.223.202.45/VGIS-Examples/images/marker/marker-icon.png', (image: HTMLImageElement) => {
+        //     console.log(image);
+        // });
 
     }
 

@@ -56,6 +56,7 @@ export * from "./core/worker/image_decoder";
 export * from "./core/worker/image_merger";
 export * from "./core/worker/xhr_worker";
 
+export * from "./core/loader/image_loader";
 export * from "./core/loader/file_loader";
 export * from "./core/loader/draco_loader";
 export * from "./core/loader/ktx_loader";
