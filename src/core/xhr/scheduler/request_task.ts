@@ -1,5 +1,5 @@
 import { xhrWorkerPool } from "../../worker/pool/xhr_worker_pool";
-import { XHRCancelToken, XHRRequest, XHRResponse } from "../xhr_request";
+import { XHRCancelToken, XHRRequest, XHRResponse, XHRResponseType } from "../xhr_request";
 import { RequestTaskOptions, RequestTaskPriority, RequestTaskStatus, RequestTaskType } from "./@types/request";
 import { RequestServer } from "./request_server";
 
@@ -154,12 +154,35 @@ export class RequestTask {
     private executeNormalTask () {
         (this._options.requestInWorker ? xhrWorkerPool.getInstance() : XHRRequest).create(this._options).then((response: XHRResponse) => {
             if (!response.abort) {
-                this._options.onComplete({
-                    response: response,
-                    status: RequestTaskStatus.SUCCESS,
-                    taskType: this.taskType
-                });
-                this.onTaskComplete();
+                //@ts-ignore
+                const shouldCreateImageBitMap = this._options.responseType === XHRResponseType.BLOB && this._options.createImageBitMap && !this._options.requestInWorker;
+                if (shouldCreateImageBitMap) {
+                    //@ts-ignore
+                    createImageBitmap(response.data, this._options.imageBitMapOptions || {}).then(imageBitMap => {
+                        response.data = imageBitMap;
+                        this._options.onComplete({
+                            response: response,
+                            status: RequestTaskStatus.SUCCESS,
+                            taskType: this.taskType
+                        });
+                        this.onTaskComplete();
+                    }).catch(err => {
+                        console.log(`[${RequestTask.name}] [error]: `, err);
+                        this._options.onComplete({
+                            error: err,
+                            status: RequestTaskStatus.ERROR,
+                            taskType: this.taskType
+                        });
+                        this.onTaskComplete();
+                    });
+                } else {
+                    this._options.onComplete({
+                        response: response,
+                        status: RequestTaskStatus.SUCCESS,
+                        taskType: this.taskType
+                    });
+                    this.onTaskComplete();
+                }
             } else {
                 if (RequestTask.DEBUG) {
                     console.log(`[${RequestTask.name}] [abort]: `, response.config.url);

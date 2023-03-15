@@ -68,17 +68,13 @@ export class FileLoader extends BaseLoader {
             onError: onError
         });
 
-        requestSystem.request({
+        requestSystem.request(Object.assign({
             url: url,
             headers: this.getHeaders(),
             withCredentials: this.withCredentials,
             responseType: this._responseType,
             taskType: SystemDefines.RequestTaskeType.FILE_LOADER,
             requestInWorker: this._loadInWorker,
-            priority: this._loadParams.priority,
-            throttle: this._loadParams.throttle,
-            throttleServer: this._loadParams.throttleServer,
-            params: this._loadParams.params,
             onProgress: (totalBytes: number, loadedBytes: number) => {
                 if (onProgress) onProgress(totalBytes, loadedBytes);
             },
@@ -101,7 +97,7 @@ export class FileLoader extends BaseLoader {
                 }
                 this.manager.itemEnd(url);
             }
-        });
+        }, this._loadParams));
 
         this.manager.itemStart(url);
 

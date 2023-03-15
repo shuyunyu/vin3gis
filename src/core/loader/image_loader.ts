@@ -44,14 +44,10 @@ export class ImageLoader extends BaseLoader {
 
         scope.manager.itemStart(url);
 
-        requestSystem.request({
+        requestSystem.request(Object.assign({
             url: url,
             imageTask: true,
             taskType: SystemDefines.RequestTaskeType.IMAGE,
-            priority: this._loadParams.priority,
-            throttle: this._loadParams.throttle,
-            throttleServer: this._loadParams.throttleServer,
-            params: this._loadParams.params,
             onProgress: (totalBytes: number, loadedBytes: number) => {
                 if (onProgress) {
                     onProgress(totalBytes, loadedBytes);
@@ -73,7 +69,7 @@ export class ImageLoader extends BaseLoader {
                     scope.manager.itemEnd(url);
                 }
             }
-        })
+        }, this._loadParams));
 
     }
 

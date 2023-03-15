@@ -5,6 +5,7 @@ export type LoadParams = {
     priority?: number;//任务优先级
     throttle?: boolean;//是否需要考虑并发限制
     throttleServer?: boolean;//是否需要考虑每个服务器的并发限制
+    headers?: Record<string, string>;
 }
 
 export class BaseLoader extends Loader {

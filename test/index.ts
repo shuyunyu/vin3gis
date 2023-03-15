@@ -1,5 +1,5 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Fog, FogExp2, FrontSide, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, MeshStandardMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector2, Vector3 } from "three";
-import { AssetLoader, DRACOLoader, FileLoader, FrameRenderer, ImageLoader, math, requestSystem, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
+import { AssetLoader, DRACOLoader, FileLoader, FrameRenderer, ImageBitmapLoader, ImageLoader, math, requestSystem, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, AnchorConstant, ArcGISImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
@@ -135,6 +135,14 @@ class GISTest {
         // imageLoader.load('http://124.223.202.45/VGIS-Examples/images/marker/marker-icon.png', (image: HTMLImageElement) => {
         //     console.log(image);
         // });
+
+        //ImageBitmapLoader
+
+        const imageBitmapLoader = new ImageBitmapLoader();
+        imageBitmapLoader.setLoadInWorker(true);
+        imageBitmapLoader.load('http://124.223.202.45/VGIS-Examples/images/marker/marker-icon.png', (image: ImageBitmap) => {
+            console.log(image);
+        })
 
     }
 
