@@ -58,6 +58,7 @@ export * from "./core/worker/xhr_worker";
 
 export * from "./core/loader/image_loader";
 export * from "./core/loader/imagebitmap_loader";
+export * from "./core/loader/texture_loader";
 export * from "./core/loader/file_loader";
 export * from "./core/loader/draco_loader";
 export * from "./core/loader/ktx_loader";

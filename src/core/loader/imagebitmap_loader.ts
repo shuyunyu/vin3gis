@@ -21,6 +21,8 @@ export class ImageBitmapLoader extends BaseLoader {
 
         super(manager);
 
+        this._loadInWorker = true;
+
         if (typeof createImageBitmap === 'undefined') {
 
             console.warn('THREE.ImageBitmapLoader: createImageBitmap() not supported.');
