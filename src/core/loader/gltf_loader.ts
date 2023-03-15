@@ -1,4 +1,3 @@
-//@ts-nocheck
 import {
     AnimationClip,
     Bone,
@@ -11,7 +10,6 @@ import {
     DoubleSide,
     FrontSide,
     Group,
-    ImageBitmapLoader,
     InstancedMesh,
     InterleavedBuffer,
     InterleavedBufferAttribute,
@@ -54,23 +52,25 @@ import {
     Sphere,
     SpotLight,
     Texture,
-    TextureLoader,
     TriangleFanDrawMode,
     TriangleStripDrawMode,
     Vector2,
     Vector3,
     VectorKeyframeTrack,
     sRGBEncoding,
-    LoadingManager
+    LoadingManager,
+    Camera
 } from 'three';
 import { toTrianglesDrawMode } from '../utils/buffer_geometry_utils.js';
 import { XHRResponseType } from '../xhr/xhr_request';
 import { DRACOLoader } from './draco_loader.js';
 import { FileLoader } from './file_loader.js';
+import { ImageBitmapLoader } from './imagebitmap_loader.js';
 import { KTX2Loader } from './ktx2_loader.js';
+import { TextureLoader } from './texture_loader.js';
 
 
-type PluginCallback = (parser: any) => void;
+type PluginCallback = (parser: any) => any;
 
 type OnLoad = (gltf: any) => void;
 type OnProgress = (total: number, loaded: number) => void;
@@ -978,10 +978,13 @@ class GLTFMaterialsSheenExtension {
  */
 class GLTFMaterialsTransmissionExtension {
 
-    constructor (parser) {
+    public name = EXTENSIONS.KHR_MATERIALS_TRANSMISSION;
+
+    public parser: GLTFParser;
+
+    constructor (parser: GLTFParser) {
 
         this.parser = parser;
-        this.name = EXTENSIONS.KHR_MATERIALS_TRANSMISSION;
 
     }
 
@@ -1036,10 +1039,14 @@ class GLTFMaterialsTransmissionExtension {
  */
 class GLTFMaterialsVolumeExtension {
 
-    constructor (parser) {
+    public name = EXTENSIONS.KHR_MATERIALS_VOLUME;
+
+    public parser: GLTFParser;
+
+    constructor (parser: GLTFParser) {
 
         this.parser = parser;
-        this.name = EXTENSIONS.KHR_MATERIALS_VOLUME;
+
 
     }
 
@@ -1095,10 +1102,13 @@ class GLTFMaterialsVolumeExtension {
  */
 class GLTFMaterialsIorExtension {
 
-    constructor (parser) {
+    public name = EXTENSIONS.KHR_MATERIALS_IOR;
+
+    public parser: GLTFParser;
+
+    constructor (parser: GLTFParser) {
 
         this.parser = parser;
-        this.name = EXTENSIONS.KHR_MATERIALS_IOR;
 
     }
 
@@ -1141,10 +1151,13 @@ class GLTFMaterialsIorExtension {
  */
 class GLTFMaterialsSpecularExtension {
 
-    constructor (parser) {
+    public name = EXTENSIONS.KHR_MATERIALS_SPECULAR;
+
+    public parser: GLTFParser;
+
+    constructor (parser: GLTFParser) {
 
         this.parser = parser;
-        this.name = EXTENSIONS.KHR_MATERIALS_SPECULAR;
 
     }
 
@@ -1204,7 +1217,11 @@ class GLTFMaterialsSpecularExtension {
  */
 class GLTFTextureBasisUExtension {
 
-    constructor (parser) {
+    public name = EXTENSIONS.KHR_TEXTURE_BASISU;
+
+    public parser: GLTFParser;
+
+    constructor (parser: GLTFParser) {
 
         this.parser = parser;
         this.name = EXTENSIONS.KHR_TEXTURE_BASISU;
@@ -1255,10 +1272,15 @@ class GLTFTextureBasisUExtension {
  */
 class GLTFTextureWebPExtension {
 
-    constructor (parser) {
+    public name = EXTENSIONS.EXT_TEXTURE_WEBP;
+
+    public parser: GLTFParser;
+
+    public isSupported?: Promise<boolean>;
+
+    constructor (parser: GLTFParser) {
 
         this.parser = parser;
-        this.name = EXTENSIONS.EXT_TEXTURE_WEBP;
         this.isSupported = null;
 
     }
@@ -1340,10 +1362,15 @@ class GLTFTextureWebPExtension {
  */
 class GLTFTextureAVIFExtension {
 
-    constructor (parser) {
+    public name = EXTENSIONS.EXT_TEXTURE_AVIF;
+
+    public parser: GLTFParser;
+
+    public isSupported?: Promise<boolean>;
+
+    constructor (parser: GLTFParser) {
 
         this.parser = parser;
-        this.name = EXTENSIONS.EXT_TEXTURE_AVIF;
         this.isSupported = null;
 
     }
@@ -1423,9 +1450,12 @@ class GLTFTextureAVIFExtension {
  */
 class GLTFMeshoptCompression {
 
-    constructor (parser) {
+    public name = EXTENSIONS.EXT_MESHOPT_COMPRESSION;
 
-        this.name = EXTENSIONS.EXT_MESHOPT_COMPRESSION;
+    public parser: GLTFParser;
+
+    constructor (parser: GLTFParser) {
+
         this.parser = parser;
 
     }
@@ -1508,9 +1538,12 @@ class GLTFMeshoptCompression {
  */
 class GLTFMeshGpuInstancing {
 
-    constructor (parser) {
+    public name = EXTENSIONS.EXT_MESH_GPU_INSTANCING;
 
-        this.name = EXTENSIONS.EXT_MESH_GPU_INSTANCING;
+    public parser: GLTFParser;
+
+    constructor (parser: GLTFParser) {
+
         this.parser = parser;
 
     }
@@ -1590,20 +1623,23 @@ class GLTFMeshGpuInstancing {
 
                 for (let i = 0; i < count; i++) {
 
+                    //@ts-ignore
                     if (attributes.TRANSLATION) {
-
+                        //@ts-ignore
                         p.fromBufferAttribute(attributes.TRANSLATION, i);
 
                     }
 
+                    //@ts-ignore
                     if (attributes.ROTATION) {
-
+                        //@ts-ignore
                         q.fromBufferAttribute(attributes.ROTATION, i);
 
                     }
 
+                    //@ts-ignore
                     if (attributes.SCALE) {
-
+                        //@ts-ignore
                         s.fromBufferAttribute(attributes.SCALE, i);
 
                     }
@@ -1661,11 +1697,14 @@ const BINARY_EXTENSION_CHUNK_TYPES = { JSON: 0x4E4F534A, BIN: 0x004E4942 };
 
 class GLTFBinaryExtension {
 
-    constructor (data) {
+    public name = EXTENSIONS.KHR_BINARY_GLTF;
 
-        this.name = EXTENSIONS.KHR_BINARY_GLTF;
-        this.content = null;
-        this.body = null;
+    public content = null;
+    public body = null;
+
+    public header: Record<string, any>;
+
+    constructor (data: ArrayBufferLike) {
 
         const headerView = new DataView(data, 0, BINARY_EXTENSION_HEADER_LENGTH);
         const textDecoder = new TextDecoder();
@@ -1733,15 +1772,19 @@ class GLTFBinaryExtension {
  */
 class GLTFDracoMeshCompressionExtension {
 
-    constructor (json, dracoLoader) {
+    public name = EXTENSIONS.KHR_DRACO_MESH_COMPRESSION;
+
+    public json: any;
+
+    public dracoLoader: DRACOLoader;
+
+    constructor (json: any, dracoLoader: DRACOLoader) {
 
         if (!dracoLoader) {
 
             throw new Error('THREE.GLTFLoader: No DRACOLoader instance provided.');
 
         }
-
-        this.name = EXTENSIONS.KHR_DRACO_MESH_COMPRESSION;
         this.json = json;
         this.dracoLoader = dracoLoader;
         this.dracoLoader.preload();
@@ -1816,11 +1859,8 @@ class GLTFDracoMeshCompressionExtension {
  */
 class GLTFTextureTransformExtension {
 
-    constructor () {
+    public name = EXTENSIONS.KHR_TEXTURE_TRANSFORM;
 
-        this.name = EXTENSIONS.KHR_TEXTURE_TRANSFORM;
-
-    }
 
     extendTexture (texture, transform) {
 
@@ -1872,11 +1912,9 @@ class GLTFTextureTransformExtension {
  */
 class GLTFMeshQuantizationExtension {
 
-    constructor () {
 
-        this.name = EXTENSIONS.KHR_MESH_QUANTIZATION;
+    public name = EXTENSIONS.KHR_MESH_QUANTIZATION;
 
-    }
 
 }
 
@@ -2049,6 +2087,7 @@ const ATTRIBUTES = {
 const PATH_PROPERTIES = {
     scale: 'scale',
     translation: 'position',
+    position: 'position',
     rotation: 'quaternion',
     weights: 'morphTargetInfluences'
 };
@@ -2348,7 +2387,7 @@ class GLTFParser {
 
     public cache: GLTFRegistry;
 
-    public associations: Map<string, any>;
+    public associations: Map<Object, any>;
 
     public primitiveCache: Record<string, any>;
 
@@ -2364,6 +2403,8 @@ class GLTFParser {
     public nodeNamesUsed = {};
 
     public fileLoader: FileLoader;
+
+    public textureLoader: TextureLoader | ImageBitmapLoader;
 
     constructor (json = {}, options = {}) {
 
@@ -2621,6 +2662,7 @@ class GLTFParser {
     private _invokeOne (func) {
 
         const extensions = Object.values(this.plugins);
+        //@ts-ignore
         extensions.push(this);
 
         for (let i = 0; i < extensions.length; i++) {
@@ -2638,6 +2680,7 @@ class GLTFParser {
     _invokeAll (func) {
 
         const extensions = Object.values(this.plugins);
+        //@ts-ignore
         extensions.unshift(this);
 
         const pending = [];
@@ -2660,7 +2703,7 @@ class GLTFParser {
      * @param {number} index
      * @return {Promise<Object3D|Material|THREE.Texture|AnimationClip|ArrayBuffer|Object>}
      */
-    getDependency (type, index) {
+    public getDependency (type: string, index: number) {
 
         const cacheKey = type + ':' + index;
         let dependency = this.cache.get(cacheKey);
@@ -2795,7 +2838,7 @@ class GLTFParser {
      * @param {number} bufferIndex
      * @return {Promise<ArrayBuffer>}
      */
-    loadBuffer (bufferIndex) {
+    public loadBuffer (bufferIndex: number): Promise<ArrayBuffer> {
 
         const bufferDef = this.json.buffers[bufferIndex];
         const loader = this.fileLoader;
@@ -2832,7 +2875,7 @@ class GLTFParser {
      * @param {number} bufferViewIndex
      * @return {Promise<ArrayBuffer>}
      */
-    loadBufferView (bufferViewIndex) {
+    public loadBufferView (bufferViewIndex: number): Promise<ArrayBuffer> {
 
         const bufferViewDef = this.json.bufferViews[bufferViewIndex];
 
@@ -2851,7 +2894,7 @@ class GLTFParser {
      * @param {number} accessorIndex
      * @return {Promise<BufferAttribute|InterleavedBufferAttribute>}
      */
-    loadAccessor (accessorIndex) {
+    public loadAccessor (accessorIndex: number): Promise<BufferAttribute | InterleavedBufferAttribute> {
 
         const parser = this;
         const json = this.json;
@@ -2985,7 +3028,7 @@ class GLTFParser {
      * @param {number} textureIndex
      * @return {Promise<THREE.Texture|null>}
      */
-    loadTexture (textureIndex) {
+    public loadTexture (textureIndex: number): Promise<Texture | null> {
 
         const json = this.json;
         const options = this.options;
@@ -3006,7 +3049,7 @@ class GLTFParser {
 
     }
 
-    loadTextureImage (textureIndex, sourceIndex, loader) {
+    public loadTextureImage (textureIndex: number, sourceIndex: number, loader: TextureLoader | ImageBitmapLoader): Promise<Texture | null> {
 
         const parser = this;
         const json = this.json;
@@ -3053,7 +3096,7 @@ class GLTFParser {
 
     }
 
-    loadImageSource (sourceIndex, loader) {
+    public loadImageSource (sourceIndex: number, loader: TextureLoader | ImageBitmapLoader): Promise<Texture | null> {
 
         const parser = this;
         const json = this.json;
@@ -3097,9 +3140,9 @@ class GLTFParser {
 
                 let onLoad = resolve;
 
-                if (loader.isImageBitmapLoader === true) {
+                if (loader instanceof ImageBitmapLoader) {
 
-                    onLoad = function (imageBitmap) {
+                    onLoad = function (imageBitmap: ImageBitmap) {
 
                         const texture = new Texture(imageBitmap);
                         texture.needsUpdate = true;
@@ -3114,7 +3157,7 @@ class GLTFParser {
 
             });
 
-        }).then(function (texture) {
+        }).then(function (texture: Texture) {
 
             // Clean up resources and configure Texture.
 
@@ -3147,11 +3190,11 @@ class GLTFParser {
      * @param {Object} mapDef
      * @return {Promise<Texture>}
      */
-    assignTexture (materialParams, mapName, mapDef, encoding) {
+    public assignTexture (materialParams: any, mapName: string, mapDef: any, encoding?: any): Promise<Texture> {
 
         const parser = this;
 
-        return this.getDependency('texture', mapDef.index).then(function (texture) {
+        return this.getDependency('texture', mapDef.index).then(function (texture: Texture) {
 
             if (!texture) return null;
 
@@ -3199,7 +3242,7 @@ class GLTFParser {
      * be created if necessary, and reused from a cache.
      * @param  {Object3D} mesh Mesh, Line, or Points instance.
      */
-    assignFinalMaterial (mesh) {
+    public assignFinalMaterial (mesh: any) {
 
         const geometry = mesh.geometry;
         let material = mesh.material;
@@ -3296,7 +3339,7 @@ class GLTFParser {
 
     }
 
-    getMaterialType ( /* materialIndex */) {
+    public getMaterialType ( /* materialIndex */) {
 
         return MeshStandardMaterial;
 
@@ -3307,7 +3350,7 @@ class GLTFParser {
      * @param {number} materialIndex
      * @return {Promise<Material>}
      */
-    loadMaterial (materialIndex) {
+    public loadMaterial (materialIndex: number): Promise<Material> {
 
         const parser = this;
         const json = this.json;
@@ -3315,7 +3358,7 @@ class GLTFParser {
         const materialDef = json.materials[materialIndex];
 
         let materialType;
-        const materialParams = {};
+        const materialParams: Record<string, any> = {};
         const materialExtensions = materialDef.extensions || {};
 
         const pending = [];
@@ -3461,7 +3504,7 @@ class GLTFParser {
     }
 
     /** When Object3D instances are targeted by animation, they need unique names. */
-    createUniqueName (originalName) {
+    public createUniqueName (originalName: string) {
 
         const sanitizedName = PropertyBinding.sanitizeNodeName(originalName || '');
 
@@ -3487,7 +3530,7 @@ class GLTFParser {
      * @param {Array<GLTF.Primitive>} primitives
      * @return {Promise<Array<BufferGeometry>>}
      */
-    loadGeometries (primitives) {
+    public loadGeometries (primitives: any): Promise<BufferGeometry[]> {
 
         const parser = this;
         const extensions = this.extensions;
@@ -3554,7 +3597,7 @@ class GLTFParser {
      * @param {number} meshIndex
      * @return {Promise<Group|Mesh|SkinnedMesh>}
      */
-    loadMesh (meshIndex) {
+    public loadMesh (meshIndex: number): Promise<Group | Mesh | SkinnedMesh> {
 
         const parser = this;
         const json = this.json;
@@ -3698,7 +3741,7 @@ class GLTFParser {
      * @param {number} cameraIndex
      * @return {Promise<THREE.Camera>}
      */
-    loadCamera (cameraIndex) {
+    public loadCamera (cameraIndex: number): Promise<Camera> {
 
         let camera;
         const cameraDef = this.json.cameras[cameraIndex];
@@ -3734,7 +3777,7 @@ class GLTFParser {
      * @param {number} skinIndex
      * @return {Promise<Skeleton>}
      */
-    loadSkin (skinIndex) {
+    public loadSkin (skinIndex: number): Promise<Skeleton> {
 
         const skinDef = this.json.skins[skinIndex];
 
@@ -3804,7 +3847,7 @@ class GLTFParser {
      * @param {number} animationIndex
      * @return {Promise<AnimationClip>}
      */
-    loadAnimation (animationIndex) {
+    public loadAnimation (animationIndex: number): Promise<AnimationClip> {
 
         const json = this.json;
 
@@ -3878,6 +3921,7 @@ class GLTFParser {
                         break;
 
                     case PATH_PROPERTIES.position:
+                    case PATH_PROPERTIES.translation:
                     case PATH_PROPERTIES.scale:
                     default:
 
@@ -3970,7 +4014,7 @@ class GLTFParser {
 
     }
 
-    createNodeMesh (nodeIndex) {
+    public createNodeMesh (nodeIndex: number) {
 
         const json = this.json;
         const parser = this;
@@ -4010,7 +4054,7 @@ class GLTFParser {
      * @param {number} nodeIndex
      * @return {Promise<Object3D>}
      */
-    loadNode (nodeIndex) {
+    public loadNode (nodeIndex: number): Promise<Object3D> {
 
         const json = this.json;
         const parser = this;
@@ -4070,7 +4114,7 @@ class GLTFParser {
 
     // ._loadNodeShallow() parses a single node.
     // skin and child nodes are created and added in .loadNode() (no '_' prefix).
-    _loadNodeShallow (nodeIndex) {
+    private _loadNodeShallow (nodeIndex: number) {
 
         const json = this.json;
         const extensions = this.extensions;
@@ -4217,7 +4261,7 @@ class GLTFParser {
      * @param {number} sceneIndex
      * @return {Promise<Group>}
      */
-    loadScene (sceneIndex) {
+    public loadScene (sceneIndex: number) {
 
         const extensions = this.extensions;
         const sceneDef = this.json.scenes[sceneIndex];
