@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { Color, Matrix4, Vector3 } from "three";
 import { math } from "../../../../core/math/math";
 import { Utils } from "../../../../core/utils/utils";

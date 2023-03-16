@@ -8,7 +8,6 @@ import { gltfCache } from "../../cache/gltf_cache";
 import { Cartesian3 } from "../../cartesian/cartesian3";
 import { Cartesian4 } from "../../cartesian/cartesian4";
 import { Cartographic } from "../../cartographic";
-import { GltfLoader } from "../../loader/gltf_loader";
 import { Axis } from "../../misc/axis";
 import { ComponentDatatype } from "../../misc/component_data_type";
 import { getJsonFromTypedArray } from "../../misc/get_json_from_typed_array";
@@ -304,7 +303,9 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
 
         //转换gltf
         // let gltf = parseGlb(gltfView);
-        let gltf = GltfConvert.convertGlbToGltf(new buffer.Buffer(gltfView), true);
+        // let gltf = GltfConvert.convertGlbToGltf(new buffer.Buffer(gltfView), true);
+        let gltf = null;
+
 
         this._rtcCenterTransform = MatConstants.Mat4_IDENTITY;
         var rtcCenter = featureTable.getGlobalProperty(
@@ -325,7 +326,7 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
         this.updateContentMatrix(this.tile, gltf);
 
 
-        GltfLoader.loadByJson(this.tileset.tilingScheme.projection, this._contentModelMatrix, this.tileset.coordinateOffsetType, this.tileset.gltfUpAxis, gltf);
+        // GltfLoader.loadByJson(this.tileset.tilingScheme.projection, this._contentModelMatrix, this.tileset.coordinateOffsetType, this.tileset.gltfUpAxis, gltf);
     }
 
     private updateContentMatrix (tile: Earth3DTile, gltf: any) {
