@@ -213,6 +213,44 @@ class GISTest {
         //     console.log(gltf);
         // })
 
+        //GLTFLoader .glb
+        // const ktx2Loader = new KTX2Loader()
+        //     .setTranscoderPath('http://124.223.202.45/Vin3GIS/v0.0.1/libs/basis/')
+        //     .detectSupport(mapViewer.renderer.renderer);
+        // const loader = new GLTFLoader();
+        // loader.setKTX2Loader(ktx2Loader);
+        // loader.load('https://threejs.org/examples/models/gltf/coffeemat.glb', function (gltf) {
+
+        //     // coffeemat.glb was produced from the source scene using gltfpack:
+        //     // gltfpack -i coffeemat/scene.gltf -o coffeemat.glb -cc -tc
+        //     // The resulting model uses EXT_meshopt_compression (for geometry) and KHR_texture_basisu (for texture compression using ETC1S/BasisLZ)
+
+        //     const camera = mapViewer.renderer.camera;
+        //     mapViewer.renderer.scene.add(gltf.scene);
+        //     camera.position.set(2, 500, 1);
+        //     camera.lookAt(gltf.scene.position);
+
+        //     ktx2Loader.dispose();
+
+        //     console.log(gltf)
+
+        // });
+
+        //GLTFLoader .glb & DRACOLoader
+        // const dracoLoader = new DRACOLoader()
+        // dracoLoader.setPath("https://threejs.org/examples/");
+        // dracoLoader.setDecoderPath("http://124.223.202.45/Vin3GIS/v0.0.1/libs/draco/");
+        // const gltfLoader = new GLTFLoader();
+        // gltfLoader.setDRACOLoader(dracoLoader);
+        // gltfLoader.load('https://threejs.org/examples/models/gltf/IridescentDishWithOlives.glb', (gltf) => {
+        //     dracoLoader.dispose();
+        //     const camera = mapViewer.renderer.camera;
+        //     mapViewer.renderer.scene.add(gltf.scene);
+        //     camera.position.set(2, 0.5, 1);
+        //     camera.lookAt(gltf.scene.position);
+        //     console.log(gltf);
+        // });
+
     }
 
     private static textDrawText () {

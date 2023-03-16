@@ -1,6 +1,7 @@
+//@ts-nocheck
 // This file is part of meshoptimizer library and is distributed under the terms of MIT License.
 // Copyright (C) 2016-2022, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
-var MeshoptDecoder = (function () {
+export const MeshoptDecoder = (function () {
     "use strict";
 
     // Built with clang version 14.0.4
@@ -28,7 +29,7 @@ var MeshoptDecoder = (function () {
                 instance.exports.__wasm_call_ctors();
             });
 
-    function unpack(data) {
+    function unpack (data) {
         var result = new Uint8Array(data.length);
         for (var i = 0; i < data.length; ++i) {
             var ch = data.charCodeAt(i);
@@ -41,7 +42,7 @@ var MeshoptDecoder = (function () {
         return result.buffer.slice(0, write);
     }
 
-    function decode(fun, target, count, size, source, filter) {
+    function decode (fun, target, count, size, source, filter) {
         var sbrk = instance.exports.sbrk;
         var count4 = (count + 3) & ~3;
         var tp = sbrk(count4 * size);
@@ -75,7 +76,7 @@ var MeshoptDecoder = (function () {
     var workers = [];
     var requestId = 0;
 
-    function createWorker(url) {
+    function createWorker (url) {
         var worker = {
             object: new Worker(url),
             pending: 0,
@@ -94,7 +95,7 @@ var MeshoptDecoder = (function () {
         return worker;
     }
 
-    function initWorkers(count) {
+    function initWorkers (count) {
         var source =
             "var instance; var ready = WebAssembly.instantiate(new Uint8Array([" + new Uint8Array(unpack(wasm)) + "]), {})" +
             ".then(function(result) { instance = result.instance; instance.exports.__wasm_call_ctors(); });" +
@@ -111,7 +112,7 @@ var MeshoptDecoder = (function () {
         URL.revokeObjectURL(url);
     }
 
-    function decodeWorker(count, size, source, mode, filter) {
+    function decodeWorker (count, size, source, mode, filter) {
         var worker = workers[0];
 
         for (var i = 1; i < workers.length; ++i) {
@@ -130,7 +131,7 @@ var MeshoptDecoder = (function () {
         });
     }
 
-    function workerProcess(event) {
+    function workerProcess (event) {
         ready.then(function () {
             var data = event.data;
             try {
@@ -174,5 +175,3 @@ var MeshoptDecoder = (function () {
         }
     };
 })();
-
-export { MeshoptDecoder };

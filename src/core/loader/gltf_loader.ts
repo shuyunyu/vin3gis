@@ -61,6 +61,7 @@ import {
     LoadingManager,
     Camera
 } from 'three';
+import { MeshoptDecoder } from '../libs/meshopt_decoder.module';
 import { toTrianglesDrawMode } from '../utils/buffer_geometry_utils';
 import { XHRResponseType } from '../xhr/xhr_request';
 import { DRACOLoader } from './draco_loader';
@@ -72,7 +73,9 @@ import { TextureLoader } from './texture_loader';
 
 type PluginCallback = (parser: any) => any;
 
-type OnLoad = (gltf: any) => void;
+type GLTF = any;
+
+type OnLoad = (gltf: GLTF) => void;
 type OnProgress = (total: number, loaded: number) => void;
 type OnError = (err: any) => void;
 
@@ -88,7 +91,7 @@ export class GLTFLoader extends Loader {
 
         super(manager);
 
-
+        this.setMeshoptDecoder(MeshoptDecoder);
 
         this.register(function (parser) {
 
@@ -224,6 +227,7 @@ export class GLTFLoader extends Loader {
         loader.setResponseType(XHRResponseType.ARRAYBUFFER);
         loader.setRequestHeader(this.requestHeader);
         loader.setWithCredentials(this.withCredentials);
+        loader.setLoadInWorker(true);
 
         loader.load(url, function (data: ArrayBuffer) {
 
@@ -2472,7 +2476,7 @@ class GLTFParser {
         } else {
 
             this.textureLoader = new ImageBitmapLoader(this.options.manager);
-
+            this.textureLoader.setLoadInWorker(true);
         }
 
         this.textureLoader.setCrossOrigin(this.options.crossOrigin);
@@ -2480,6 +2484,7 @@ class GLTFParser {
 
         this.fileLoader = new FileLoader(this.options.manager);
         this.fileLoader.setResponseType(XHRResponseType.ARRAYBUFFER);
+        this.fileLoader.setLoadInWorker(true);
 
         if (this.options.crossOrigin === 'use-credentials') {
 
