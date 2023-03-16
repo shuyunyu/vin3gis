@@ -57,6 +57,8 @@ export * from "./core/worker/image_decoder";
 export * from "./core/worker/image_merger";
 export * from "./core/worker/xhr_worker";
 
+export * from "./core/libs/meshopt_decoder.module";
+
 export * from "./core/loader/image_loader";
 export * from "./core/loader/imagebitmap_loader";
 export * from "./core/loader/texture_loader";

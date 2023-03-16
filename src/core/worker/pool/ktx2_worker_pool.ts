@@ -18,7 +18,7 @@ export class KTX2WorkerPool extends WorkerPool<KTX2Worker>{
 
     public getInstance (): KTX2Worker {
         //@ts-ignore
-        return super.getInstance(this._jsContent, this._config, this._transcoderBinary);
+        return super.getInstance(this._jsContent, this._config, this._transcoderBinary.slice(0));
     }
 
     public dispose (): void {
