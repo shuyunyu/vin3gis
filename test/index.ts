@@ -1,5 +1,5 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Fog, FogExp2, FrontSide, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, MeshStandardMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, Vector2, Vector3 } from "three";
-import { AssetLoader, DRACOLoader, FileLoader, FrameRenderer, ImageBitmapLoader, ImageLoader, KTX2Loader, KTXLoader, math, requestSystem, TextureLoader, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
+import { AssetLoader, DRACOLoader, FileLoader, FrameRenderer, GLTFLoader, ImageBitmapLoader, ImageLoader, KTX2Loader, KTXLoader, math, requestSystem, TextureLoader, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, AnchorConstant, ArcGISImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
@@ -204,6 +204,13 @@ class GISTest {
         //     camera.lookAt(scene.position);
 
         //     ktx2Loader.dispose();
+        // })
+
+        //GLTFLoader
+        // const gltfLoader = new GLTFLoader();
+        // gltfLoader.setPath('https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/');
+        // gltfLoader.loadAsync('DamagedHelmet.gltf').then(gltf => {
+        //     console.log(gltf);
         // })
 
     }
