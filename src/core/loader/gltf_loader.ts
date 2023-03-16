@@ -61,13 +61,13 @@ import {
     LoadingManager,
     Camera
 } from 'three';
-import { toTrianglesDrawMode } from '../utils/buffer_geometry_utils.js';
+import { toTrianglesDrawMode } from '../utils/buffer_geometry_utils';
 import { XHRResponseType } from '../xhr/xhr_request';
-import { DRACOLoader } from './draco_loader.js';
-import { FileLoader } from './file_loader.js';
-import { ImageBitmapLoader } from './imagebitmap_loader.js';
-import { KTX2Loader } from './ktx2_loader.js';
-import { TextureLoader } from './texture_loader.js';
+import { DRACOLoader } from './draco_loader';
+import { FileLoader } from './file_loader';
+import { ImageBitmapLoader } from './imagebitmap_loader';
+import { KTX2Loader } from './ktx2_loader';
+import { TextureLoader } from './texture_loader';
 
 
 type PluginCallback = (parser: any) => any;

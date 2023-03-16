@@ -1,5 +1,5 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Fog, FogExp2, FrontSide, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, MeshStandardMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, Vector2, Vector3 } from "three";
-import { AssetLoader, DRACOLoader, FileLoader, FrameRenderer, ImageBitmapLoader, ImageLoader, math, requestSystem, TextureLoader, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
+import { AssetLoader, DRACOLoader, FileLoader, FrameRenderer, ImageBitmapLoader, ImageLoader, KTX2Loader, math, requestSystem, TextureLoader, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, AnchorConstant, ArcGISImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
@@ -28,8 +28,9 @@ import { xhrWorkerPool } from "../src/core/worker/pool/xhr_worker_pool";
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
     // const initCameraPosition = new Vector3(wgs84LngLat[0], wgs84LngLat[1], 16500000);
-    const initCameraPosition = new Vector3(118.256, 24.418, 165000);
+    // const initCameraPosition = new Vector3(118.256, 24.418, 165000);
     // const initCameraPosition = new Vector3(0, 0, 16500000);
+    const initCameraPosition = new Vector3(0, 0, Transform.carCoordToWorldCoord(1.65));
     const initCameraOrientation = new Vector3(0, -90, 0);
     const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), Orientation.fromDegreeEulerAngles(initCameraOrientation));
     const mapViewer = new MapViewer({
@@ -149,6 +150,39 @@ class GISTest {
         // textureLoader.load('http://124.223.202.45/VGIS-Examples/images/marker/marker-icon.png', (texture: Texture) => {
         //     console.log(texture);
         // })
+
+        //KTX2Loader
+        const ktx2Loader = new KTX2Loader()
+            .setTranscoderPath('https://threejs.org/examples/jsm/libs/basis/')
+            .detectSupport(mapViewer.renderer.renderer);
+
+        ktx2Loader.loadAsync('https://threejs.org/examples/textures/compressed/sample_uastc_zstd.ktx2').then((texture: Texture) => {
+            function flipY (geometry) {
+                const uv = geometry.attributes.uv;
+                for (let i = 0; i < uv.count; i++) {
+                    uv.setY(i, 1 - uv.getY(i));
+                }
+                return geometry;
+            }
+            const geometry = flipY(new PlaneGeometry());
+            const material = new MeshBasicMaterial({
+                color: 0xFFFFFF,
+                side: DoubleSide
+            });
+            const mesh = new Mesh(geometry, material);
+            material.map = texture;
+            material.transparent = true;
+            material.needsUpdate = true;
+            mapViewer.renderer.scene.add(mesh);
+
+            const camera = mapViewer.renderer.camera;
+            const scene = mapViewer.renderer.scene;
+            camera.position.set(2, 1.5, 1);
+            camera.lookAt(scene.position);
+
+            ktx2Loader.dispose();
+        })
+
     }
 
     private static textDrawText () {

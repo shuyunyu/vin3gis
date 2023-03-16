@@ -18,4 +18,10 @@ export class DracokWorkerPool extends WorkerPool<DracoWorker>{
         return super.getInstance(this._jsContent, this._decoderConfig);
     }
 
+    public dispose (): void {
+        super.dispose();
+        this._jsContent = null;
+        this._decoderConfig = null;
+    }
+
 }

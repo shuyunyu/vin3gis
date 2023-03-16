@@ -30,6 +30,7 @@ export class FileLoader extends BaseLoader {
     public constructor (manager?: LoadingManager) {
         super(manager);
         this._loadInWorker = false;
+        this._responseType = XHRResponseType.TEXT;
     }
 
     public setResponseType (responseType: XHRResponseType) {

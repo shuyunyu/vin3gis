@@ -62,6 +62,8 @@ export * from "./core/loader/texture_loader";
 export * from "./core/loader/file_loader";
 export * from "./core/loader/draco_loader";
 export * from "./core/loader/ktx_loader";
+export * from "./core/loader/ktx2_loader";
+export * from "./core/loader/gltf_loader";
 
 export * from "./tools/debug_tools";
 export * from "./tools/stats";
