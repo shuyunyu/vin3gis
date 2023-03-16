@@ -1,5 +1,5 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Fog, FogExp2, FrontSide, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, MeshStandardMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, Vector2, Vector3 } from "three";
-import { AssetLoader, DRACOLoader, FileLoader, FrameRenderer, ImageBitmapLoader, ImageLoader, KTX2Loader, math, requestSystem, TextureLoader, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
+import { AssetLoader, DRACOLoader, FileLoader, FrameRenderer, ImageBitmapLoader, ImageLoader, KTX2Loader, KTXLoader, math, requestSystem, TextureLoader, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, AnchorConstant, ArcGISImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
@@ -151,37 +151,60 @@ class GISTest {
         //     console.log(texture);
         // })
 
+
+        //KTXLoader
+        // const ktxLoader = new KTXLoader();
+        // ktxLoader.setLoadInWorker(true);
+        // ktxLoader.loadAsync("https://threejs.org/examples/textures/compressed/disturb_BC1.ktx").then((texture: Texture) => {
+        //     const geometry = new PlaneGeometry();
+        //     const material = new MeshBasicMaterial({
+        //         color: 0xFFFFFF,
+        //         side: DoubleSide
+        //     });
+        //     const mesh = new Mesh(geometry, material);
+        //     material.map = texture;
+        //     material.transparent = true;
+        //     material.needsUpdate = true;
+        //     mapViewer.renderer.scene.add(mesh);
+
+        //     const camera = mapViewer.renderer.camera;
+        //     const scene = mapViewer.renderer.scene;
+        //     camera.position.set(2, 1.5, 1);
+        //     camera.lookAt(scene.position);
+        // });
+
+
         //KTX2Loader
-        const ktx2Loader = new KTX2Loader()
-            .setTranscoderPath('https://threejs.org/examples/jsm/libs/basis/')
-            .detectSupport(mapViewer.renderer.renderer);
+        // const ktx2Loader = new KTX2Loader()
+        //     .setTranscoderPath('http://124.223.202.45/Vin3GIS/v0.0.1/libs/basis/')
+        //     .detectSupport(mapViewer.renderer.renderer);
 
-        ktx2Loader.loadAsync('https://threejs.org/examples/textures/compressed/sample_uastc_zstd.ktx2').then((texture: Texture) => {
-            function flipY (geometry) {
-                const uv = geometry.attributes.uv;
-                for (let i = 0; i < uv.count; i++) {
-                    uv.setY(i, 1 - uv.getY(i));
-                }
-                return geometry;
-            }
-            const geometry = flipY(new PlaneGeometry());
-            const material = new MeshBasicMaterial({
-                color: 0xFFFFFF,
-                side: DoubleSide
-            });
-            const mesh = new Mesh(geometry, material);
-            material.map = texture;
-            material.transparent = true;
-            material.needsUpdate = true;
-            mapViewer.renderer.scene.add(mesh);
+        // ktx2Loader.loadAsync('https://threejs.org/examples/textures/compressed/sample_uastc_zstd.ktx2').then((texture: Texture) => {
+        //     function flipY (geometry) {
+        //         const uv = geometry.attributes.uv;
+        //         for (let i = 0; i < uv.count; i++) {
+        //             uv.setY(i, 1 - uv.getY(i));
+        //         }
+        //         return geometry;
+        //     }
+        //     const geometry = flipY(new PlaneGeometry());
+        //     const material = new MeshBasicMaterial({
+        //         color: 0xFFFFFF,
+        //         side: DoubleSide
+        //     });
+        //     const mesh = new Mesh(geometry, material);
+        //     material.map = texture;
+        //     material.transparent = true;
+        //     material.needsUpdate = true;
+        //     mapViewer.renderer.scene.add(mesh);
 
-            const camera = mapViewer.renderer.camera;
-            const scene = mapViewer.renderer.scene;
-            camera.position.set(2, 1.5, 1);
-            camera.lookAt(scene.position);
+        //     const camera = mapViewer.renderer.camera;
+        //     const scene = mapViewer.renderer.scene;
+        //     camera.position.set(2, 1.5, 1);
+        //     camera.lookAt(scene.position);
 
-            ktx2Loader.dispose();
-        })
+        //     ktx2Loader.dispose();
+        // })
 
     }
 

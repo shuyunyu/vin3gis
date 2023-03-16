@@ -1,6 +1,7 @@
 import {
-    CompressedTextureLoader, LoadingManager
+    LoadingManager
 } from 'three';
+import { CompressedTextureLoader } from './compressed_texture_loader';
 
 /**
  * for description see https://www.khronos.org/opengles/sdk/tools/KTX/
