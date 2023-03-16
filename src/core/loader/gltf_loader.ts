@@ -501,14 +501,16 @@ const EXTENSIONS = {
  */
 class GLTFLightsExtension {
 
-    constructor (parser) {
+    public name = EXTENSIONS.KHR_LIGHTS_PUNCTUAL;
+
+    public parser: GLTFParser;
+
+    // Object3D instance caches
+    public cache = { refs: {}, uses: {} };
+
+    constructor (parser: GLTFParser) {
 
         this.parser = parser;
-        this.name = EXTENSIONS.KHR_LIGHTS_PUNCTUAL;
-
-        // Object3D instance caches
-        this.cache = { refs: {}, uses: {} };
-
     }
 
     _markDefs () {
@@ -523,7 +525,7 @@ class GLTFLightsExtension {
             if (nodeDef.extensions
                 && nodeDef.extensions[this.name]
                 && nodeDef.extensions[this.name].light !== undefined) {
-
+                //@ts-ignore
                 parser._addNodeRef(this.cache, nodeDef.extensions[this.name].light);
 
             }
@@ -623,7 +625,7 @@ class GLTFLightsExtension {
         if (lightIndex === undefined) return null;
 
         return this._loadLight(lightIndex).then(function (light) {
-
+            //@ts-ignore
             return parser._getNodeRef(self.cache, lightIndex, light);
 
         });
@@ -639,9 +641,9 @@ class GLTFLightsExtension {
  */
 class GLTFMaterialsUnlitExtension {
 
-    constructor () {
+    public name = EXTENSIONS.KHR_MATERIALS_UNLIT;
 
-        this.name = EXTENSIONS.KHR_MATERIALS_UNLIT;
+    constructor () {
 
     }
 
@@ -692,10 +694,13 @@ class GLTFMaterialsUnlitExtension {
  */
 class GLTFMaterialsEmissiveStrengthExtension {
 
-    constructor (parser) {
+    public name = EXTENSIONS.KHR_MATERIALS_EMISSIVE_STRENGTH;
+
+    public parser: GLTFParser;
+
+    constructor (parser: GLTFParser) {
 
         this.parser = parser;
-        this.name = EXTENSIONS.KHR_MATERIALS_EMISSIVE_STRENGTH;
 
     }
 
@@ -731,10 +736,13 @@ class GLTFMaterialsEmissiveStrengthExtension {
  */
 class GLTFMaterialsClearcoatExtension {
 
-    constructor (parser) {
+    public name = EXTENSIONS.KHR_MATERIALS_CLEARCOAT;
+
+    public parser: GLTFParser;
+
+    constructor (parser: GLTFParser) {
 
         this.parser = parser;
-        this.name = EXTENSIONS.KHR_MATERIALS_CLEARCOAT;
 
     }
 
@@ -815,10 +823,13 @@ class GLTFMaterialsClearcoatExtension {
  */
 class GLTFMaterialsIridescenceExtension {
 
-    constructor (parser) {
+    public name = EXTENSIONS.KHR_MATERIALS_IRIDESCENCE;
+
+    public parser: GLTFParser;
+
+    constructor (parser: GLTFParser) {
 
         this.parser = parser;
-        this.name = EXTENSIONS.KHR_MATERIALS_IRIDESCENCE;
 
     }
 
@@ -903,10 +914,13 @@ class GLTFMaterialsIridescenceExtension {
  */
 class GLTFMaterialsSheenExtension {
 
-    constructor (parser) {
+    public name = EXTENSIONS.KHR_MATERIALS_SHEEN;
+
+    public parser: GLTFParser;
+
+    constructor (parser: GLTFParser) {
 
         this.parser = parser;
-        this.name = EXTENSIONS.KHR_MATERIALS_SHEEN;
 
     }
 
