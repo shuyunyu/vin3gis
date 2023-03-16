@@ -1,10 +1,9 @@
-import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Fog, FogExp2, FrontSide, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, TextureLoader, Vector2, Vector3 } from "three";
-import { AssetLoader, FrameRenderer, math, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
+import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Fog, FogExp2, FrontSide, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, MeshStandardMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, Vector2, Vector3 } from "three";
+import { AssetLoader, DRACOLoader, FileLoader, FrameRenderer, GLTFLoader, ImageBitmapLoader, ImageLoader, KTX2Loader, KTXLoader, math, requestSystem, TextureLoader, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, AnchorConstant, ArcGISImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
-import { xhrWorker } from "../src/core/worker/xhr_worker";
 import { GridImageryTileProvider } from "../src/gis/core/provider/grid_imagery_tile_provider";
 import { createScheduler, removeScheduler } from "../src/core/utils/schedule_utils";
 import { BaiduImageryTileProvider } from "../src/gis/core/provider/baidu_imagery_tile_provider";
@@ -23,12 +22,15 @@ import { MultiPolylineGeometry } from "../src/gis/core/datasource/geometry/multi
 import { PolygonGeometry } from "../src/gis/core/datasource/geometry/polygon_geometry";
 import { GeoJSONLoader } from "../src/gis/core/loader/geojson_loader";
 import { PolygonShape } from "../src/gis/core/datasource/misc/polygon_shape";
+import { SystemDefines } from "../src/@types/core/system/system";
+import { xhrWorkerPool } from "../src/core/worker/pool/xhr_worker_pool";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
     // const initCameraPosition = new Vector3(wgs84LngLat[0], wgs84LngLat[1], 16500000);
-    const initCameraPosition = new Vector3(118.256, 24.418, 165000);
+    // const initCameraPosition = new Vector3(118.256, 24.418, 165000);
     // const initCameraPosition = new Vector3(0, 0, 16500000);
+    const initCameraPosition = new Vector3(0, 0, Transform.carCoordToWorldCoord(1.65));
     const initCameraOrientation = new Vector3(0, -90, 0);
     const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), Orientation.fromDegreeEulerAngles(initCameraOrientation));
     const mapViewer = new MapViewer({
@@ -36,12 +38,12 @@ window.onload = () => {
         //EmptyImageryTileProvider
         //AMapImageryTileProvider
         //TdtImageryTileProvider
-        imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
+        // imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
         // imageryTileProivder: new BaiduImageryTileProvider({ correction: true }),
         // imageryTileProivder: new OSMImageryTileProvider(),
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
-        // imageryTileProivder: new EmptyImageryTileProvider(),
+        imageryTileProivder: new EmptyImageryTileProvider(),
         // imageryTileProivder: new ArcGISImageryTileProvider({ url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer" }),
         // imageryTileProivder: new TdtImageryTileProvider({
         //     style: "street",
@@ -83,6 +85,134 @@ class GISTest {
         // this.testWorker();
         // global.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
+        this.testEngineLoader(mapViewer);
+    }
+
+    private static testEngineLoader (mapViewer: MapViewer) {
+
+        //FileLoader
+
+        // const fileLoader = new FileLoader();
+        // fileLoader.setResponseType(XHRResponseType.ARRAYBUFFER);
+        // fileLoader.setLoadInWorker(true);
+        // fileLoader.setLoadParams({ params: { t: Date.now() } });
+        // fileLoader.load("https://threejs.org/examples/models/draco/bunny.drc", (res: any) => {
+        //     console.log("loaded: ", res);
+        // }, (total, loaded) => {
+        //     console.log("progress: ", total, loaded);
+        // });
+
+
+        //DRACOLoader
+
+        // const dracoLoader = new DRACOLoader();
+        // dracoLoader.setPath("https://threejs.org/examples/");
+        // dracoLoader.setDecoderPath("http://124.223.202.45/Vin3GIS/v0.0.1/libs/draco/");
+        // dracoLoader.setDecoderConfig({ type: "wasm" });
+        // dracoLoader.load('models/draco/bunny.drc', function (geometry) {
+
+        //     geometry.computeVertexNormals();
+
+        //     const material = new MeshStandardMaterial({ color: 0x606060 });
+        //     const mesh = new Mesh(geometry, material);
+        //     mesh.scale.copy(new Vector3(10, 10, 10))
+        //     mesh.castShadow = true;
+        //     mesh.receiveShadow = true;
+        //     mapViewer.renderer.scene.add(mesh);
+
+        //     // Release decoder resources.
+        //     dracoLoader.dispose();
+
+        //     mapViewer.renderer.camera.position.set(3, 0.25, 3);
+        //     mapViewer.renderer.camera.lookAt(0, 0.1, 0);
+        //     mapViewer.renderer.camera.updateMatrixWorld();
+
+        // });
+
+        //ImageLoader
+
+        // const imageLoader = new ImageLoader();
+        // imageLoader.setLoadParams({ params: { t: Date.now() } });
+        // imageLoader.load('http://124.223.202.45/VGIS-Examples/images/marker/marker-icon.png', (image: HTMLImageElement) => {
+        //     console.log(image);
+        // });
+
+        //ImageBitmapLoader
+
+        // const imageBitmapLoader = new ImageBitmapLoader();
+        // imageBitmapLoader.setLoadInWorker(true);
+        // imageBitmapLoader.load('http://124.223.202.45/VGIS-Examples/images/marker/marker-icon.png', (image: ImageBitmap) => {
+        //     console.log(image);
+        // })
+
+        //TextureLoader
+        // const textureLoader = new TextureLoader();
+        // textureLoader.load('http://124.223.202.45/VGIS-Examples/images/marker/marker-icon.png', (texture: Texture) => {
+        //     console.log(texture);
+        // })
+
+
+        //KTXLoader
+        // const ktxLoader = new KTXLoader();
+        // ktxLoader.setLoadInWorker(true);
+        // ktxLoader.loadAsync("https://threejs.org/examples/textures/compressed/disturb_BC1.ktx").then((texture: Texture) => {
+        //     const geometry = new PlaneGeometry();
+        //     const material = new MeshBasicMaterial({
+        //         color: 0xFFFFFF,
+        //         side: DoubleSide
+        //     });
+        //     const mesh = new Mesh(geometry, material);
+        //     material.map = texture;
+        //     material.transparent = true;
+        //     material.needsUpdate = true;
+        //     mapViewer.renderer.scene.add(mesh);
+
+        //     const camera = mapViewer.renderer.camera;
+        //     const scene = mapViewer.renderer.scene;
+        //     camera.position.set(2, 1.5, 1);
+        //     camera.lookAt(scene.position);
+        // });
+
+
+        //KTX2Loader
+        // const ktx2Loader = new KTX2Loader()
+        //     .setTranscoderPath('http://124.223.202.45/Vin3GIS/v0.0.1/libs/basis/')
+        //     .detectSupport(mapViewer.renderer.renderer);
+
+        // ktx2Loader.loadAsync('https://threejs.org/examples/textures/compressed/sample_uastc_zstd.ktx2').then((texture: Texture) => {
+        //     function flipY (geometry) {
+        //         const uv = geometry.attributes.uv;
+        //         for (let i = 0; i < uv.count; i++) {
+        //             uv.setY(i, 1 - uv.getY(i));
+        //         }
+        //         return geometry;
+        //     }
+        //     const geometry = flipY(new PlaneGeometry());
+        //     const material = new MeshBasicMaterial({
+        //         color: 0xFFFFFF,
+        //         side: DoubleSide
+        //     });
+        //     const mesh = new Mesh(geometry, material);
+        //     material.map = texture;
+        //     material.transparent = true;
+        //     material.needsUpdate = true;
+        //     mapViewer.renderer.scene.add(mesh);
+
+        //     const camera = mapViewer.renderer.camera;
+        //     const scene = mapViewer.renderer.scene;
+        //     camera.position.set(2, 1.5, 1);
+        //     camera.lookAt(scene.position);
+
+        //     ktx2Loader.dispose();
+        // })
+
+        //GLTFLoader
+        // const gltfLoader = new GLTFLoader();
+        // gltfLoader.setPath('https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/');
+        // gltfLoader.loadAsync('DamagedHelmet.gltf').then(gltf => {
+        //     console.log(gltf);
+        // })
+
     }
 
     private static textDrawText () {
@@ -599,7 +729,7 @@ class GISTest {
     private static testXHRWorker () {
         globalThis.testXHRWorker = () => {
             const url = "https://webst04.is.autonavi.com/appmaptile?style=6&x=33&y=30&z=6";
-            xhrWorker.create({
+            xhrWorkerPool.getInstance().create({
                 url: url,
                 params: {},
                 responseType: XHRResponseType.BLOB,
@@ -611,6 +741,20 @@ class GISTest {
             }).catch(err => {
                 console.error(err);
             });
+        }
+        globalThis.testXHRArrayBuffer = () => {
+            requestSystem.request({
+                url: "https://threejs.org/examples/models/draco/bunny.drc?t=" + Date.now(),
+                responseType: XHRResponseType.ARRAYBUFFER,
+                taskType: SystemDefines.RequestTaskeType.ARRAYBUFFER,
+                onComplete: () => {
+                    console.log("onComplete");
+                },
+                requestInWorker: true,
+                onProgress: (total: number, loaded: number) => {
+                    console.log("onProgress: total: " + total + " loaded: " + loaded);
+                }
+            })
         }
     }
 

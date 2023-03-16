@@ -1,3 +1,4 @@
+import { XHRRequestOnProgress } from "../../../core/xhr/xhr_request";
 import { SystemDefines } from "../system/system";
 
 export namespace AssetDefines {
@@ -13,6 +14,7 @@ export namespace AssetDefines {
         priority?: number;
         throttle?: boolean;
         throttleServer?: boolean;
+        onProgress?: XHRRequestOnProgress;
     }
 
     /**

@@ -1,4 +1,6 @@
+import { Utils } from "../utils/utils";
 import { XHRCancelable, XHRRequestOptions, XHRResponse } from "../xhr/xhr_request";
+import { BaseWorker } from "./base_worker";
 import { TaskProcessor } from "./task_processor";
 import XHRRequestWorkerScriptStr from "./xhr_request_worker.js";
 
@@ -34,17 +36,46 @@ type OutputParams = {
 
 class XHRWorkerCancelToken implements XHRCancelable {
 
+    private _xhrWorker: XHRWorker;
+
     private _requestId: number;
 
     private _options: XHRRequestOptions;
 
-    public constructor (requestId: number, options: XHRRequestOptions) {
+    public constructor (xhrWorker: XHRWorker, requestId: number, options: XHRRequestOptions) {
+        this._xhrWorker = xhrWorker;
         this._requestId = requestId;
         this._options = options;
     }
 
     public abort () {
-        xhrWorker.abort(this._requestId, this._options);
+        this._xhrWorker.abort(this._requestId, this._options);
+    }
+
+}
+
+const taskMessageHandler = <P, R> (processor: TaskProcessor<P, R>, data: any) => {
+    processor.activeTasks = processor.activeTasks - 1;
+
+    let id = data.id;
+    if (!Utils.defined(id)) {
+        return;
+    }
+
+    let pMap = processor.promiseMap[id];
+
+    if (Utils.defined(data.error)) {
+        console.error("worker executed failed: ", data.error);
+        processor.taskCompletedEvent.emit(data.error);
+        pMap.reject(data.error);
+    } else if (data.result.stats === "onprogress") {
+        const onProgress = processor.userDataMap[id];
+        onProgress && onProgress(data.result.response.total, data.result.response.loaded);
+    } else {
+        processor.taskCompletedEvent.emit(null);
+        pMap.resolve(data.result as R);
+        delete processor.promiseMap[id];
+        delete processor.userDataMap[id];
     }
 
 }
@@ -52,11 +83,11 @@ class XHRWorkerCancelToken implements XHRCancelable {
 /**
  * 在worker中运行的XMLHttpRequest
  */
-class XHRWorker {
+export class XHRWorker extends BaseWorker {
 
     private _init: boolean = false;
 
-    private _taskProcessor: TaskProcessor<InputParams, OutputParams>;
+    protected _taskProcessor: TaskProcessor<InputParams, OutputParams>;
 
     private _requestId: number = 0;
 
@@ -65,7 +96,7 @@ class XHRWorker {
     private init () {
         if (this._init) return;
         this._init = true;
-        this._taskProcessor = new TaskProcessor(XHRRequestWorkerScriptStr);
+        this._taskProcessor = new TaskProcessor(XHRRequestWorkerScriptStr, taskMessageHandler);
     }
 
     private handleOptions (options: XHRRequestOptions, ignoreKeys: string[]) {
@@ -87,24 +118,25 @@ class XHRWorker {
      * @returns 
      */
     public create (options: XHRWorkerRequestOptions) {
-        options = this.handleOptions(options, ["cancelToken"]);
+        options = this.handleOptions(options, ["cancelToken", "onProgress"]);
         this.init();
         return new Promise<XHRResponse>((resolve, reject) => {
             const requestId = ++this._requestId;
             let canceled = false;
             if (options.cancelToken) {
-                options.cancelToken.httpRequest = new XHRWorkerCancelToken(requestId, options);
+                options.cancelToken.httpRequest = new XHRWorkerCancelToken(this, requestId, options);
                 canceled = options.cancelToken.canceled;
             }
             if (!canceled) {
                 this._requestTaskMap[requestId] = { resolve: resolve, reject: reject };
                 const sendOpt = Object.assign(Object.create(null), options);
                 delete sendOpt.cancelToken;
+                delete sendOpt.onProgress;
                 this._taskProcessor.scheduleTask({
                     requestId: requestId,
                     taskType: TaskType.EXECUTE,
                     options: sendOpt
-                }, null).then(res => {
+                }, null, options.onProgress).then(res => {
                     if (res.stats === ResponseStats.SUCCESS) {
                         resolve(res.response);
                     } else if (res.stats === ResponseStats.ERROR) {
@@ -160,5 +192,3 @@ class XHRWorker {
     }
 
 }
-
-export const xhrWorker = new XHRWorker();

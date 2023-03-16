@@ -18,6 +18,9 @@ export enum XHRRequestMethod {
     DELETE
 }
 
+//请求进度回调
+export type XHRRequestOnProgress = (totalBytes: number, loadedBytes: number) => void;
+
 type TransformRequestFunc = (data: any, options: XHRRequestOptions) => any;
 type TransformResponseFunc = (response: XHRResponse) => any;
 
@@ -45,6 +48,8 @@ export interface XHRRequestOptions {
     timeout?: number;
     //是否跨站点访问控制请求
     withCredentials?: boolean;
+    //请求进度回调
+    onProgress?: XHRRequestOnProgress;
     //用来取消xhr请求的对象
     cancelToken?: XHRCancelToken;
     //参数序列化方法 可自定义参数序列化  args=> 0:params
@@ -368,6 +373,11 @@ export class XHRRequest {
                 }
             }
         };
+        if (options.onProgress) {
+            httpRequest.onprogress = function (e: ProgressEvent<EventTarget>) {
+                options.onProgress.call(null, e.total, e.loaded);
+            }
+        }
         httpRequest.ontimeout = function () {
             httpRequest.onreadystatechange = XHRRequest.falseFn;
             callback.call(null, 'XMLHttpRequest timeout', null);

@@ -5,6 +5,9 @@ import TransferTypedArrayTestScript from "./transfer_typed_array_test_worker.js"
 let testing: boolean = false;
 let testAwiters: Record<string, Function>[] = [];
 
+//定义worker任务消息处理对象
+export type WorkerTaskMessageHandler = <P, R> (processor: TaskProcessor<P, R>, data: any) => void;
+
 const callTestAwiterResolve = function (result: boolean) {
     for (let i = 0; i < testAwiters.length; i++) {
         const awiter = testAwiters[i];
@@ -24,11 +27,11 @@ const canTransferArrayBuffer = function () {
             });
             if (!testing) {
                 testing = true;
-                createWorker(TransferTypedArrayTestScript).then((worker: Worker) => {
+                createWorker(TransferTypedArrayTestScript).then(res => {
                     let value = 99;
                     let array = new Int8Array([value]);
                     try {
-                        worker.postMessage({
+                        res.worker.postMessage({
                             array: array,
                         },
                             [array.buffer]);
@@ -36,7 +39,7 @@ const canTransferArrayBuffer = function () {
                         TaskProcessor.canTransferArrayBuffer = false;
                         callTestAwiterResolve(false);
                     }
-                    worker.onmessage = (event) => {
+                    res.worker.onmessage = (event) => {
                         var array = event.data.array;
 
                         // some versions of Firefox silently fail to transfer typed arrays.
@@ -45,7 +48,8 @@ const canTransferArrayBuffer = function () {
                         var result = Utils.defined(array) && array[0] === value;
 
                         TaskProcessor.canTransferArrayBuffer = result;
-                        worker.terminate();
+                        res.worker.terminate();
+                        URL.revokeObjectURL(res.workerSourceURL);
                         callTestAwiterResolve(result);
                     }
                 }).catch((err: any) => {
@@ -65,15 +69,16 @@ const canTransferArrayBuffer = function () {
  * @returns 
  */
 const createWorker = <P, R> (workerScriptstr: string, processor?: TaskProcessor<P, R>) => {
-    return new Promise<Worker>((resolve, reject) => {
+    return new Promise<{ worker: Worker, workerSourceURL: string }>((resolve, reject) => {
         const jsBlob = Utils.createScriptBlob(workerScriptstr);
-        let worker = new Worker(URL.createObjectURL(jsBlob));
+        const workerSourceURL = URL.createObjectURL(jsBlob);
+        let worker = new Worker(workerSourceURL);
         if (Utils.defined(processor)) {
             worker.onmessage = function (event) {
-                completeTask(processor, event.data);
+                processor.taskMessageHanlder(processor, event.data);
             }
         }
-        resolve(worker);
+        resolve({ worker: worker, workerSourceURL: workerSourceURL });
     });
 
 }
@@ -98,7 +103,7 @@ const completeTask = <P, R> (processor: TaskProcessor<P, R>, data: any) => {
     }
 
     delete processor.promiseMap[id];
-
+    delete processor.userDataMap[id];
 }
 
 
@@ -110,26 +115,33 @@ export class TaskProcessor<P, R> {
 
     private workerScriptstr: string;
 
+    public readonly taskMessageHanlder: WorkerTaskMessageHandler;
+
     private _maxmiumActiveTasks: number;
 
     public activeTasks = 0;
 
     public promiseMap: Record<string, Record<string, Function>> = {};
 
+    public userDataMap: Record<string, any> = {};
+
     public taskCompletedEvent = new GenericEvent<any>;
 
     private _nextId: number = 0;
 
-    private _worker: Worker | undefined;
+    private _worker?: Worker;
+
+    private _workerSourceURL?: string;
 
     private _workerWaiters: Record<string, Function>[] = [];
 
     private _creatingWorker: boolean = false;
 
-    public static canTransferArrayBuffer: boolean | undefined;
+    public static canTransferArrayBuffer?: boolean;
 
-    constructor (workerScriptstr: string, maxmiumActiveTasks?: number) {
+    constructor (workerScriptstr: string, taskMessageHanlder?: WorkerTaskMessageHandler, maxmiumActiveTasks?: number) {
         this.workerScriptstr = workerScriptstr;
+        this.taskMessageHanlder = taskMessageHanlder || completeTask;
         this._maxmiumActiveTasks = Utils.defaultValue(maxmiumActiveTasks, Number.POSITIVE_INFINITY);
     }
 
@@ -157,8 +169,9 @@ export class TaskProcessor<P, R> {
                 if (!this._creatingWorker) {
                     this._creatingWorker = true;
                     canTransferArrayBuffer().then(() => {
-                        createWorker(this.workerScriptstr, this).then((w: Worker) => {
-                            this._worker = w;
+                        createWorker(this.workerScriptstr, this).then(res => {
+                            this._worker = res.worker;
+                            this._workerSourceURL = res.workerSourceURL;
                             this.callAwiters(undefined, this._worker);
                         }).catch((err: any) => {
                             this.callAwiters(err, undefined);
@@ -172,7 +185,7 @@ export class TaskProcessor<P, R> {
         });
     }
 
-    public scheduleTask (params: P, transferableObjects: Transferable[]) {
+    public scheduleTask (params: P, transferableObjects: Transferable[], useData?: any) {
         return new Promise<R>((resolve, reject) => {
             this.ready().then(() => {
                 if (this.activeTasks >= this._maxmiumActiveTasks) {
@@ -188,6 +201,7 @@ export class TaskProcessor<P, R> {
                         resolve: resolve,
                         reject: reject
                     }
+                    this.userDataMap[id] = useData;
                     this._worker.postMessage({
                         id: id,
                         params: params,
@@ -198,6 +212,17 @@ export class TaskProcessor<P, R> {
                 reject(err);
             });
         });
+    }
+
+    public dispose () {
+        if (this._worker) {
+            this._worker.terminate();
+            this._worker = null;
+        }
+        if (this._workerSourceURL) {
+            URL.revokeObjectURL(this._workerSourceURL);
+            this._workerSourceURL = null;
+        }
     }
 
 }

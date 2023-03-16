@@ -370,7 +370,7 @@ function mergeBufferAttributes (attributes) {
 //  * @param {BufferAttribute}
 //  * @return {BufferAttribute}
 //  */
-// export function deepCloneAttribute (attribute: BufferAttribute) {
+// export function deepCloneAttribute (attribute) {
 
 //     if (attribute.isInstancedInterleavedBufferAttribute || attribute.isInterleavedBufferAttribute) {
 
@@ -380,7 +380,7 @@ function mergeBufferAttributes (attributes) {
 
 //     if (attribute.isInstancedBufferAttribute) {
 
-//         return new InstancedBufferAttribute(attribute).copy(attribute);
+//         return new InstancedBufferAttribute().copy(attribute);
 
 //     }
 
