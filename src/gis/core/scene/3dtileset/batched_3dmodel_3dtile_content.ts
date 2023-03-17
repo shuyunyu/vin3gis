@@ -13,7 +13,6 @@ import { ComponentDatatype } from "../../misc/component_data_type";
 import { getJsonFromTypedArray } from "../../misc/get_json_from_typed_array";
 import { Transform } from "../../transform/transform";
 import { FrameState } from "../frame_state";
-import { GltfConvert } from "../model/gltf/gltf_convert";
 import { Earth3DTile } from "./earth_3dtile";
 import { Earth3DTileset } from "./earth_3dtileset";
 import { Earth3DTileBatchTable } from "./earth_3dtile_batch_table";
@@ -287,9 +286,10 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
             throw new Error("glTF byte length must be greater than 0.");
         }
 
-        let gltfView;
+        let gltfView: Uint8Array;
         if (byteOffset % 4 === 0) {
-            gltfView = new Uint8Array(arrayBuffer, byteOffset, gltfByteLength);
+            // gltfView = new Uint8Array(arrayBuffer, byteOffset, gltfByteLength);
+            gltfView = new Uint8Array(arrayBuffer.slice(byteOffset, gltfByteLength));
         } else {
             // Create a copy of the glb so that it is 4-byte aligned
             console.error(
@@ -304,7 +304,7 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
         //转换gltf
         // let gltf = parseGlb(gltfView);
         // let gltf = GltfConvert.convertGlbToGltf(new buffer.Buffer(gltfView), true);
-        let gltf = null;
+        let gltf = this.tileset.gltfLoader.parse(gltfView.buffer, '');
 
 
         this._rtcCenterTransform = MatConstants.Mat4_IDENTITY;

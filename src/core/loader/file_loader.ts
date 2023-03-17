@@ -92,7 +92,7 @@ export class FileLoader extends BaseLoader {
                 } else {
                     for (let i = 0; i < callbacks.length; i++) {
                         const callback = callbacks[i];
-                        if (callback.onError) callback.onError(res.response.message);
+                        if (callback.onError) callback.onError(res.error);
                     }
                     this.manager.itemError(url);
                 }

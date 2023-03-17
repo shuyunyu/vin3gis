@@ -1009,8 +1009,11 @@ class GISTest {
     }
 
     public static test3dtiles (mapViewer: MapViewer) {
+        const dracoLoader = new DRACOLoader()
+        dracoLoader.setDecoderPath("http://124.223.202.45/Vin3GIS/v0.0.1/libs/draco/");
         const tileset = new Earth3DTileset({
-            url: 'http://data.mars3d.cn/3dtiles/jzw-shanghai/tileset.json'
+            url: 'http://data.mars3d.cn/3dtiles/jzw-shanghai/tileset.json',
+            dracoLoader: dracoLoader
         });
         mapViewer.scene.primitives.add(tileset);
     }

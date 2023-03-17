@@ -1,5 +1,7 @@
 import { Matrix4 } from "three";
 import { AssetDefines } from "../../../@types/core/asset/asset";
+import { DRACOLoader } from "../../../core/loader/draco_loader";
+import { KTX2Loader } from "../../../core/loader/ktx2_loader";
 import { Utils } from "../../../core/utils/utils";
 import { XHRRequestOptions } from "../../../core/xhr/xhr_request";
 import { Earth3DTile } from "../../core/scene/3dtileset/earth_3dtile";
@@ -15,6 +17,8 @@ export interface Earth3DTilesetOptions {
     url: string;
     //坐标偏移类型
     coordinateOffsetType?: CoordinateOffsetType;
+    dracoLoader?: DRACOLoader;
+    ktx2Loader?: KTX2Loader;
     //模型变换矩阵
     modelMatrix?: Matrix4;
     //是否显示 defalt true

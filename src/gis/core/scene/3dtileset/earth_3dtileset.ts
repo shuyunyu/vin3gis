@@ -2,6 +2,9 @@ import { Matrix4, Object3D } from "three";
 import { AssetLoader } from "../../../../core/asset/asset_loader";
 import { MatConstants } from "../../../../core/constants/mat_constants";
 import { GenericEvent } from "../../../../core/event/generic_event";
+import { DRACOLoader } from "../../../../core/loader/draco_loader";
+import { GLTFLoader } from "../../../../core/loader/gltf_loader";
+import { KTX2Loader } from "../../../../core/loader/ktx2_loader";
 import { math } from "../../../../core/math/math";
 import { Utils } from "../../../../core/utils/utils";
 import { XHRRequestOptions } from "../../../../core/xhr/xhr_request";
@@ -37,6 +40,12 @@ export class Earth3DTileset implements IPrimitive {
     }
 
     private _id: string;
+
+    public readonly dracoLoader: DRACOLoader;
+
+    public readonly ktx2Loader: KTX2Loader;
+
+    public readonly gltfLoader: GLTFLoader;
 
     private _url: string;
 
@@ -441,6 +450,11 @@ export class Earth3DTileset implements IPrimitive {
         this._container = new Object3D();
         this._url = options.url;
         this._coordinateOffsetType = Utils.defaultValue(options.coordinateOffsetType, CoordinateOffsetType.NONE);
+        this.dracoLoader = options.dracoLoader;
+        this.ktx2Loader = options.ktx2Loader;
+        this.gltfLoader = new GLTFLoader();
+        if (this.dracoLoader) this.gltfLoader.setDRACOLoader(this.dracoLoader);
+        if (this.ktx2Loader) this.gltfLoader.setKTX2Loader(this.ktx2Loader);
         this._show = Utils.defaultValue(options.show, true);
         this._statistics = new Earth3DTilesetStatistics();
         this._maximumMemoryUsage = Utils.defaultValue(options.maximumMemoryUsage, 1024);

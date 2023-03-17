@@ -66,7 +66,9 @@ export class DracoWorker extends BaseWorker {
                 taskConfig: taskConfig
             }, [buffer]).then((res: DracoGeometry) => {
                 resolve(res);
-            }).catch(reject);
+            }).catch(err => {
+                reject(err);
+            });
         });
     }
 
