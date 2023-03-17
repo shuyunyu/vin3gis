@@ -8,7 +8,7 @@ import { Cartesian3 } from "../cartesian/cartesian3";
 import { Cartographic } from "../cartographic";
 import { Rectangle } from "../geometry/rectangle";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
-import { WebMercatorTilingScheme } from "../tilingscheme/web_mercator_tiling_scheme";
+import { webMercatorTilingScheme } from "../tilingscheme/web_mercator_tiling_scheme";
 import { Transform } from "../transform/transform";
 import { IBoundingVolume } from "./bounding_volume";
 import { FrameState } from "./frame_state";
@@ -18,26 +18,24 @@ const volumeConstant = (4.0 / 3.0) * math.PI;
 
 export class BoundingRegionVolume implements IBoundingVolume {
 
-    private static defaultTilingScheme: ITilingScheme = new WebMercatorTilingScheme();
-
     //投影过后的矩形范围
-    private _rectangle: Rectangle | undefined;
+    private _rectangle: Rectangle;
 
-    private _minimumHeight: number | undefined;
+    private _minimumHeight: number;
 
-    private _maximumHeight: number | undefined;
+    private _maximumHeight: number;
 
     private _tilingScheme: ITilingScheme;
 
-    private _aabb: Box3 | undefined;
+    private _aabb: Box3;
 
-    private _boundingSphere: Sphere | undefined;
+    private _boundingSphere: Sphere;
 
-    private _boundingSphereCenter: Vector3 | undefined;
+    private _boundingSphereCenter: Vector3;
 
-    private _boundingSphereRadius: number | undefined;
+    private _boundingSphereRadius: number;
 
-    private _boundingSphereVolume: number | undefined;
+    private _boundingSphereVolume: number;
 
     public get rectangle () {
         return this._rectangle!;
@@ -72,7 +70,7 @@ export class BoundingRegionVolume implements IBoundingVolume {
     }
 
     constructor (southWest: Cartographic, northEast: Cartographic, minimumHeight: number, maximumHeight: number, coordinateOffsetType: CoordinateOffsetType, tilingScheme?: ITilingScheme) {
-        this._tilingScheme = Utils.defaultValue(tilingScheme, BoundingRegionVolume.defaultTilingScheme);
+        this._tilingScheme = Utils.defaultValue(tilingScheme, webMercatorTilingScheme);
         this.update(southWest, northEast, minimumHeight, maximumHeight, coordinateOffsetType);
     }
     public distanceToCamera (frameState: FrameState): number {
@@ -96,8 +94,7 @@ export class BoundingRegionVolume implements IBoundingVolume {
         this._boundingSphere = this._aabb.getBoundingSphere(new Sphere());
         this._boundingSphereCenter = this._boundingSphere.center.clone();
         this._boundingSphereRadius = this._boundingSphere.radius;
-        let metersPerUnit = Transform.getMetersPerUnit();
-        let radius = this._boundingSphereRadius * metersPerUnit;
+        let radius = this._boundingSphereRadius;
         this._boundingSphereVolume = volumeConstant * radius * radius * radius;
     }
 
@@ -108,7 +105,7 @@ export class BoundingRegionVolume implements IBoundingVolume {
         let halfH = (maximumHeight - minimumHeight) / 2;
         let halfL = rectangle.height / 2;
         let centerCar = new Cartesian3(rectangle.center.x, rectangle.center.y, y);
-        let centerVec = Transform.earthCar3ToWorldVec3(centerCar, scratchVec3);
+        let centerVec = Transform.geoCar3ToWorldVec3(centerCar, scratchVec3);
         return GeometryUtils.createBox3(centerVec, halfW / metersPerUnit, halfH / metersPerUnit, halfL / metersPerUnit);
     }
 

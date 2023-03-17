@@ -212,7 +212,7 @@ export class Transform {
      * @param cartesian3 
      * @returns 
      */
-    public static geoCart3ToWorldVec3 (cartesian3: Cartesian3, out?: Vector3) {
+    public static geoCar3ToWorldVec3 (cartesian3: Cartesian3, out?: Vector3) {
         let metersPerUnit = this.getMetersPerUnit();
         let result = this.earthCar3ToWorldVec3(cartesian3, out);
         result.multiplyScalar(1 / metersPerUnit);
@@ -238,7 +238,7 @@ export class Transform {
      */
     public static cartographicToWorldVec3 (cartographic: Cartographic, tilingScheme: ITilingScheme, out?: Vector3) {
         let cartesian3 = tilingScheme.projection.project(cartographic);
-        return this.geoCart3ToWorldVec3(cartesian3, out);
+        return this.geoCar3ToWorldVec3(cartesian3, out);
     }
 
     /**
@@ -248,7 +248,9 @@ export class Transform {
      * @returns 
      */
     public static worldCar3ToCartographic (worldVec3: ICartesian3Like, tilingScheme: ITilingScheme, out?: Cartographic) {
+        let metersPerUnit = this.getMetersPerUnit();
         let cartesian3 = this.worldCar3ToEarthVec3(worldVec3, scratchCartesian3);
+        cartesian3.multiplyScalar(metersPerUnit);
         return tilingScheme.projection.unproject(cartesian3, out);
     }
 

@@ -24,12 +24,13 @@ import { GeoJSONLoader } from "../src/gis/core/loader/geojson_loader";
 import { PolygonShape } from "../src/gis/core/datasource/misc/polygon_shape";
 import { SystemDefines } from "../src/@types/core/system/system";
 import { xhrWorkerPool } from "../src/core/worker/pool/xhr_worker_pool";
+import { Earth3DTileset } from "../src/gis/core/scene/3dtileset/earth_3dtileset";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
     // const initCameraPosition = new Vector3(wgs84LngLat[0], wgs84LngLat[1], 16500000);
     // const initCameraPosition = new Vector3(118.256, 24.418, 165000);
-    const initCameraPosition = new Vector3(121.556, 31.268, 165000);
+    const initCameraPosition = new Vector3(121.556, 31.268, 1650);
     // const initCameraPosition = new Vector3(0, 0, 16500000);
     // const initCameraPosition = new Vector3(0, 0, Transform.carCoordToWorldCoord(1.65));
     const initCameraOrientation = new Vector3(0, -90, 0);
@@ -39,12 +40,12 @@ window.onload = () => {
         //EmptyImageryTileProvider
         //AMapImageryTileProvider
         //TdtImageryTileProvider
-        imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
+        // imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
         // imageryTileProivder: new BaiduImageryTileProvider({ correction: true }),
         // imageryTileProivder: new OSMImageryTileProvider(),
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
-        // imageryTileProivder: new EmptyImageryTileProvider(),
+        imageryTileProivder: new EmptyImageryTileProvider(),
         // imageryTileProivder: new ArcGISImageryTileProvider({ url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer" }),
         // imageryTileProivder: new TdtImageryTileProvider({
         //     style: "street",
@@ -87,6 +88,7 @@ class GISTest {
         // global.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
         this.testEngineLoader(mapViewer);
+        this.test3dtiles(mapViewer);
     }
 
     private static testEngineLoader (mapViewer: MapViewer) {
@@ -1004,6 +1006,13 @@ class GISTest {
         console.log(tiledTexture.tileImage(res2.canvas));
 
         global.tiledTexture = tiledTexture;
+    }
+
+    public static test3dtiles (mapViewer: MapViewer) {
+        const tileset = new Earth3DTileset({
+            url: 'http://data.mars3d.cn/3dtiles/jzw-shanghai/tileset.json'
+        });
+        mapViewer.scene.primitives.add(tileset);
     }
 
 }

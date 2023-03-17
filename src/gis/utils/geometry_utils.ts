@@ -3,7 +3,7 @@ import { ICartesian3Like } from "../@types/core/gis";
 
 export class GeometryUtils {
 
-    public static createBox3 (center: ICartesian3Like, halfWidth: number, halfHeight: number, halfLength) {
+    public static createBox3 (center: ICartesian3Like, halfWidth: number, halfHeight: number, halfLength: number) {
         const xmin = center.x - halfWidth;
         const xmax = center.x + halfWidth;
         const ymin = center.y - halfHeight;

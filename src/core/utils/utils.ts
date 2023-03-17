@@ -262,4 +262,25 @@ export class Utils {
         return result;
     }
 
+    public static clone (object: any, deep: boolean) {
+        if (object === null || typeof object !== "object") {
+            return object;
+        }
+
+        deep = this.defaultValue(deep, false);
+
+        var result = new object.constructor();
+        for (var propertyName in object) {
+            if (object.hasOwnProperty(propertyName)) {
+                var value = object[propertyName];
+                if (deep) {
+                    value = this.clone(value, deep);
+                }
+                result[propertyName] = value;
+            }
+        }
+
+        return result;
+    }
+
 }

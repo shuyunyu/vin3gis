@@ -7,7 +7,7 @@ import { Earth3DTilesetGltfUpAxis } from "../../@types/core/earth_3dtileset";
 import { CoordinateOffsetType } from "../../@types/core/gis";
 import { Cartesian3 } from "../cartesian/cartesian3";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
-import { WebMercatorTilingScheme } from "../tilingscheme/web_mercator_tiling_scheme";
+import { webMercatorTilingScheme } from "../tilingscheme/web_mercator_tiling_scheme";
 import { Transform } from "../transform/transform";
 import { IBoundingVolume } from "./bounding_volume";
 import { FrameState } from "./frame_state";
@@ -17,32 +17,30 @@ const scratchVec3 = new Vector3();
 
 export class BoundingOrientedBoxVolume implements IBoundingVolume {
 
-    private static defaultTilingScheme: ITilingScheme = new WebMercatorTilingScheme();
-
     private _tilingScheme: ITilingScheme;
 
     //中心点
-    private _center: Cartesian3 | undefined;
+    private _center: Cartesian3;
 
     //方向矩阵
-    private _halfAxes: Matrix3 | undefined;
+    private _halfAxes: Matrix3;
 
     //obb
-    private _obb: OBB | undefined;
+    private _obb: OBB;
 
-    private _boundingSphere: Sphere | undefined;
+    private _boundingSphere: Sphere;
 
     //保存范围球的中心 避免每次都去计算
-    private _boundingSphereCenter: Vector3 | undefined;
+    private _boundingSphereCenter: Vector3;
 
-    private _boundingSphereRadius: number | undefined;
+    private _boundingSphereRadius: number;
 
-    private _boundingSphereVolume: number | undefined;
+    private _boundingSphereVolume: number;
 
     private _upAxis: Earth3DTilesetGltfUpAxis;
 
     public get center () {
-        return this._center!;
+        return this._center;
     }
 
     public get halfAxes () {
@@ -70,7 +68,7 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
     }
 
     constructor (center: Cartesian3, halfAxes: Matrix3, upAxis: Earth3DTilesetGltfUpAxis, coordinateOffsetType: CoordinateOffsetType, tilingScheme?: ITilingScheme) {
-        this._tilingScheme = Utils.defaultValue(tilingScheme, BoundingOrientedBoxVolume.defaultTilingScheme);
+        this._tilingScheme = Utils.defaultValue(tilingScheme, webMercatorTilingScheme);
         this._upAxis = upAxis;
         this.update(center, halfAxes, coordinateOffsetType);
     }
@@ -88,13 +86,13 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
         let metersPerUnit = Transform.getMetersPerUnit();
         let cartographic = this._tilingScheme.projection.ellipsoid.cartesianToCartographic(center);
         Transform.wgs84ToCartographic(cartographic, coordinateOffsetType, cartographic);
-        this._center = this._tilingScheme.projection.project(cartographic!);
+        this._center = this._tilingScheme.projection.project(cartographic);
         this._halfAxes = new Matrix3().copy(halfAxes).multiplyScalar(1 / metersPerUnit);
         this._obb = this.createOBB(this._center, this._halfAxes);
         this._boundingSphere = this.createBoundingSphere(this._halfAxes);
         this._boundingSphereCenter = this._boundingSphere.center.clone();
         this._boundingSphereRadius = this._boundingSphere.radius;
-        let radius = this._boundingSphereRadius * metersPerUnit;
+        let radius = this._boundingSphereRadius;
         this._boundingSphereVolume = volumeConstant * radius * radius * radius;
     }
 
@@ -116,7 +114,7 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
         let hx = xV.length();
         let hy = yV.length();
         let hz = zV.length();
-        let centerVec = Transform.earthCar3ToWorldVec3(center, scratchVec3);
+        let centerVec = Transform.geoCar3ToWorldVec3(center, scratchVec3);
         let obb = new OBB(centerVec, new Vector3(hx, hy, hz), halfAxes);
         if (this._upAxis == Earth3DTilesetGltfUpAxis.Z) {
             const mat4 = new Matrix4().makeRotationFromEuler(new Euler(-math.PI_OVER_TWO, 0, 0));

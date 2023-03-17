@@ -1058,13 +1058,10 @@ export class Earth3DTile {
         return new Promise<ArrayBuffer>((resolve, reject) => {
             let tileset = tile.tileset;
             let absoluteUri = Utils.getAbsouteUri(tile.tilesetRecourceUri || "", tile.resourceUri!);
-            this._requestTask = AssetLoader.requestArrayBuffer({
+            this._requestTask = AssetLoader.requestArrayBuffer(Object.assign({}, tileset.assetLoadParams, {
                 url: absoluteUri,
                 priority: tile.priority,
-                params: Object.assign({}, tileset.assetLoadParams, {
-                    url: absoluteUri
-                })
-            }, (res: { buffer: ArrayBuffer, result: RequestTaskResult }) => {
+            }), (res: { buffer: ArrayBuffer, result: RequestTaskResult }) => {
                 if (res.buffer) {
                     resolve(res.buffer);
                 } else {

@@ -5,7 +5,7 @@ import { Utils } from "../../../core/utils/utils";
 import { CoordinateOffsetType } from "../../@types/core/gis";
 import { Cartesian3 } from "../cartesian/cartesian3";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
-import { WebMercatorTilingScheme } from "../tilingscheme/web_mercator_tiling_scheme";
+import { webMercatorTilingScheme } from "../tilingscheme/web_mercator_tiling_scheme";
 import { Transform } from "../transform/transform";
 import { IBoundingVolume } from "./bounding_volume";
 import { FrameState } from "./frame_state";
@@ -28,21 +28,19 @@ const scracthVec3 = new Vector3();
 
 export class BoundingSphereVolume implements IBoundingVolume {
 
-    private static defaultTilingScheme = new WebMercatorTilingScheme();
-
     private _tilingScheme: ITilingScheme;
 
-    private _center: Cartesian3 | undefined;
+    private _center: Cartesian3;
 
-    private _radius: number | undefined;
+    private _radius: number;
 
-    private _sphere: Sphere | undefined;
+    private _sphere: Sphere;
 
-    private _boundingSphereCenter: Vector3 | undefined;
+    private _boundingSphereCenter: Vector3;
 
-    private _boundingSphereRadius: number | undefined;
+    private _boundingSphereRadius: number;
 
-    private _boundingSphereVolume: number | undefined;
+    private _boundingSphereVolume: number;
 
     public get center () {
         return this._center!;
@@ -73,7 +71,7 @@ export class BoundingSphereVolume implements IBoundingVolume {
     }
 
     constructor (center: Cartesian3, radius: number, coordinateOffsetType: CoordinateOffsetType, tilingScheme?: ITilingScheme) {
-        this._tilingScheme = Utils.defaultValue(tilingScheme, BoundingSphereVolume.defaultTilingScheme);
+        this._tilingScheme = Utils.defaultValue(tilingScheme, webMercatorTilingScheme);
         this.update(center, radius, coordinateOffsetType);
     }
     public distanceToCamera (frameState: FrameState): number {
@@ -91,7 +89,7 @@ export class BoundingSphereVolume implements IBoundingVolume {
         Transform.wgs84ToCartesian(this._tilingScheme.projection, this.center, coordinateOffsetType, this._center);
         this._radius = radius;
         let metersPerUnit = Transform.getMetersPerUnit();
-        let centerVec = Transform.earthCar3ToWorldVec3(center, scracthVec3);
+        let centerVec = Transform.geoCar3ToWorldVec3(center, scracthVec3);
         this._sphere = new Sphere(centerVec, this._radius / metersPerUnit);
         this._boundingSphereCenter = this._sphere.center.clone();
         this._boundingSphereRadius = this._sphere.radius;

@@ -197,12 +197,12 @@ export class Ellipsoid {
         let longitude = Math.atan2(n!.y, n!.x);
         let latitude = Math.asin(n!.z);
         let height = Math.sign(Cartesian3.dot(h, cartesian)) * Cartesian3.len(h);
-        if (!p) {
+        if (!result) {
             return new Cartographic(longitude, latitude, height);
         }
-        result!.longitude = longitude;
-        result!.latitude = latitude;
-        result!.height = height;
+        result.longitude = longitude;
+        result.latitude = latitude;
+        result.height = height;
         return result;
     }
 

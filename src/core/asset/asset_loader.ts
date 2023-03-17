@@ -213,6 +213,7 @@ export class AssetLoader {
             responseType: XHRResponseType.ARRAYBUFFER,
             throttle: params.throttle,
             throttleServer: params.throttleServer,
+            requestInWorker: params.requestInWorker,
             onComplete: (result: RequestTaskResult) => {
                 if (result.status === RequestTaskStatus.SUCCESS) {
                     cb({

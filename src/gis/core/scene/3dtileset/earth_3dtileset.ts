@@ -1,4 +1,4 @@
-import { Matrix4 } from "three";
+import { Matrix4, Object3D } from "three";
 import { AssetLoader } from "../../../../core/asset/asset_loader";
 import { MatConstants } from "../../../../core/constants/mat_constants";
 import { GenericEvent } from "../../../../core/event/generic_event";
@@ -29,6 +29,12 @@ enum RootTileLoadState {
 export class Earth3DTileset implements IPrimitive {
 
     private log: Log = new Log(Earth3DTileset);
+
+    private _container?: Object3D;
+
+    public get container () {
+        return this._container;
+    }
 
     private _id: string;
 
@@ -432,6 +438,7 @@ export class Earth3DTileset implements IPrimitive {
 
     constructor (options: Earth3DTilesetOptions) {
         this._id = Utils.createGuid();
+        this._container = new Object3D();
         this._url = options.url;
         this._coordinateOffsetType = Utils.defaultValue(options.coordinateOffsetType, CoordinateOffsetType.NONE);
         this._show = Utils.defaultValue(options.show, true);
@@ -447,7 +454,10 @@ export class Earth3DTileset implements IPrimitive {
         this._rootTileLoadState = RootTileLoadState.UNLOAD;
         this._readyPromise = this.createReadyPromise();
         this._assetLoadParams = Object.assign({}, options.assetLoadParams, {
-            url: this._url
+            url: this._url,
+            requestInWorker: true,
+            throttle: true,
+            throttleServer: true,
         });
         this._maximumPriority = {
             foveatedFactor: -Number.MAX_VALUE,
@@ -580,8 +590,7 @@ export class Earth3DTileset implements IPrimitive {
             rootTile.depth = parentTile!.depth + 1;
         }
 
-        let stack = [];
-        stack.push(rootTile);
+        let stack = [rootTile];
 
         //遍历root下的所有子节点
         while (stack.length) {
@@ -644,7 +653,7 @@ export class Earth3DTileset implements IPrimitive {
     private loadJson () {
         return new Promise<any>((resolve, reject) => {
             AssetLoader.loadJSON(this._assetLoadParams).then(res => {
-                resolve(true);
+                resolve(res);
             }).catch(reject);
         });
     }
@@ -835,7 +844,10 @@ export class Earth3DTileset implements IPrimitive {
 
 
     public destroy () {
-
+        if (this._container) {
+            this._container.removeFromParent();
+            this._container = null;
+        }
     }
 
 }
