@@ -1,11 +1,12 @@
-import { Matrix3, Matrix4, Vector3 } from "three";
+import { BufferGeometry, Color, Matrix3, Matrix4, Mesh, MeshBasicMaterial, Vector3 } from "three";
 import { AssetLoader } from "../../../../core/asset/asset_loader";
 import { MatConstants } from "../../../../core/constants/mat_constants";
 import { math } from "../../../../core/math/math";
+import { disposeSystem } from "../../../../core/system/dispose_system";
 import { Utils } from "../../../../core/utils/utils";
 import { IScheduleRequestTask, RequestTaskResult, RequestTaskStatus } from "../../../../core/xhr/scheduler/@types/request";
 import { Earth3DTileContentState, Earth3DTileOptimizationHint, Earth3DTileOptions, Earth3DTileRefine, has3DTilesExtension } from "../../../@types/core/earth_3dtileset";
-import { BoundingShpereUtils } from "../../../utils/bounding_shpere_utils";
+import { BoundingSphereUtils } from "../../../utils/bounding_shpere_utils";
 import { Matrix4Utils } from "../../../utils/matrix4_utils";
 import { Cartesian3 } from "../../cartesian/cartesian3";
 import { Cartographic } from "../../cartographic";
@@ -37,6 +38,8 @@ export class Earth3DTile {
 
     //边界体
     private _boundingVolume: IBoundingVolume;
+
+    private _boundingVolumeMesh: Mesh;
 
     //content的边界体
     private _contentBoundingVolume?: IBoundingVolume;
@@ -577,14 +580,14 @@ export class Earth3DTile {
 
     public getBoundingVolume () {
         if (!Utils.defined(this._boundingVolume2D)) {
-            this._boundingVolume2D = BoundingShpereUtils.project2D(this.tileset.tilingScheme, this.tileset.coordinateOffsetType, this.boundingVolume.boundingSphereRadius, this.boundingVolume.boundingSphereCenter);;
+            this._boundingVolume2D = BoundingSphereUtils.project2D(this.tileset.tilingScheme, this.tileset.coordinateOffsetType, this.boundingVolume.boundingSphereRadius, this.boundingVolume.boundingSphereCenter);;
         }
         return this._boundingVolume2D!;
     }
 
     private getContentBoundingVolume () {
         if (!Utils.defined(this._contentBoundingVolume2D)) {
-            this._contentBoundingVolume2D = BoundingShpereUtils.project2D(this.tileset.tilingScheme, this.tileset.coordinateOffsetType, this.contentBoundingVolume.boundingSphereRadius, this.contentBoundingVolume.boundingSphereCenter);
+            this._contentBoundingVolume2D = BoundingSphereUtils.project2D(this.tileset.tilingScheme, this.tileset.coordinateOffsetType, this.contentBoundingVolume.boundingSphereRadius, this.contentBoundingVolume.boundingSphereCenter);
         }
         return this._contentBoundingVolume2D!;
     }
@@ -1172,6 +1175,7 @@ export class Earth3DTile {
         }
         this._contentState = Earth3DTileContentState.UNLOADED;
         this._lastStyleTime = 0.0;
+        this.disposeBoundingVolemeMesh();
     }
 
     /**
@@ -1198,6 +1202,7 @@ export class Earth3DTile {
      */
     public showContent (tileset: Earth3DTileset) {
         this.content?.show(tileset);
+        this.showBoundingVolumeMesh();
     }
 
     /**
@@ -1206,6 +1211,33 @@ export class Earth3DTile {
      */
     public hideContent (tileset: Earth3DTileset) {
         this.content?.hide(tileset);
+        this.hideBoundingVolumeMesh();
+    }
+
+    private showBoundingVolumeMesh () {
+        if (this._boundingVolume && !this._boundingVolumeMesh) {
+            this._boundingVolumeMesh = this._boundingVolume.createBoundingMesh(new MeshBasicMaterial({
+                color: new Color('#FF0000'),
+                wireframe: true
+            }));
+            if (this._boundingVolumeMesh) this._boundingVolumeMesh.parent = this.tileset.container;
+        }
+    }
+
+    private hideBoundingVolumeMesh () {
+        if (this._boundingVolumeMesh && this._boundingVolumeMesh.parent) {
+            this._boundingVolumeMesh.removeFromParent();
+        }
+    }
+
+    private disposeBoundingVolemeMesh () {
+        if (this._boundingVolumeMesh) {
+            this.hideBoundingVolumeMesh();
+            disposeSystem.disposeObj(this._boundingVolumeMesh.geometry);
+            //@ts-ignore
+            disposeSystem.disposeObj(this._boundingVolumeMesh.material);
+            this._boundingVolumeMesh = null;
+        }
     }
 
 }

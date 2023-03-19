@@ -1,4 +1,4 @@
-import { Euler, Matrix3, Matrix4, Sphere, Vector3 } from "three";
+import { BufferGeometry, Euler, Material, Matrix3, Matrix4, Mesh, Sphere, Vector3 } from "three";
 import { math } from "../../../core/math/math";
 import { OBB } from "../../../core/math/obb";
 import { IntersectUtils } from "../../../core/utils/intersect_utils";
@@ -121,6 +121,10 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
             obb.applyMatrix4(mat4)
         }
         return obb;
+    }
+
+    public createBoundingMesh (material: Material): Mesh<BufferGeometry, Material | Material[]> {
+        return null;
     }
 
 }

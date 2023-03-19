@@ -1,4 +1,4 @@
-import { Box3, Sphere, Vector3 } from "three";
+import { Box3, BoxGeometry, BufferGeometry, Material, Mesh, Sphere, Vector3 } from "three";
 import { math } from "../../../core/math/math";
 import { IntersectUtils } from "../../../core/utils/intersect_utils";
 import { Utils } from "../../../core/utils/utils";
@@ -107,6 +107,11 @@ export class BoundingRegionVolume implements IBoundingVolume {
         let centerCar = new Cartesian3(rectangle.center.x, rectangle.center.y, y);
         let centerVec = Transform.geoCar3ToWorldVec3(centerCar, scratchVec3);
         return GeometryUtils.createBox3(centerVec, halfW / metersPerUnit, halfH / metersPerUnit, halfL / metersPerUnit);
+    }
+
+
+    public createBoundingMesh (material: Material): Mesh<BufferGeometry, Material | Material[]> {
+        return null;
     }
 
 }

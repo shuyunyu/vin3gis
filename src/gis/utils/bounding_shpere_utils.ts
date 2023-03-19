@@ -19,7 +19,7 @@ let projectTo2DCartographicScratch = new Cartographic();
 
 let scratchCartographic = new Cartographic();
 
-export class BoundingShpereUtils {
+export class BoundingSphereUtils {
 
     public static project2D (tilingScheme: ITilingScheme, coordinateOffsetType: CoordinateOffsetType, boundingSphereRadius: number, boundingSphereCenter: Vector3) {
         let projection = tilingScheme.projection;

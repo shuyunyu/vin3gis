@@ -1,4 +1,4 @@
-import { Sphere, Vector3 } from "three";
+import { BufferGeometry, Material, Mesh, Sphere, SphereGeometry, Vector3 } from "three";
 import { math } from "../../../core/math/math";
 import { IntersectUtils } from "../../../core/utils/intersect_utils";
 import { Utils } from "../../../core/utils/utils";
@@ -94,6 +94,11 @@ export class BoundingSphereVolume implements IBoundingVolume {
         this._boundingSphereCenter = this._sphere.center.clone();
         this._boundingSphereRadius = this._sphere.radius;
         this._boundingSphereVolume = volumeConstant * radius * radius * radius;
+    }
+
+    public createBoundingMesh (material: Material): Mesh<BufferGeometry, Material | Material[]> {
+        const geometry = new SphereGeometry(this.radius);
+        return new Mesh(geometry, material);
     }
 
     public static fromPoints (positions: Cartesian3[], coordinateOffsetType: CoordinateOffsetType, result?: BoundingSphereVolume) {

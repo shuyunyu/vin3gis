@@ -1,4 +1,4 @@
-import { Sphere, Vector3 } from "three";
+import { Material, Mesh, Sphere, Vector3 } from "three";
 import { FrameState } from "./frame_state";
 
 /**
@@ -17,4 +17,6 @@ export interface IBoundingVolume {
     distanceToCamera (frameState: FrameState): number;
     //计算可见性
     computeVisible (frameState: FrameState): boolean;
+    //构建包围盒的mesh
+    createBoundingMesh (material: Material): Mesh;
 }
