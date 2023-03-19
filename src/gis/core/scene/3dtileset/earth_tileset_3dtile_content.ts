@@ -102,7 +102,7 @@ export class EarthTileset3DTileContent implements IEarth3DTileContent {
 
     private initialize () {
         this._tileset.loadTileset(this._json, this._tile);
-        this._readyPromise_resolve!(this);
+        this._readyPromise_resolve(this);
     }
 
     update (tileset: Earth3DTileset, frameState: FrameState): void {

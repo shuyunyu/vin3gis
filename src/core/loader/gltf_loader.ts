@@ -2559,7 +2559,7 @@ class GLTFParser {
 
             })).then(function () {
 
-                onLoad(result);
+                if (onLoad) onLoad(result);
 
             });
 

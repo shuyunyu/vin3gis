@@ -4,7 +4,6 @@ import { Utils } from "../../../../core/utils/utils";
 import { Earth3DTilesetGltfUpAxis } from "../../../@types/core/earth_3dtileset";
 import { GltfUtils } from "../../../utils/gltf_utils";
 import { Matrix4Utils } from "../../../utils/matrix4_utils";
-import { gltfCache } from "../../cache/gltf_cache";
 import { Cartesian3 } from "../../cartesian/cartesian3";
 import { Cartesian4 } from "../../cartesian/cartesian4";
 import { Cartographic } from "../../cartographic";
@@ -31,35 +30,29 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
 
     public _readyPromise: Promise<IEarth3DTileContent>;
 
-    private _readyPromise_resolve: Function | undefined;
+    private _readyPromise_resolve: Function;
 
-    private _readyPromise_reject: Function | undefined;
+    private _readyPromise_reject: Function;
 
     private _tileset: Earth3DTileset;
 
     private _tile: Earth3DTile;
 
+    private _gltf: any;
+
     private _featurePropertiesDirty: boolean;
 
-    private _rtcCenterTransform: Matrix4 | undefined;
+    private _rtcCenterTransform: Matrix4;
 
-    private _contentModelMatrix: Matrix4 | undefined;
+    private _contentModelMatrix: Matrix4;
 
-    private _rtcCenter3D: Cartesian3 | undefined;
+    private _rtcCenter3D: Cartesian3;
 
-    private _rctCenter2D: Cartesian3 | undefined;
+    private _rctCenter2D: Cartesian3;
 
-    private _rtcCenter: Cartesian3 | undefined;
+    private _rtcCenter: Cartesian3;
 
-    private _node: Node | undefined;
-
-    private _computedMartix: Matrix4 | undefined;
-
-    private _destroyed: boolean = false;
-
-    private _textureImageHandledCount: number = 0;
-
-    private _textureImageHandledTargetCount: number = 0;
+    private _computedMartix: Matrix4;
 
     private _featuresLength: number = 0;
     private _pointsLength: number = 0;
@@ -133,13 +126,6 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
         });
     }
 
-    private createNode () {
-        // let node = Utils.createNodeWithName("b3dmGltfNode");
-        // //默认不显示
-        // node.active = false;
-        // this._node = node;
-        // return node;
-    }
 
     /**
      * 初始化
@@ -289,7 +275,7 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
         let gltfView: Uint8Array;
         if (byteOffset % 4 === 0) {
             // gltfView = new Uint8Array(arrayBuffer, byteOffset, gltfByteLength);
-            gltfView = new Uint8Array(arrayBuffer.slice(byteOffset, gltfByteLength));
+            gltfView = new Uint8Array(arrayBuffer.slice(byteOffset, byteOffset + gltfByteLength));
         } else {
             // Create a copy of the glb so that it is 4-byte aligned
             console.error(
@@ -300,12 +286,6 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
                 uint8Array.subarray(byteOffset, byteOffset + gltfByteLength)
             );
         }
-
-        //转换gltf
-        // let gltf = parseGlb(gltfView);
-        // let gltf = GltfConvert.convertGlbToGltf(new buffer.Buffer(gltfView), true);
-        let gltf = this.tileset.gltfLoader.parse(gltfView.buffer, '');
-
 
         this._rtcCenterTransform = MatConstants.Mat4_IDENTITY;
         var rtcCenter = featureTable.getGlobalProperty(
@@ -321,12 +301,13 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
 
         }
 
-        let node = this.createNode();
-
-        this.updateContentMatrix(this.tile, gltf);
-
-
-        // GltfLoader.loadByJson(this.tileset.tilingScheme.projection, this._contentModelMatrix, this.tileset.coordinateOffsetType, this.tileset.gltfUpAxis, gltf);
+        this.tileset.gltfLoader.parseAsync(gltfView.buffer, '').then(gltf => {
+            this._gltf = gltf;
+            this.updateContentMatrix(this.tile, gltf);
+            this._readyPromise_resolve(this);
+        }).catch(err => {
+            this._readyPromise_reject(err);
+        });
     }
 
     private updateContentMatrix (tile: Earth3DTile, gltf: any) {
@@ -385,155 +366,14 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
     }
 
 
-    /**
-     * 获取mesh合并处理方法
-     * @param computedContentMatrix 
-     * @returns 
-     */
-    // private getMergeMeshHandler (computedContentMatrix: Mat4, cacheId: string) {
-    // let _this = this;
-    // return function (node: Node, ccmodel: any, meshArr: Mesh[], materials: Material[], materialImageAssetRecord: Record<string, ImageAsset | ImageBitmap>, dictGroup: Record<string, []>, json: any, options: GltfLoaderOptions) {
-    //     if (_this._destroyed) {
-    //         for (let i = 0; i < meshArr.length; i++) {
-    //             const mesh = meshArr[i];
-    //             mesh.destroy();
-    //         }
-    //         for (let i = 0; i < materials.length; i++) {
-    //             const mat = materials[i];
-    //             GISResLoader.instance.releaseMaterialTextureResource(mat);
-    //             mat.destroy();
-    //         }
-    //         return;
-    //     }
-
-    //     if (options.mergeMesh) {
-    //         let finalMeshArr: Mesh[] = [];
-    //         let mergedCount = 0;
-    //         let finalMesh = meshArr.length === 1 ? meshArr[0] : new Mesh();
-    //         finalMeshArr.push(finalMesh);
-    //         if (meshArr.length === 1) {
-    //             //TODO 读取gltf中的变换信息
-    //             let nodeMatrix = Matrix4.multiplyTransformation(computedContentMatrix, GltfUtils.getNodeMatrix(json, 0), new Mat4());
-    //             node.matrix = nodeMatrix;
-    //         } else {
-    //             for (let i = 0; i < meshArr.length; i++) {
-    //                 const mesh = meshArr[i];
-    //                 if (mergedCount >= options.batchCount!) {
-    //                     finalMesh = new Mesh();
-    //                     mergedCount = 0;
-    //                     finalMeshArr.push(finalMesh);
-    //                 }
-    //                 //TODO 读取gltf中的变换信息
-    //                 let nodeMatrix = Matrix4.multiplyTransformation(computedContentMatrix, GltfUtils.getNodeMatrix(json, i), new Mat4());
-
-    //                 finalMesh.merge(mesh, nodeMatrix);
-    //                 mergedCount++;
-    //             }
-    //         }
-
-    //         let mt = materials[0];
-
-    //         for (let i = 0; i < finalMeshArr.length; i++) {
-    //             const fmesh = finalMeshArr[i];
-    //             let meshRender = node.addComponent(MeshRenderer);
-    //             meshRender.mesh = fmesh;
-    //             meshRender.setMaterial(Utils.defined(_this.tileset.material) ? _this.tileset.material!.material : mt, 0);
-    //         }
-    //         _this._geometryByteLength += finalMesh.data.byteLength;
-    //         let imageAsset = materialImageAssetRecord[mt.hash];
-    //         if (Utils.defined(imageAsset)) {
-    //             _this._texturesByteLength += imageAsset.width * imageAsset.height * 4;
-    //         }
-
-    //     } else {
-    //         let nodeMatrix = Matrix4.multiplyTransformation(computedContentMatrix, GltfUtils.getNodeMatrix(json, 0), new Mat4());
-    //         node.matrix = nodeMatrix;
-    //         for (let i = 0; i < meshArr.length; i++) {
-    //             const mesh = meshArr[i];
-    //             _this._geometryByteLength += mesh.data.byteLength;
-    //             let meshRender = node.addComponent(MeshRenderer);
-    //             meshRender.mesh = mesh;
-    //             let mts = dictGroup[i];
-    //             for (const matIndex in mts) {
-    //                 let mater = Utils.defined(_this.tileset.material) ? _this.tileset.material!.material : materials[mts[matIndex]];
-    //                 mater.addRef();
-    //                 meshRender.setMaterial(mater, Number(matIndex));
-    //                 let imageAsset = materialImageAssetRecord[mater.hash];
-    //                 if (Utils.defined(imageAsset)) {
-    //                     _this._texturesByteLength += imageAsset.width * imageAsset.height * 4;
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     //缓存贴图 图片资源
-    //     GltfCacheManager.instance.cacheGltf(cacheId, {
-    //         materialImageAssetRecord: materialImageAssetRecord
-    //     });
-    //     if (Object.keys(materialImageAssetRecord).length > 0) {
-    //         _this.loadContentTexture();
-    //     } else {
-    //         _this._readyPromise_resolve!(_this);
-    //     }
-
-
-    // };
-    // }
-
-    //单张贴图处理完成
-    // private onTextureImageHandled (texture: Texture2D, imageAsset: ImageAsset, material: any) {
-    //     this._textureImageHandledCount++;
-    //     material.setProperty("mainTexture", texture);
-    //     if (this._textureImageHandledCount >= this._textureImageHandledTargetCount) {
-    //         this._textureImageHandledCount = 0;
-    //         this._textureImageHandledTargetCount = 0;
-    //         this._readyPromise_resolve!(this);
-    //     }
-    // }
-
-    //加载贴图
-    // private loadContentTexture () {
-    //     let meshRenderArr = this._node!.getComponents(MeshRenderer);
-    //     let cache = GltfCacheManager.instance.getCache(this.tile.id);
-    //     if (Utils.defined(cache)) {
-    //         let materialImageAssetRecord = cache.materialImageAssetRecord;
-    //         if (materialImageAssetRecord && Object.keys(materialImageAssetRecord).length > 0) {
-    //             for (let i = 0; i < meshRenderArr.length; i++) {
-    //                 const meshRender = meshRenderArr[i];
-    //                 let materials = meshRender.materials;
-    //                 if (Utils.defined(materials)) {
-    //                     for (let j = 0; j < materials.length; j++) {
-    //                         const material = materials[j];
-    //                         if (Utils.defined(material)) {
-    //                             let imageAsset = materialImageAssetRecord[material!.hash];
-    //                             GISResLoader.instance.createTexture2DWithImageAsset(imageAsset as ImageAsset, true, this.onTextureImageHandled, this, material!);
-    //                             this._textureImageHandledTargetCount++;
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-
     public show (tileset: Earth3DTileset): void {
-        // if (!this._node!.parent) {
-        //     this._node!.parent = tileset.node;
-        // }
-        // if (!this._node!.active) {
-        //     this._node!.active = true;
-        // }
+
     }
 
 
 
     public hide (tileset: Earth3DTileset) {
-        // if (this._node!.parent) {
-        //     this._node!.removeFromParent();
-        // }
-        // if (this._node!.active) {
-        //     this._node!.active = false;
-        // }
+
     }
 
     /**
@@ -542,39 +382,21 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
      * @param frameState 
      */
     public update (tilset: Earth3DTileset, frameState: FrameState) {
-        let cacheInfo = gltfCache.getCache(this.tile.id);
-        this.updateContentMatrix(this.tile, cacheInfo.gltf);
+        this.updateContentMatrix(this.tile, this._gltf);
     }
 
     /**
      * 释放节点资源
      */
-    private releaseNodeResource (releaseAll: boolean) {
-        // let meshRenderArr = this._node!.getComponents(MeshRenderer);
-        // if (meshRenderArr !== null) {
-        //     for (let i = 0; i < meshRenderArr!.length; i++) {
-        //         const meshRender = meshRenderArr![i];
-        //         meshRender.materials.forEach(mat => {
-        //             if (Utils.defined(mat)) {
-        //                 GISResLoader.instance.releaseMaterialTextureResource(mat!);
-        //             }
-        //             if (releaseAll) {
-        //                 mat?.decRef();
-        //                 mat?.destroy();
-        //                 GISResLoader.instance.releaseNodeMeshResource(this._node!);
-        //             }
-        //         });
-        //     }
-        // }
+    private releaseResource () {
+
     }
 
     public destroy (): void {
-        this._destroyed = true;
-        this.releaseNodeResource(true);
+        this.releaseResource();
         this._texturesByteLength = 0;
         this._geometryByteLength = 0;
         this._batchTableByteLength = 0;
-        gltfCache.release(this.tile.id);
     }
 
 }

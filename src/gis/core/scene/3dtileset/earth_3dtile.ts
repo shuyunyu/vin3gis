@@ -1098,7 +1098,7 @@ export class Earth3DTile {
                 tile._lastStyleTime = 0;
                 tile._content = content;
                 tile._contentState = Earth3DTileContentState.READY;
-                tile._contentReadyPromise_resolve!(content);
+                tile._contentReadyPromise_resolve(content);
             });
         }).catch((err: RequestTaskResult) => {
             //TODO Cancelled due to low priority - try again later.
