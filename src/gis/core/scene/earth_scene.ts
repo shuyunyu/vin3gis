@@ -80,6 +80,8 @@ export class EarthScene {
         this.imageryProviders.add(imageryTileProvider);
         this.entities = new EntityCollection();
         this.primitives = new PrimitiveCollection();
+        //将渲染根节点添加到场景中
+        this._renderer.scene.add(this.primitives.root);
         this.quadtreePrimitive = new QuadtreePrimitive(this.imageryProviders.get(0)!, tileCacheSize);
         this.tilingScheme = this.quadtreePrimitive.tileProvider.tilingScheme;
         this.camera = new EarthCamera(this._renderer, this.tilingScheme);

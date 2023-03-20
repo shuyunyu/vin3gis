@@ -1,3 +1,4 @@
+import { Color, DoubleSide, MeshBasicMaterial } from "three";
 import { math } from "../../../core/math/math";
 
 /**
@@ -66,6 +67,9 @@ export class InternalConfig {
     //默认雾的密度
     public static DEFAULT_FOG_DENSITY = 0.0002;
 
+    //是否显示3dtile的包围盒
+    public static SHOW_3DTILE_BOUNDING_VOLUME = true;
+
     /**
      * 校验相机的pitch是否有效
      * @param pitch 
@@ -82,6 +86,19 @@ export class InternalConfig {
      */
     public static clampCameraPitch (pitch: number) {
         return math.clamp(pitch, this.MIN_PITCH, this.MAX_PITCH);
+    }
+
+    /**
+     * 获取3dtile包围盒显示材质
+     */
+    public static get3dtileBoundingVolumeMaterial () {
+        return new MeshBasicMaterial({
+            color: new Color('#FF0000'),
+            wireframe: true,
+            side: DoubleSide,
+            transparent: true,
+            depthTest: false,
+        })
     }
 
 }

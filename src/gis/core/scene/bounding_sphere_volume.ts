@@ -98,7 +98,10 @@ export class BoundingSphereVolume implements IBoundingVolume {
 
     public createBoundingMesh (material: Material): Mesh<BufferGeometry, Material | Material[]> {
         const geometry = new SphereGeometry(this.radius);
-        return new Mesh(geometry, material);
+        const mesh = new Mesh(geometry, material);
+        mesh.position.copy(this.boundingSphere.center);
+        mesh.matrixWorldNeedsUpdate = true;
+        return mesh;
     }
 
     public static fromPoints (positions: Cartesian3[], coordinateOffsetType: CoordinateOffsetType, result?: BoundingSphereVolume) {

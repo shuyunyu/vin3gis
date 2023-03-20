@@ -1,4 +1,4 @@
-import { BufferGeometry, Color, Matrix3, Matrix4, Mesh, MeshBasicMaterial, Vector3 } from "three";
+import { BufferGeometry, Color, Material, Matrix3, Matrix4, Mesh, MeshBasicMaterial, Vector3 } from "three";
 import { AssetLoader } from "../../../../core/asset/asset_loader";
 import { MatConstants } from "../../../../core/constants/mat_constants";
 import { math } from "../../../../core/math/math";
@@ -10,9 +10,10 @@ import { BoundingSphereUtils } from "../../../utils/bounding_sphere_utils";
 import { Matrix4Utils } from "../../../utils/matrix4_utils";
 import { Cartesian3 } from "../../cartesian/cartesian3";
 import { Cartographic } from "../../cartographic";
+import { InternalConfig } from "../../internal/internal_config";
 import { DoubleLinkedListNode } from "../../misc/double_linked_list";
 import { Transform } from "../../transform/transform";
-import { BoundingOrientedBoxVolume } from "../bounding_oriented_box_bolume";
+import { BoundingOrientedBoxVolume } from "../bounding_oriented_box_volume";
 import { BoundingRegionVolume } from "../bounding_region_volume";
 import { BoundingSphereVolume } from "../bounding_sphere_volume";
 import { IBoundingVolume } from "../bounding_volume";
@@ -40,6 +41,8 @@ export class Earth3DTile {
     private _boundingVolume: IBoundingVolume;
 
     private _boundingVolumeMesh: Mesh;
+
+    private _boundingVolumeMaterial: Material;
 
     //content的边界体
     private _contentBoundingVolume?: IBoundingVolume;
@@ -1215,22 +1218,30 @@ export class Earth3DTile {
     }
 
     private showBoundingVolumeMesh () {
-        if (this._boundingVolume && !this._boundingVolumeMesh) {
-            this._boundingVolumeMesh = this._boundingVolume.createBoundingMesh(new MeshBasicMaterial({
-                color: new Color('#FF0000'),
-                wireframe: true
-            }));
-            if (this._boundingVolumeMesh) this._boundingVolumeMesh.parent = this.tileset.container;
+        if (!InternalConfig.SHOW_3DTILE_BOUNDING_VOLUME) return;
+        if (this._boundingVolume) {
+            if (!this._boundingVolumeMaterial) {
+                this._boundingVolumeMaterial = InternalConfig.get3dtileBoundingVolumeMaterial();
+            }
+            if (!this._boundingVolumeMesh) {
+                this._boundingVolumeMesh = this._boundingVolume.createBoundingMesh(this._boundingVolumeMaterial);
+            }
+            if (!this._boundingVolumeMesh.parent) {
+                this.tileset.container.add(this._boundingVolumeMesh);
+            }
+
         }
     }
 
     private hideBoundingVolumeMesh () {
+        if (!InternalConfig.SHOW_3DTILE_BOUNDING_VOLUME) return;
         if (this._boundingVolumeMesh && this._boundingVolumeMesh.parent) {
             this._boundingVolumeMesh.removeFromParent();
         }
     }
 
     private disposeBoundingVolemeMesh () {
+        if (!InternalConfig.SHOW_3DTILE_BOUNDING_VOLUME) return;
         if (this._boundingVolumeMesh) {
             this.hideBoundingVolumeMesh();
             disposeSystem.disposeObj(this._boundingVolumeMesh.geometry);
