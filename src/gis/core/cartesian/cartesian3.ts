@@ -802,6 +802,28 @@ export class Cartesian3 implements ICartesian2Like, ICartesian3Like {
         return result;
     }
 
+    public static magnitude (cartesian: Cartesian3) {
+        return Math.sqrt(this.magnitudeSquared(cartesian));
+    }
+
+    public static magnitudeSquared (cartesian: Cartesian3) {
+        return (
+            cartesian.x * cartesian.x +
+            cartesian.y * cartesian.y +
+            cartesian.z * cartesian.z
+        );
+    }
+
+    public static fromElements (x: number, y: number, z: number, result?: Cartesian3) {
+        if (!result) {
+            return new Cartesian3(x, y, z);
+        }
+        result.x = x;
+        result.y = y;
+        result.z = z;
+        return result;
+    }
+
 }
 
 const v3_1 = new Cartesian3();

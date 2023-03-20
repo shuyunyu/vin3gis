@@ -1,4 +1,4 @@
-import { BoxGeometry, BufferGeometry, Euler, Material, Matrix3, Matrix4, Mesh, Sphere, Vector3 } from "three";
+import { BoxGeometry, BufferGeometry, Euler, Material, Matrix3, Matrix4, Mesh, Quaternion, Sphere, Vector3 } from "three";
 import { math } from "../../../core/math/math";
 import { OBB } from "../../../core/math/obb";
 import { IntersectUtils } from "../../../core/utils/intersect_utils";
@@ -14,6 +14,7 @@ import { FrameState } from "./frame_state";
 
 const volumeConstant = (4.0 / 3.0) * math.PI;
 const scratchMat4 = new Matrix4();
+const scratchMat3 = new Matrix3();
 
 export class BoundingOrientedBoxVolume implements IBoundingVolume {
 
@@ -108,20 +109,26 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
     }
 
     private createOBB (center: Cartesian3, halfAxes: Matrix3) {
+        const mat = new Matrix4().setFromMatrix3(halfAxes);
         if (this._upAxis == Earth3DTilesetGltfUpAxis.Z) {
-            const rotMat = new Matrix4().makeRotationFromEuler(new Euler(-math.toDegree(math.PI_OVER_TWO), 0, 0));
-            const mat = scratchMat4.setFromMatrix3(halfAxes);
+            const rotMat = scratchMat4.makeRotationFromEuler(new Euler(-math.PI_OVER_TWO, 0, 0));
             mat.multiply(rotMat);
             halfAxes.setFromMatrix4(mat);
         }
+        // const pos = new Vector3();
+        // const scale = new Vector3();
+        // const rot = new Quaternion();
+        // mat.decompose(pos, rot, scale);
         let xV = new Vector3(halfAxes.elements[0], halfAxes.elements[1], halfAxes.elements[2]);
         let yV = new Vector3(halfAxes.elements[3], halfAxes.elements[4], halfAxes.elements[5]);
         let zV = new Vector3(halfAxes.elements[6], halfAxes.elements[7], halfAxes.elements[8]);
         let hx = xV.length();
         let hy = yV.length();
         let hz = zV.length();
+        // mat.makeRotationFromQuaternion(rot);
         let centerVec = Transform.geoCar3ToWorldVec3(center);
-        let obb = new OBB(centerVec, new Vector3(hx, hy, hz), halfAxes);
+        let obb = new OBB(centerVec, new Vector3(hx, hy, hz));
+        obb.applyMatrix4(mat.extractRotation(mat));
         return obb;
     }
 
@@ -130,10 +137,9 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
         const halfSize = obb.halfSize;
         const geometry = new BoxGeometry(halfSize.x * 2, halfSize.y * 2, halfSize.z * 2);
         const mesh = new Mesh(geometry, material);
-        const mat4 = scratchMat4.setFromMatrix3(obb.rotation);
-        mat4.extractRotation(mat4);
-        mat4.setPosition(obb.center);
-        mesh.applyMatrix4(mat4);
+        const mat = scratchMat4.setFromMatrix3(obb.rotation).identity();
+        mat.setPosition(obb.center);
+        mesh.applyMatrix4(mat);
         mesh.matrixWorldNeedsUpdate = true;
         return mesh;
     }

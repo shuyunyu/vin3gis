@@ -1,6 +1,9 @@
 import { Matrix3 } from "three";
 import { Utils } from "../../core/utils/utils";
 import { ICartesian3Like } from "../@types/core/gis";
+import { Cartesian3 } from "../core/cartesian/cartesian3";
+
+const scratchColumn = new Cartesian3();
 
 export class Matrix3Utils {
     public static multiplyByScale (mat3: Matrix3, scale: ICartesian3Like, out: Matrix3) {
@@ -45,5 +48,18 @@ export class Matrix3Utils {
 
         return result;
     }
+
+    public static getScale (matrix: Matrix3, result: ICartesian3Like) {
+        result.x = Cartesian3.magnitude(
+            Cartesian3.fromElements(matrix[0], matrix[1], matrix[2], scratchColumn)
+        );
+        result.y = Cartesian3.magnitude(
+            Cartesian3.fromElements(matrix[3], matrix[4], matrix[5], scratchColumn)
+        );
+        result.z = Cartesian3.magnitude(
+            Cartesian3.fromElements(matrix[6], matrix[7], matrix[8], scratchColumn)
+        );
+        return result;
+    };
 
 }

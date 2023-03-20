@@ -1,4 +1,4 @@
-import { BufferGeometry, Color, Material, Matrix3, Matrix4, Mesh, MeshBasicMaterial, Vector3 } from "three";
+import { Material, Matrix3, Matrix4, Mesh, Vector3 } from "three";
 import { AssetLoader } from "../../../../core/asset/asset_loader";
 import { MatConstants } from "../../../../core/constants/mat_constants";
 import { math } from "../../../../core/math/math";
@@ -12,6 +12,7 @@ import { Cartesian3 } from "../../cartesian/cartesian3";
 import { Cartographic } from "../../cartographic";
 import { InternalConfig } from "../../internal/internal_config";
 import { DoubleLinkedListNode } from "../../misc/double_linked_list";
+import { EARTH_3DTILE_BOUNDING_VOLUME_RENDER_ORDER } from "../../misc/render_order";
 import { Transform } from "../../transform/transform";
 import { BoundingOrientedBoxVolume } from "../bounding_oriented_box_volume";
 import { BoundingRegionVolume } from "../bounding_region_volume";
@@ -506,12 +507,12 @@ export class Earth3DTile {
         this._id = Utils.createGuid();
         this._contentReadyPromise = this.createContentReadyPromise();
         this._tileset = options.tileset;
-        this._tilesetResourceUri = Utils.defined(options.tilesetResourceUri) ? options.tilesetResourceUri : Utils.defined(this._parent) ? this._parent!.tilesetRecourceUri : "";
+        this._tilesetResourceUri = Utils.defined(options.tilesetResourceUri) ? options.tilesetResourceUri : Utils.defined(this._parent) ? this._parent.tilesetRecourceUri : "";
         this._header = Utils.defaultValue(options.header, {});
         this._parent = options.parent;
         let contentHeader = options.header.content;
         this._transform = Utils.defined(options.header.transform) ? new Matrix4().fromArray(options.header.transform, 0) : MatConstants.Mat4_IDENTITY.clone();
-        let parentTransform = Utils.defined(this._parent) ? this._parent!.computedTransform : this._tileset.modelMatrix;
+        let parentTransform = Utils.defined(this._parent) ? this._parent.computedTransform : this._tileset.modelMatrix;
         let computedTransform = new Matrix4().copy(parentTransform).multiply(this._transform);
         this._computedTransform = computedTransform;
         let parentInitialTransform = Utils.defined(this._parent) ? this._parent.initialTransform : MatConstants.Mat4_IDENTITY;
@@ -745,8 +746,8 @@ export class Earth3DTile {
         let center = new Cartesian3(Number(box[0]), Number(box[1]), Number(box[2]));
         let halfAxes = new Matrix3().fromArray(box, 3);
         center = Matrix4Utils.multiplyByPoint(transform, center, center);
-        let rotationScale = Matrix4Utils.getMatrix3(transform, scratchMatrix);
-        halfAxes = halfAxes.copy(rotationScale.multiply(halfAxes));
+        let rotationScale = scratchMatrix.setFromMatrix4(transform);
+        halfAxes.multiplyMatrices(rotationScale, halfAxes);
         if (Utils.defined(out) && out instanceof BoundingOrientedBoxVolume) {
             out.update(center, halfAxes, this.tileset.coordinateOffsetType);
             return out;
@@ -1225,6 +1226,7 @@ export class Earth3DTile {
             }
             if (!this._boundingVolumeMesh) {
                 this._boundingVolumeMesh = this._boundingVolume.createBoundingMesh(this._boundingVolumeMaterial);
+                this._boundingVolumeMesh.renderOrder = EARTH_3DTILE_BOUNDING_VOLUME_RENDER_ORDER;
             }
             if (!this._boundingVolumeMesh.parent) {
                 this.tileset.container.add(this._boundingVolumeMesh);
