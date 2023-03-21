@@ -557,8 +557,7 @@ export class Earth3DTileset implements IPrimitive {
         //读取 gltf up axis
         if (Utils.defined(tilesetJson.asset) && Utils.defined(tilesetJson.asset.gltfUpAxis)) {
             let axisName = tilesetJson.asset.gltfUpAxis.toUpperCase();
-            if (axisName === "X") this._gltfUpAxis = Earth3DTilesetGltfUpAxis.X;
-            else if (axisName === "Y") this._gltfUpAxis = Earth3DTilesetGltfUpAxis.Y;
+            if (axisName === "Y") this._gltfUpAxis = Earth3DTilesetGltfUpAxis.Y;
             else this._gltfUpAxis = Earth3DTilesetGltfUpAxis.Z;
         } else {
             this._gltfUpAxis = Earth3DTilesetGltfUpAxis.Y;

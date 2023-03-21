@@ -66,8 +66,7 @@ export interface Earth3DTileOptions {
 
 //tileset中规定的 gtlf向上的轴
 export enum Earth3DTilesetGltfUpAxis {
-    X = 1,
-    Y,
+    Y = 1,
     Z
 }
 

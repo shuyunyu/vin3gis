@@ -1,11 +1,11 @@
-import { Material, Matrix3, Matrix4, Mesh, Vector3 } from "three";
+import { Euler, Material, Matrix3, Matrix4, Mesh, Vector3 } from "three";
 import { AssetLoader } from "../../../../core/asset/asset_loader";
 import { MatConstants } from "../../../../core/constants/mat_constants";
 import { math } from "../../../../core/math/math";
 import { disposeSystem } from "../../../../core/system/dispose_system";
 import { Utils } from "../../../../core/utils/utils";
 import { IScheduleRequestTask, RequestTaskResult, RequestTaskStatus } from "../../../../core/xhr/scheduler/@types/request";
-import { Earth3DTileContentState, Earth3DTileOptimizationHint, Earth3DTileOptions, Earth3DTileRefine, has3DTilesExtension } from "../../../@types/core/earth_3dtileset";
+import { Earth3DTileContentState, Earth3DTileOptimizationHint, Earth3DTileOptions, Earth3DTileRefine, Earth3DTilesetGltfUpAxis, has3DTilesExtension } from "../../../@types/core/earth_3dtileset";
 import { BoundingSphereUtils } from "../../../utils/bounding_sphere_utils";
 import { Matrix4Utils } from "../../../utils/matrix4_utils";
 import { Cartesian3 } from "../../cartesian/cartesian3";
@@ -27,6 +27,7 @@ import { EarthEmpty3DTileContent } from "./earth_empty_3dtile_content";
 import { preprocess3DTileContent } from "./preprocess_3dtile_content";
 
 const scratchTransform = new Matrix4();
+const scratchTransform1 = new Matrix4();
 const scratchToTileCenter = new Vector3();
 const scratchCartesian = new Cartesian3();
 const scratchScale = new Cartesian3();
@@ -513,7 +514,7 @@ export class Earth3DTile {
         let contentHeader = options.header.content;
         this._transform = Utils.defined(options.header.transform) ? new Matrix4().fromArray(options.header.transform, 0) : MatConstants.Mat4_IDENTITY.clone();
         let parentTransform = Utils.defined(this._parent) ? this._parent.computedTransform : this._tileset.modelMatrix;
-        let computedTransform = new Matrix4().copy(parentTransform).multiply(this._transform);
+        let computedTransform = this._transform.premultiply(parentTransform);
         this._computedTransform = computedTransform;
         let parentInitialTransform = Utils.defined(this._parent) ? this._parent.initialTransform : MatConstants.Mat4_IDENTITY;
         this._initialTransform = new Matrix4().copy(parentInitialTransform).multiply(this._transform);
@@ -746,13 +747,20 @@ export class Earth3DTile {
         let center = new Cartesian3(Number(box[0]), Number(box[1]), Number(box[2]));
         let halfAxes = new Matrix3().fromArray(box, 3);
         center = Matrix4Utils.multiplyByPoint(transform, center, center);
-        let rotationScale = scratchMatrix.setFromMatrix4(transform);
-        halfAxes.multiplyMatrices(rotationScale, halfAxes);
+        const scale = Transform.getMetersScale();
+        scratchTransform.makeScale(scale.x, scale.y, scale.z);
+        scratchTransform.premultiply(transform);
+        let rotationScale = scratchMatrix.setFromMatrix4(scratchTransform);
+        halfAxes.premultiply(rotationScale);
+        if (this._tileset.gltfUpAxis === Earth3DTilesetGltfUpAxis.Z) {
+            const rotMat = scratchTransform1.makeRotationFromEuler(new Euler(-math.PI_OVER_TWO, 0, 0));
+            halfAxes.multiply(new Matrix3().setFromMatrix4(rotMat));
+        }
         if (Utils.defined(out) && out instanceof BoundingOrientedBoxVolume) {
             out.update(center, halfAxes, this.tileset.coordinateOffsetType);
             return out;
         }
-        return new BoundingOrientedBoxVolume(center, halfAxes, this.tileset.gltfUpAxis, this.tileset.coordinateOffsetType);
+        return new BoundingOrientedBoxVolume(center, halfAxes, this.tileset.coordinateOffsetType);
     }
 
 
