@@ -754,7 +754,7 @@ export class Earth3DTile {
         halfAxes.premultiply(rotationScale);
         if (this._tileset.gltfUpAxis === Earth3DTilesetGltfUpAxis.Z) {
             const rotMat = scratchTransform1.makeRotationFromEuler(new Euler(-math.PI_OVER_TWO, 0, 0));
-            halfAxes.multiply(new Matrix3().setFromMatrix4(rotMat));
+            // halfAxes.premultiply(new Matrix3().setFromMatrix4(rotMat));
         }
         if (Utils.defined(out) && out instanceof BoundingOrientedBoxVolume) {
             out.update(center, halfAxes, this.tileset.coordinateOffsetType);

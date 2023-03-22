@@ -1,5 +1,5 @@
-import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Float32BufferAttribute, Fog, FogExp2, FrontSide, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, MeshStandardMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, Vector2, Vector3 } from "three";
-import { AssetLoader, DRACOLoader, FileLoader, FrameRenderer, GLTFLoader, ImageBitmapLoader, ImageLoader, KTX2Loader, KTXLoader, math, requestSystem, TextureLoader, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
+import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Euler, Float32BufferAttribute, Fog, FogExp2, FrontSide, Matrix3, Matrix4, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, MeshStandardMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, Vector2, Vector3 } from "three";
+import { AssetLoader, DRACOLoader, FileLoader, FrameRenderer, GLTFLoader, ImageBitmapLoader, ImageLoader, KTX2Loader, KTXLoader, math, OBB, requestSystem, TextureLoader, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
 import { AMapImageryTileProvider, AnchorConstant, ArcGISImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
@@ -25,13 +25,14 @@ import { PolygonShape } from "../src/gis/core/datasource/misc/polygon_shape";
 import { SystemDefines } from "../src/@types/core/system/system";
 import { xhrWorkerPool } from "../src/core/worker/pool/xhr_worker_pool";
 import { Earth3DTileset } from "../src/gis/core/scene/3dtileset/earth_3dtileset";
+import { InternalConfig } from "../src/gis/core/internal/internal_config";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
     // const initCameraPosition = new Vector3(wgs84LngLat[0], wgs84LngLat[1], 16500000);
     // const initCameraPosition = new Vector3(118.256, 24.418, 165000);
     const initCameraPosition = new Vector3(121.556, 31.268, 16500 * 3);
-    // const initCameraPosition = new Vector3(0, 0, 16500000);
+    // const initCameraPosition = new Vector3(0, 0, Transform.getMetersPerUnit() * 1.65);
     // const initCameraPosition = new Vector3(0, 0, Transform.carCoordToWorldCoord(1.65));
     const initCameraOrientation = new Vector3(0, -90, 0);
     const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), Orientation.fromDegreeEulerAngles(initCameraOrientation));
@@ -89,6 +90,7 @@ class GISTest {
         // this.testDataTexture(render);
         this.testEngineLoader(mapViewer);
         this.test3dtiles(mapViewer);
+        // this.testOBB(mapViewer);
     }
 
     private static testEngineLoader (mapViewer: MapViewer) {
@@ -1016,6 +1018,20 @@ class GISTest {
             dracoLoader: dracoLoader
         });
         mapViewer.scene.primitives.add(tileset);
+    }
+
+    public static testOBB (mapViewer: MapViewer) {
+        const euler = new Euler(math.toRadian(0), math.toRadian(45), math.toRadian(0));
+        const rotMat = new Matrix4().makeRotationFromEuler(euler);
+        const halfAxis = new Matrix3().setFromMatrix4(rotMat);
+        const halfSize = new Vector3(1, 0.5, 0.1);
+        const obb = new OBB(new Vector3(), halfSize, halfAxis);
+        const box = new BoxGeometry(obb.halfSize.x * 2, obb.halfSize.y * 2, obb.halfSize.z * 2);
+        const mesh = new Mesh(box, InternalConfig.get3dtileBoundingVolumeMaterial());
+        const meshMat = new Matrix4().setFromMatrix3(obb.rotation);
+        meshMat.setPosition(obb.center);
+        mesh.applyMatrix4(meshMat);
+        mapViewer.renderer.scene.add(mesh);
     }
 
 }

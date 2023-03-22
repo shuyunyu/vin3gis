@@ -1,4 +1,4 @@
-import { Matrix4, Vector3 } from "three";
+import { Matrix4, Object3D, Vector3 } from "three";
 import { MatConstants } from "../../../../core/constants/mat_constants";
 import { Utils } from "../../../../core/utils/utils";
 import { Earth3DTilesetGltfUpAxis } from "../../../@types/core/earth_3dtileset";
@@ -39,6 +39,8 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
     private _tile: Earth3DTile;
 
     private _gltf: any;
+
+    private _group: Object3D;
 
     private _featurePropertiesDirty: boolean;
 
@@ -303,6 +305,7 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
 
         this.tileset.gltfLoader.parseAsync(gltfView.buffer, '').then(gltf => {
             this._gltf = gltf;
+            this._group = this._gltf.scene;
             this.updateContentMatrix(this.tile, gltf);
             this._readyPromise_resolve(this);
         }).catch(err => {
@@ -356,8 +359,12 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
         scratchCartesian3.z = computedContentMatrix.elements[14];
         Transform.wgs84ToCartesian(tilingScheme.projection, scratchCartesian3, this.tileset.coordinateOffsetType, scratchCartesian3);
         let cCar = scratchCartesian3;
-        let wVec = Transform.earthCar3ToWorldVec3(cCar, scratchVec3);
+        let wVec = Transform.geoCar3ToWorldVec3(cCar, scratchVec3);
 
+        if (this._group) {
+            this._group.position.copy(wVec);
+            this._group.matrixWorldNeedsUpdate = true;
+        }
 
         Matrix4Utils.setTranslation(computedContentMatrix, wVec, computedContentMatrix);
 
@@ -367,13 +374,17 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
 
 
     public show (tileset: Earth3DTileset): void {
-
+        // if (this._group && !this._group.parent) {
+        //     tileset.container.add(this._group);
+        // }
     }
 
 
 
     public hide (tileset: Earth3DTileset) {
-
+        // if (this._group && this._group.parent) {
+        //     this._group.removeFromParent();
+        // }
     }
 
     /**
