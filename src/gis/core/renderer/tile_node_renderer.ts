@@ -25,7 +25,7 @@ type FadeoutTile = {
 export class TileNodeRenderer {
 
     //渲染器根节点
-    public readonly root = new Object3D();
+    public readonly root;
 
     private _tileNodeRecord: Record<string, TileNode> = Object.create(null);
 
@@ -42,6 +42,8 @@ export class TileNodeRenderer {
     private _fog: Fog;
 
     public constructor (fog: Fog) {
+        this.root = new Object3D();
+        this.root.name = `${TileNodeRenderer.name}_root`;
         this._fog = fog;
         this._fog.changedEvent.addEventListener(this.updateByFog, this);
     }

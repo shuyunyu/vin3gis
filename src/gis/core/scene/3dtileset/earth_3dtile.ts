@@ -7,6 +7,7 @@ import { Utils } from "../../../../core/utils/utils";
 import { IScheduleRequestTask, RequestTaskResult, RequestTaskStatus } from "../../../../core/xhr/scheduler/@types/request";
 import { Earth3DTileContentState, Earth3DTileOptimizationHint, Earth3DTileOptions, Earth3DTileRefine, Earth3DTilesetGltfUpAxis, has3DTilesExtension } from "../../../@types/core/earth_3dtileset";
 import { BoundingSphereUtils } from "../../../utils/bounding_sphere_utils";
+import { Matrix3Utils } from "../../../utils/matrix3_utils";
 import { Matrix4Utils } from "../../../utils/matrix4_utils";
 import { Cartesian3 } from "../../cartesian/cartesian3";
 import { Cartographic } from "../../cartographic";
@@ -27,7 +28,6 @@ import { EarthEmpty3DTileContent } from "./earth_empty_3dtile_content";
 import { preprocess3DTileContent } from "./preprocess_3dtile_content";
 
 const scratchTransform = new Matrix4();
-const scratchTransform1 = new Matrix4();
 const scratchToTileCenter = new Vector3();
 const scratchCartesian = new Cartesian3();
 const scratchScale = new Cartesian3();
@@ -514,7 +514,7 @@ export class Earth3DTile {
         let contentHeader = options.header.content;
         this._transform = Utils.defined(options.header.transform) ? new Matrix4().fromArray(options.header.transform, 0) : MatConstants.Mat4_IDENTITY.clone();
         let parentTransform = Utils.defined(this._parent) ? this._parent.computedTransform : this._tileset.modelMatrix;
-        let computedTransform = this._transform.premultiply(parentTransform);
+        let computedTransform = new Matrix4().copy(this._transform).premultiply(parentTransform);
         this._computedTransform = computedTransform;
         let parentInitialTransform = Utils.defined(this._parent) ? this._parent.initialTransform : MatConstants.Mat4_IDENTITY;
         this._initialTransform = new Matrix4().copy(parentInitialTransform).multiply(this._transform);
@@ -647,7 +647,7 @@ export class Earth3DTile {
     public updateVisibility (frameState: FrameState) {
         let parent = this._parent;
         let tileset = this._tileset;
-        let parentTransform = Utils.defined(parent) ? parent!.computedTransform : tileset.modelMatrix;
+        let parentTransform = Utils.defined(parent) ? parent.computedTransform : tileset.modelMatrix;
         this.updateTransform(parentTransform);
         this._distanceToCamera = this.distanceToTile(frameState);
         this._centerZDepth = this.distanceToTileCenter(frameState);
@@ -672,7 +672,7 @@ export class Earth3DTile {
         if (!transformChanged) {
             return;
         }
-        computedTransform.copy(this._computedTransform);
+        this._computedTransform.copy(computedTransform);
         // Update the bounding volumes
         let header = this._header;
         let content = this._header.content;
@@ -695,7 +695,7 @@ export class Earth3DTile {
         if (!Utils.defined(this._geometricError)) return;
         let scale = Matrix4Utils.getScale(this._computedTransform, scratchScale);
         let uniformScale = scale.max();
-        this._geometricError = this._geometricError! * uniformScale;
+        this._geometricError = this._geometricError * uniformScale;
     }
 
     /**
@@ -753,8 +753,8 @@ export class Earth3DTile {
         let rotationScale = scratchMatrix.setFromMatrix4(scratchTransform);
         halfAxes.premultiply(rotationScale);
         if (this._tileset.gltfUpAxis === Earth3DTilesetGltfUpAxis.Z) {
-            const rotMat = scratchTransform1.makeRotationFromEuler(new Euler(-math.PI_OVER_TWO, 0, 0));
-            // halfAxes.premultiply(new Matrix3().setFromMatrix4(rotMat));
+            const rotMat = Matrix3Utils.fromRotationX(-math.PI_OVER_TWO, new Matrix3());
+            halfAxes.premultiply(rotMat);
         }
         if (Utils.defined(out) && out instanceof BoundingOrientedBoxVolume) {
             out.update(center, halfAxes, this.tileset.coordinateOffsetType);

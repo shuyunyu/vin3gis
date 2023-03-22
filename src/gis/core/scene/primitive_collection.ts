@@ -12,6 +12,7 @@ export class PrimitiveCollection extends Collection<IPrimitive> {
     public constructor () {
         super();
         this.root = new Object3D();
+        this.root.name = `${PrimitiveCollection.name}_root`;
     }
 
     public add (item: IPrimitive, index?: number): boolean {
