@@ -46,8 +46,8 @@ window.onload = () => {
         // imageryTileProivder: new OSMImageryTileProvider(),
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
-        // imageryTileProivder: new EmptyImageryTileProvider(),
-        imageryTileProivder: new ArcGISImageryTileProvider({ url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer" }),
+        imageryTileProivder: new EmptyImageryTileProvider(),
+        // imageryTileProivder: new ArcGISImageryTileProvider({ url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer" }),
         // imageryTileProivder: new TdtImageryTileProvider({
         //     style: "street",
         //     key: "1d109683f4d84198e37a38c442d68311",

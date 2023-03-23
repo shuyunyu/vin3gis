@@ -1,4 +1,4 @@
-import { Matrix3, Matrix4, Plane, Vector3 } from "three";
+import { Euler, Matrix3, Matrix4, Plane, Vector3 } from "three";
 import { VecConstants } from "../../../core/constants/vec_constants";
 import { math } from "../../../core/math/math";
 import { Utils } from "../../../core/utils/utils";
@@ -98,6 +98,8 @@ const scratchFromENU = new Matrix4();
 const scratchRotation = new Matrix3();
 const scratchToENU = new Matrix4();
 
+const scratchTransfrom = new Matrix4();
+
 const scratchCalculateCartesian: Record<string, Cartesian3> = {
     east: new Cartesian3(),
     north: new Cartesian3(),
@@ -116,6 +118,9 @@ export class Transform {
 
     //定义地图平面
     public static readonly MAP_PLANE = new Plane(VecConstants.UNIT_Y_VEC3);
+
+    //旋转矩阵
+    public static readonly ROTATE_MAT = Object.freeze(new Matrix4().makeRotationFromEuler(new Euler(-math.PI_OVER_TWO)));
 
     /**
      * 获取 每单位 threejs距离 代表的实际地理距离
@@ -166,6 +171,15 @@ export class Transform {
         Cartesian3.rotateX(out, vec3, Cartesian3.ZERO, -math.PI_OVER_TWO);
         return out;
     }
+
+    public static earthMatrix3ToWorldMatrix3 (mat3: Matrix3, out?: Matrix3) {
+        const mat4 = scratchTransfrom.setFromMatrix3(mat3);
+        mat4.multiply(this.ROTATE_MAT);
+        out = out || new Matrix3();
+        out.setFromMatrix4(mat4);
+        return out;
+    }
+
 
     /**
      * 转换threejs中的vec3到 地球上的vec3

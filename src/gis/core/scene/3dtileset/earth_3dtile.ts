@@ -1,13 +1,12 @@
-import { Euler, Material, Matrix3, Matrix4, Mesh, Vector3 } from "three";
+import { Material, Matrix3, Matrix4, Mesh, Vector3 } from "three";
 import { AssetLoader } from "../../../../core/asset/asset_loader";
 import { MatConstants } from "../../../../core/constants/mat_constants";
 import { math } from "../../../../core/math/math";
 import { disposeSystem } from "../../../../core/system/dispose_system";
 import { Utils } from "../../../../core/utils/utils";
 import { IScheduleRequestTask, RequestTaskResult, RequestTaskStatus } from "../../../../core/xhr/scheduler/@types/request";
-import { Earth3DTileContentState, Earth3DTileOptimizationHint, Earth3DTileOptions, Earth3DTileRefine, Earth3DTilesetGltfUpAxis, has3DTilesExtension } from "../../../@types/core/earth_3dtileset";
+import { Earth3DTileContentState, Earth3DTileOptimizationHint, Earth3DTileOptions, Earth3DTileRefine, has3DTilesExtension } from "../../../@types/core/earth_3dtileset";
 import { BoundingSphereUtils } from "../../../utils/bounding_sphere_utils";
-import { Matrix3Utils } from "../../../utils/matrix3_utils";
 import { Matrix4Utils } from "../../../utils/matrix4_utils";
 import { Cartesian3 } from "../../cartesian/cartesian3";
 import { Cartographic } from "../../cartographic";
@@ -512,7 +511,7 @@ export class Earth3DTile {
         this._header = Utils.defaultValue(options.header, {});
         this._parent = options.parent;
         let contentHeader = options.header.content;
-        this._transform = Utils.defined(options.header.transform) ? new Matrix4().fromArray(options.header.transform, 0) : MatConstants.Mat4_IDENTITY.clone();
+        this._transform = Utils.defined(options.header.transform) ? new Matrix4().fromArray(options.header.transform) : MatConstants.Mat4_IDENTITY.clone();
         let parentTransform = Utils.defined(this._parent) ? this._parent.computedTransform : this._tileset.modelMatrix;
         let computedTransform = new Matrix4().copy(this._transform).premultiply(parentTransform);
         this._computedTransform = computedTransform;
@@ -667,7 +666,7 @@ export class Earth3DTile {
      */
     public updateTransform (parentTransform?: Matrix4) {
         parentTransform = Utils.defaultValue(parentTransform, MatConstants.Mat4_IDENTITY);
-        let computedTransform = scratchTransform.copy(parentTransform).multiply(this._transform);
+        let computedTransform = scratchTransform.copy(this._transform).premultiply(parentTransform);
         let transformChanged = !computedTransform.equals(this._computedTransform);
         if (!transformChanged) {
             return;
@@ -745,22 +744,15 @@ export class Earth3DTile {
      */
     private createBox (box: any, transform: Matrix4, out?: IBoundingVolume): IBoundingVolume {
         let center = new Cartesian3(Number(box[0]), Number(box[1]), Number(box[2]));
-        let halfAxes = new Matrix3().fromArray(box, 3);
+        let halfAxis = new Matrix3().fromArray(box, 3);
         center = Matrix4Utils.multiplyByPoint(transform, center, center);
-        const scale = Transform.getMetersScale();
-        scratchTransform.makeScale(scale.x, scale.y, scale.z);
-        scratchTransform.premultiply(transform);
-        let rotationScale = scratchMatrix.setFromMatrix4(scratchTransform);
-        halfAxes.premultiply(rotationScale);
-        if (this._tileset.gltfUpAxis === Earth3DTilesetGltfUpAxis.Z) {
-            const rotMat = Matrix3Utils.fromRotationX(-math.PI_OVER_TWO, new Matrix3());
-            halfAxes.premultiply(rotMat);
-        }
+        let rotationScale = scratchMatrix.setFromMatrix4(transform);
+        halfAxis.premultiply(rotationScale);
         if (Utils.defined(out) && out instanceof BoundingOrientedBoxVolume) {
-            out.update(center, halfAxes, this.tileset.coordinateOffsetType);
+            out.update(center, this._tileset.gltfUpAxis, halfAxis, this.tileset.coordinateOffsetType);
             return out;
         }
-        return new BoundingOrientedBoxVolume(center, halfAxes, this.tileset.coordinateOffsetType);
+        return new BoundingOrientedBoxVolume(center, this._tileset.gltfUpAxis, halfAxis, this.tileset.coordinateOffsetType);
     }
 
 

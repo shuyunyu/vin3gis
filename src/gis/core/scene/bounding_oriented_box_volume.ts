@@ -1,8 +1,9 @@
-import { BoxGeometry, BufferGeometry, Material, Matrix3, Matrix4, Mesh, Sphere, Vector3 } from "three";
+import { BoxGeometry, BufferGeometry, Euler, Material, Matrix3, Matrix4, Mesh, Quaternion, Sphere, Vector3 } from "three";
 import { math } from "../../../core/math/math";
 import { OBB } from "../../../core/math/obb";
 import { IntersectUtils } from "../../../core/utils/intersect_utils";
 import { Utils } from "../../../core/utils/utils";
+import { Earth3DTilesetGltfUpAxis } from "../../@types/core/earth_3dtileset";
 import { CoordinateOffsetType } from "../../@types/core/gis";
 import { Cartesian3 } from "../cartesian/cartesian3";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
@@ -22,7 +23,9 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
     private _center: Cartesian3;
 
     //方向矩阵
-    private _halfAxes: Matrix3;
+    private _halfAxis: Matrix3;
+
+    private _gltfUpAxis: Earth3DTilesetGltfUpAxis;
 
     //obb
     private _obb: OBB;
@@ -40,8 +43,8 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
         return this._center;
     }
 
-    public get halfAxes () {
-        return this._halfAxes!;
+    public get halfAxis () {
+        return this._halfAxis!;
     }
 
     public get obb () {
@@ -64,9 +67,9 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
         return this._boundingSphereVolume!;
     }
 
-    constructor (center: Cartesian3, halfAxes: Matrix3, coordinateOffsetType: CoordinateOffsetType, tilingScheme?: ITilingScheme) {
+    constructor (center: Cartesian3, gltfUpAxis: Earth3DTilesetGltfUpAxis, halfAxis: Matrix3, coordinateOffsetType: CoordinateOffsetType, tilingScheme?: ITilingScheme) {
         this._tilingScheme = Utils.defaultValue(tilingScheme, webMercatorTilingScheme);
-        this.update(center, halfAxes, coordinateOffsetType);
+        this.update(center, gltfUpAxis, halfAxis, coordinateOffsetType);
     }
 
     public distanceToCamera (frameState: FrameState): number {
@@ -78,69 +81,63 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
         return IntersectUtils.intersectOBBFrustum(this.obb, frameState.frustum);
     }
 
-    public update (center: Cartesian3, halfAxes: Matrix3, coordinateOffsetType: CoordinateOffsetType) {
+    public update (center: Cartesian3, gltfUpAxis: Earth3DTilesetGltfUpAxis, halfAxis: Matrix3, coordinateOffsetType: CoordinateOffsetType) {
+        this._gltfUpAxis = gltfUpAxis;
         let cartographic = this._tilingScheme.projection.ellipsoid.cartesianToCartographic(center);
         Transform.wgs84ToCartographic(cartographic, coordinateOffsetType, cartographic);
+        if (this._gltfUpAxis === Earth3DTilesetGltfUpAxis.Z) {
+            // this._halfAxis = halfAxis.clone();
+            this._halfAxis = Transform.earthMatrix3ToWorldMatrix3(halfAxis);
+            // scratchMat4.makeRotationFromEuler(new Euler(0, 0, -math.PI_OVER_TWO));
+            // const mat3 = new Matrix3().setFromMatrix4(scratchMat4);
+            // this._halfAxis.premultiply(mat3);
+        } else {
+            this._halfAxis = halfAxis.clone();
+        }
         this._center = this._tilingScheme.projection.project(cartographic);
-        this._halfAxes = new Matrix3().copy(halfAxes);
-        this._obb = this.createOBB(this._center, this._halfAxes);
-        this._boundingSphere = this.createBoundingSphere(this._halfAxes);
+        this._obb = this.createOBB(this._center, this._halfAxis);
+        this._boundingSphere = this.createBoundingSphere(this._halfAxis);
         this._boundingSphereCenter = this._boundingSphere.center.clone();
         this._boundingSphereRadius = this._boundingSphere.radius;
         let radius = this._boundingSphereRadius;
         this._boundingSphereVolume = volumeConstant * radius * radius * radius;
     }
 
-    public createBoundingSphere (halfAxes: Matrix3) {
-        let u = new Vector3(halfAxes.elements[0], halfAxes.elements[1], halfAxes.elements[2]);
-        let v = new Vector3(halfAxes.elements[3], halfAxes.elements[4], halfAxes.elements[5]);
-        let w = new Vector3(halfAxes.elements[6], halfAxes.elements[7], halfAxes.elements[8]);
+    public createBoundingSphere (halfAxis: Matrix3) {
+        let u = new Vector3(halfAxis.elements[0], halfAxis.elements[1], halfAxis.elements[2]);
+        let v = new Vector3(halfAxis.elements[3], halfAxis.elements[4], halfAxis.elements[5]);
+        let w = new Vector3(halfAxis.elements[6], halfAxis.elements[7], halfAxis.elements[8]);
         Cartesian3.add(u, u, v);
         Cartesian3.add(u, u, w);
-        let radius = u.length();
+        const metersPerUnit = Transform.getMetersPerUnit();
+        let radius = u.length() / metersPerUnit;
         let center = this.obb.center.clone();
         return new Sphere(center, radius);
     }
 
-    private createOBB (center: Cartesian3, halfAxes: Matrix3) {
-        let xV = new Vector3(halfAxes.elements[0], halfAxes.elements[1], halfAxes.elements[2]);
-        let yV = new Vector3(halfAxes.elements[3], halfAxes.elements[4], halfAxes.elements[5]);
-        let zV = new Vector3(halfAxes.elements[6], halfAxes.elements[7], halfAxes.elements[8]);
+    private createOBB (center: Cartesian3, halfAxis: Matrix3) {
+        let xV = new Vector3(halfAxis.elements[0], halfAxis.elements[1], halfAxis.elements[2]);
+        let yV = new Vector3(halfAxis.elements[3], halfAxis.elements[4], halfAxis.elements[5]);
+        let zV = new Vector3(halfAxis.elements[6], halfAxis.elements[7], halfAxis.elements[8]);
         let hx = xV.length();
         let hy = yV.length();
         let hz = zV.length();
-        xV.normalize();
-        yV.normalize();
-        zV.normalize();
-
-        // handle the case where the box has a dimension of 0 in one axis
-        if (hx === 0) {
-            xV.crossVectors(yV, zV);
-        }
-        if (hy === 0) {
-            yV.crossVectors(xV, zV);
-        }
-        if (hz === 0) {
-            zV.crossVectors(xV, yV);
-        }
         let centerVec = Transform.geoCar3ToWorldVec3(center);
-        halfAxes = new Matrix3().fromArray([
-            xV.x, xV.y, xV.z,
-            yV.x, yV.y, yV.z,
-            zV.x, zV.y, zV.z
-        ])
-        let obb = new OBB(centerVec, new Vector3(hx, hy, hz), halfAxes);
+        let obb = new OBB(centerVec, new Vector3(hx, hy, hz), halfAxis.clone());
+        const scale = Transform.getMetersScale();
+        scratchMat4.makeScale(scale.x, scale.y, scale.z);
+        obb.applyMatrix4(scratchMat4);
         return obb;
     }
 
     public createBoundingMesh (material: Material): Mesh<BufferGeometry, Material | Material[]> {
         const obb = this.obb;
-        const halfSize = obb.halfSize;
-        const geometry = new BoxGeometry(halfSize.x * 2, halfSize.y * 2, halfSize.z * 2);
+        const geometry = new BoxGeometry(1, 1, 1);
         const mesh = new Mesh(geometry, material);
         const mat = scratchMat4.setFromMatrix3(obb.rotation);
-        mat.setPosition(obb.center);
-        mesh.applyMatrix4(mat);
+        mesh.position.copy(obb.center);
+        mesh.setRotationFromMatrix(mat);
+        obb.getSize(mesh.scale);
         mesh.matrixWorldNeedsUpdate = true;
         return mesh;
     }
