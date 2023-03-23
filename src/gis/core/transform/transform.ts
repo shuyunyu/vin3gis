@@ -172,6 +172,12 @@ export class Transform {
         return out;
     }
 
+    /**
+     * 转换地球上的mat3到世界坐标中的mat3
+     * @param mat3 
+     * @param out 
+     * @returns 
+     */
     public static earthMatrix3ToWorldMatrix3 (mat3: Matrix3, out?: Matrix3) {
         const mat4 = scratchTransfrom.setFromMatrix3(mat3);
         mat4.multiply(this.ROTATE_MAT);
