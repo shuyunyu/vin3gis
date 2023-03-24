@@ -275,6 +275,31 @@ export class Transform {
     }
 
     /**
+     * 将ECEF坐标系下的car3转换为cartographic
+     * @param car3 
+     * @param tilingScheme 
+     * @param out 
+     * @returns 
+     */
+    public static ecefCar3ToCartographic (car3: ICartesian3Like, tilingScheme: ITilingScheme, out?: Cartographic) {
+        //@ts-ignore
+        return tilingScheme.projection.ellipsoid.cartesianToCartographic(car3, out);
+    }
+
+    /**
+     * 将ECEF坐标系下的car3转换为2D地球上的car3
+     * @param car3 
+     * @param tilingScheme 
+     * @param out 
+     * @returns 
+     */
+    public static ecefCar3ToEarthCar3 (car3: ICartesian3Like, tilingScheme: ITilingScheme, out?: Cartesian3) {
+        const cartographic = this.ecefCar3ToCartographic(car3, tilingScheme, scratchCartographic);
+        return tilingScheme.projection.project(cartographic, out);
+    }
+
+
+    /**
      * 转换WGS84坐标
      * @param projection 
      * @param cartesian 

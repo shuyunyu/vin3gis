@@ -34,6 +34,18 @@ const scratchScale = new Cartesian3();
 const scratchMatrix = new Matrix3();
 const scratchWorldCartesian3 = new Cartesian3();
 
+const vec_1 = new Vector3();
+const vec_2 = new Vector3();
+const vec_3 = new Vector3();
+const vec_4 = new Vector3();
+const vec_5 = new Vector3();
+const vec_6 = new Vector3();
+
+const car3_1 = new Cartesian3();
+const car3_2 = new Cartesian3();
+const car3_3 = new Cartesian3();
+const car3_4 = new Cartesian3();
+
 export class Earth3DTile {
 
     private _id: string;
@@ -745,8 +757,53 @@ export class Earth3DTile {
     private createBox (box: any, transform: Matrix4, out?: IBoundingVolume): IBoundingVolume {
         let center = new Cartesian3(Number(box[0]), Number(box[1]), Number(box[2]));
         let halfAxis = new Matrix3().fromArray(box, 3);
-        center = Matrix4Utils.multiplyByPoint(transform, center, center);
+
+        const xAxis = vec_1;
+        const yAxis = vec_2;
+        const zAxis = vec_3;
+
+        halfAxis.extractBasis(xAxis, yAxis, zAxis);
+
+        const oldXAxis = vec_4.copy(xAxis);
+        const oldYAxis = vec_5.copy(yAxis);
+        const oldZAxis = vec_6.copy(zAxis);
+
+        Cartesian3.add(xAxis, xAxis, center);
+        Cartesian3.add(yAxis, yAxis, center);
+        Cartesian3.add(zAxis, zAxis, center);
+
+        Matrix4Utils.multiplyByPoint(transform, center, center);
+        //@ts-ignore
+        Matrix4Utils.multiplyByPoint(transform, xAxis, xAxis);
+        //@ts-ignore
+        Matrix4Utils.multiplyByPoint(transform, yAxis, yAxis);
+        //@ts-ignore
+        Matrix4Utils.multiplyByPoint(transform, zAxis, zAxis);
+
+        const carC = Transform.ecefCar3ToEarthCar3(center, this._tileset.tilingScheme, car3_1);
+        const car3X = Transform.ecefCar3ToEarthCar3(xAxis, this._tileset.tilingScheme, car3_2);
+        const car3Y = Transform.ecefCar3ToEarthCar3(yAxis, this._tileset.tilingScheme, car3_3);
+        const car3Z = Transform.ecefCar3ToEarthCar3(zAxis, this._tileset.tilingScheme, car3_4);
+
+        Cartesian3.subtract(xAxis, car3X, carC);
+        Cartesian3.subtract(yAxis, car3Y, carC);
+        Cartesian3.subtract(zAxis, car3Z, carC);
+
+        const xScale = xAxis.length() / oldXAxis.length();
+        const yScale = yAxis.length() / oldYAxis.length();
+        const zScale = zAxis.length() / oldZAxis.length();
+
+        oldXAxis.multiplyScalar(xScale);
+        oldYAxis.multiplyScalar(yScale);
+        oldZAxis.multiplyScalar(zScale);
+        halfAxis.fromArray([
+            oldXAxis.x, oldXAxis.y, oldXAxis.z,
+            oldYAxis.x, oldYAxis.y, oldYAxis.z,
+            oldZAxis.x, oldZAxis.y, oldZAxis.z
+        ]);
+
         transform = Transform.basisTo2D(this._tileset.tilingScheme.projection, transform, scratchTransform);
+
         let rotationScale = scratchMatrix.setFromMatrix4(transform);
         halfAxis.premultiply(rotationScale);
         if (Utils.defined(out) && out instanceof BoundingOrientedBoxVolume) {
