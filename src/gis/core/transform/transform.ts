@@ -365,14 +365,14 @@ export class Transform {
         let ellipsoid = projection.ellipsoid;
         // Get the 2D Center
         let cartographic = ellipsoid.cartesianToCartographic(rtcCenter, scratchCartographic);
-        let projectedPosition = projection.project(cartographic!);
+        let projectedPosition = projection.project(cartographic);
         // Assuming the instance are positioned in WGS84, invert the WGS84 transform to get the local transform and then convert to 2D
         let fromENU = this.eastNorthUpToFixedFrame(rtcCenter, ellipsoid, scratchFromENU);
         let toENU = Matrix4Utils.inverseTransformation(fromENU, scratchToENU);
         let rotation = Matrix4Utils.getMatrix3(matrix, scratchRotation);
         let local = Matrix4Utils.multiplyByMatrix3(toENU, rotation, result);
         // Mat4.multiply(result, local, result);
-        result.multiply(result);
+        result.premultiply(local);
         Matrix4Utils.setTranslation(result, projectedPosition, result);
 
         return result;

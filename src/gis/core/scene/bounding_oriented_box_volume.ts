@@ -1,4 +1,4 @@
-import { BoxGeometry, BufferGeometry, Material, Matrix3, Matrix4, Mesh, Quaternion, Sphere, Vector3 } from "three";
+import { BoxGeometry, BufferGeometry, Euler, Material, Matrix3, Matrix4, Mesh, Sphere, Vector3 } from "three";
 import { math } from "../../../core/math/math";
 import { OBB } from "../../../core/math/obb";
 import { IntersectUtils } from "../../../core/utils/intersect_utils";
@@ -6,6 +6,7 @@ import { Utils } from "../../../core/utils/utils";
 import { Earth3DTilesetGltfUpAxis } from "../../@types/core/earth_3dtileset";
 import { CoordinateOffsetType } from "../../@types/core/gis";
 import { Cartesian3 } from "../cartesian/cartesian3";
+import { Cartographic } from "../cartographic";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { webMercatorTilingScheme } from "../tilingscheme/web_mercator_tiling_scheme";
 import { Transform } from "../transform/transform";
@@ -14,6 +15,7 @@ import { FrameState } from "./frame_state";
 
 const volumeConstant = (4.0 / 3.0) * math.PI;
 const scratchMat4 = new Matrix4();
+const scratchEuler = new Euler();
 
 export class BoundingOrientedBoxVolume implements IBoundingVolume {
 
@@ -124,12 +126,11 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
             zV.x, zV.y, zV.z
         ]);
         const halfSize = new Vector3(hx, hy, hz).multiply(Transform.getMetersScale());
-        if (this._gltfUpAxis === Earth3DTilesetGltfUpAxis.Z) {
-            Transform.earthMatrix3ToWorldMatrix3(halfAxis, halfAxis);
-            //@ts-ignore
-            Transform.earthCar3ToWorldVec3(halfSize, halfSize);
-        }
         let obb = new OBB(centerVec, halfSize, halfAxis);
+        if (this._gltfUpAxis === Earth3DTilesetGltfUpAxis.Z) {
+            const rotMat = scratchMat4.makeRotationFromEuler(scratchEuler.set(-math.PI_OVER_TWO, 0, 0));
+            obb.applyMatrix4(rotMat);
+        }
         return obb;
     }
 
@@ -139,9 +140,8 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
         const geometry = new BoxGeometry(halfSize.x * 2, halfSize.y * 2, halfSize.z * 2);
         const mesh = new Mesh(geometry, material);
         const mat = scratchMat4.setFromMatrix3(obb.rotation);
-        mesh.position.copy(obb.center);
-        const rot = new Quaternion().setFromRotationMatrix(mat);
-        mesh.setRotationFromQuaternion(rot);
+        mat.setPosition(obb.center);
+        mesh.applyMatrix4(mat);
         mesh.matrixWorldNeedsUpdate = true;
         return mesh;
 

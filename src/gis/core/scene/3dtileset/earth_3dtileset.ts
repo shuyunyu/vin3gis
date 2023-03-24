@@ -569,7 +569,7 @@ export class Earth3DTileset implements IPrimitive {
         this._extensions = tilesetJson.extensions;
 
         this._root = this.loadTileset(tilesetJson);
-        let boundingVolume = this._root.createBoundingVolume(tilesetJson.root.boundingVolume, MatConstants.Mat4_IDENTITY);
+        // let boundingVolume = this._root.createBoundingVolume(tilesetJson.root.boundingVolume, MatConstants.Mat4_IDENTITY);
         //TODO 处理3dtile与地形的关系
 
     }

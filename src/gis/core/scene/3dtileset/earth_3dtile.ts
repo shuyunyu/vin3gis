@@ -746,6 +746,7 @@ export class Earth3DTile {
         let center = new Cartesian3(Number(box[0]), Number(box[1]), Number(box[2]));
         let halfAxis = new Matrix3().fromArray(box, 3);
         center = Matrix4Utils.multiplyByPoint(transform, center, center);
+        transform = Transform.basisTo2D(this._tileset.tilingScheme.projection, transform, scratchTransform);
         let rotationScale = scratchMatrix.setFromMatrix4(transform);
         halfAxis.premultiply(rotationScale);
         if (Utils.defined(out) && out instanceof BoundingOrientedBoxVolume) {
