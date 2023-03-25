@@ -180,7 +180,7 @@ export class Transform {
      */
     public static earthMatrix3ToWorldMatrix3 (mat3: Matrix3, out?: Matrix3) {
         const mat4 = scratchTransfrom.setFromMatrix3(mat3);
-        mat4.multiply(this.ROTATE_MAT);
+        mat4.premultiply(this.ROTATE_MAT);
         out = out || new Matrix3();
         out.setFromMatrix4(mat4);
         return out;

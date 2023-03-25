@@ -17,6 +17,6 @@ export interface IBoundingVolume {
     distanceToCamera (frameState: FrameState): number;
     //计算可见性
     computeVisible (frameState: FrameState): boolean;
-    //构建包围盒的mesh
-    createBoundingMesh (material: Material): Mesh;
+    //构建调试用的包围盒
+    createDebugBoundingVolumeMesh (material: Material): Mesh;
 }

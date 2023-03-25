@@ -1,6 +1,5 @@
 import { Matrix4, Object3D } from "three";
 import { AssetLoader } from "../../../../core/asset/asset_loader";
-import { MatConstants } from "../../../../core/constants/mat_constants";
 import { GenericEvent } from "../../../../core/event/generic_event";
 import { DRACOLoader } from "../../../../core/loader/draco_loader";
 import { GLTFLoader } from "../../../../core/loader/gltf_loader";
@@ -11,6 +10,7 @@ import { XHRRequestOptions } from "../../../../core/xhr/xhr_request";
 import { Earth3DTileContentState, Earth3DTileRefine, Earth3DTilesetGltfUpAxis, Earth3DTilesetOptions, Earth3DTilesetPriority, has3DTilesExtension } from "../../../@types/core/earth_3dtileset";
 import { CoordinateOffsetType } from "../../../@types/core/gis";
 import { Log } from "../../../log/log";
+import { InternalConfig } from "../../internal/internal_config";
 import { EarthScene } from "../earth_scene";
 import { FrameState } from "../frame_state";
 import { IPrimitive } from "../primitive";
@@ -204,6 +204,8 @@ export class Earth3DTileset implements IPrimitive {
     //上一帧选中的3dtile
     private _previousSelectedTiles: Earth3DTile[] = [];
 
+    private _previousEmptyTiles: Earth3DTile[] = [];
+
     private _selectedTiles: Earth3DTile[] = [];
 
     private _selectedTilesToStyle: Earth3DTile[] = [];
@@ -243,6 +245,10 @@ export class Earth3DTileset implements IPrimitive {
 
     public set previousSelectedTiles (previousSelectedTiles: Earth3DTile[]) {
         this._previousSelectedTiles = previousSelectedTiles;
+    }
+
+    public get previousEmptyTiles () {
+        return this._previousEmptyTiles;
     }
 
     public get statistics () {
@@ -803,6 +809,7 @@ export class Earth3DTileset implements IPrimitive {
             const previousTile = this.previousSelectedTiles[i];
             if (selectIds.indexOf(previousTile.id) === -1) {
                 previousTile.hideContent(this);
+                this.hideTileDebugBoundingVolume(previousTile);
             }
         }
         for (let i = 0; i < this.selectedTiles.length; i++) {
@@ -810,7 +817,39 @@ export class Earth3DTileset implements IPrimitive {
             this.statistics.incrementSelectionCounts(selectTile.content!);
             ++this.statistics.selected;
             selectTile.showContent(this);
+            this.showTileDebugBoundingVolume(selectTile);
+        }
+    }
 
+    private showEmptyTiles () {
+        const emptyIds = this._emptyTiles.map(t => t.id);
+        for (let i = 0; i < this._previousEmptyTiles.length; i++) {
+            const emptyTile = this._previousEmptyTiles[i];
+            if (emptyIds.indexOf(emptyTile.id) === -1) {
+                this.hideTileDebugBoundingVolume(emptyTile);
+            }
+        }
+        for (let i = 0; i < this._emptyTiles.length; i++) {
+            const emptyTile = this._emptyTiles[i];
+            this.showTileDebugBoundingVolume(emptyTile);
+        }
+    }
+
+    private showTileDebugBoundingVolume (tile: Earth3DTile) {
+        if (InternalConfig.SHOW_3DTILE_BOUNDING_VOLUME) {
+            tile.showDebugBoundingVolumeMesh();
+        }
+    }
+
+    private hideTileDebugBoundingVolume (tile: Earth3DTile) {
+        if (InternalConfig.SHOW_3DTILE_BOUNDING_VOLUME) {
+            tile.hideDebugBoundingVolumeMesh();
+        }
+    }
+
+    private disposeTileDebugBoundingVolume (tile: Earth3DTile) {
+        if (InternalConfig.SHOW_3DTILE_BOUNDING_VOLUME) {
+            tile.disposeDebugBoundingVolemeMesh();
         }
     }
 
@@ -825,6 +864,7 @@ export class Earth3DTileset implements IPrimitive {
             tileset.statistics.decrementLoadCounts(tile.content!);
             --tileset.statistics.numberOfTilesWithContentReady;
         }
+        tileset.disposeTileDebugBoundingVolume(tile);
         tile.unloadContent();
     }
 
@@ -845,14 +885,17 @@ export class Earth3DTileset implements IPrimitive {
         tileset.updatedVisibilityFrame = tileset.updatedVisibilityFrame + 1;
         this.resetMinimumMaximum(this);
         this.detectModelMatrixChanged(this, frameState);
+
         this._traversal.selectTiles(this, frameState);
+
         this.executeRequestTiles(tileset);
         this.executeUpdateTiles(tileset, frameState);
 
         this._cache.unloadTiles(this, this.unloadTile);
+
         this.cancelOutOfViewRequests(this, frameState);
         this.showSelectedTiles();
-
+        this.showEmptyTiles();
     }
 
 

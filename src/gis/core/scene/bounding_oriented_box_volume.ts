@@ -3,10 +3,8 @@ import { math } from "../../../core/math/math";
 import { OBB } from "../../../core/math/obb";
 import { IntersectUtils } from "../../../core/utils/intersect_utils";
 import { Utils } from "../../../core/utils/utils";
-import { Earth3DTilesetGltfUpAxis } from "../../@types/core/earth_3dtileset";
 import { CoordinateOffsetType } from "../../@types/core/gis";
 import { Cartesian3 } from "../cartesian/cartesian3";
-import { Cartographic } from "../cartographic";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
 import { webMercatorTilingScheme } from "../tilingscheme/web_mercator_tiling_scheme";
 import { Transform } from "../transform/transform";
@@ -26,8 +24,6 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
 
     //方向矩阵
     private _halfAxis: Matrix3;
-
-    private _gltfUpAxis: Earth3DTilesetGltfUpAxis;
 
     //obb
     private _obb: OBB;
@@ -69,9 +65,9 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
         return this._boundingSphereVolume!;
     }
 
-    constructor (center: Cartesian3, gltfUpAxis: Earth3DTilesetGltfUpAxis, halfAxis: Matrix3, coordinateOffsetType: CoordinateOffsetType, tilingScheme?: ITilingScheme) {
+    constructor (center: Cartesian3, halfAxis: Matrix3, coordinateOffsetType: CoordinateOffsetType, tilingScheme?: ITilingScheme) {
         this._tilingScheme = Utils.defaultValue(tilingScheme, webMercatorTilingScheme);
-        this.update(center, gltfUpAxis, halfAxis, coordinateOffsetType);
+        this.update(center, halfAxis, coordinateOffsetType);
     }
 
     public distanceToCamera (frameState: FrameState): number {
@@ -83,8 +79,7 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
         return IntersectUtils.intersectOBBFrustum(this.obb, frameState.frustum);
     }
 
-    public update (center: Cartesian3, gltfUpAxis: Earth3DTilesetGltfUpAxis, halfAxis: Matrix3, coordinateOffsetType: CoordinateOffsetType) {
-        this._gltfUpAxis = gltfUpAxis;
+    public update (center: Cartesian3, halfAxis: Matrix3, coordinateOffsetType: CoordinateOffsetType) {
         let cartographic = this._tilingScheme.projection.ellipsoid.cartesianToCartographic(center);
         Transform.wgs84ToCartographic(cartographic, coordinateOffsetType, cartographic);
         this._halfAxis = halfAxis.clone();
@@ -127,14 +122,10 @@ export class BoundingOrientedBoxVolume implements IBoundingVolume {
         ]);
         const halfSize = new Vector3(hx, hy, hz).multiply(Transform.getMetersScale());
         let obb = new OBB(centerVec, halfSize, halfAxis);
-        if (this._gltfUpAxis === Earth3DTilesetGltfUpAxis.Z) {
-            const rotMat = scratchMat4.makeRotationFromEuler(scratchEuler.set(-math.PI_OVER_TWO, 0, 0));
-            obb.applyMatrix4(rotMat);
-        }
         return obb;
     }
 
-    public createBoundingMesh (material: Material): Mesh<BufferGeometry, Material | Material[]> {
+    public createDebugBoundingVolumeMesh (material: Material): Mesh<BufferGeometry, Material | Material[]> {
         const obb = this.obb;
         const halfSize = obb.halfSize;
         const geometry = new BoxGeometry(halfSize.x * 2, halfSize.y * 2, halfSize.z * 2);

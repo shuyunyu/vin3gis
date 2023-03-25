@@ -96,7 +96,7 @@ export class BoundingSphereVolume implements IBoundingVolume {
         this._boundingSphereVolume = volumeConstant * radius * radius * radius;
     }
 
-    public createBoundingMesh (material: Material): Mesh<BufferGeometry, Material | Material[]> {
+    public createDebugBoundingVolumeMesh (material: Material): Mesh<BufferGeometry, Material | Material[]> {
         const geometry = new SphereGeometry(this.radius);
         const mesh = new Mesh(geometry, material);
         mesh.position.copy(this.boundingSphere.center);

@@ -54,7 +54,9 @@ export class Earth3DTilesetTraversal {
      */
     public selectTiles (tileset: Earth3DTileset, frameState: FrameState) {
         tileset.previousSelectedTiles.length = 0;
+        tileset.previousEmptyTiles.length = 0;
         tileset.selectedTiles.forEach(t => tileset.previousSelectedTiles.push(t));
+        tileset.emptyTiles.forEach(t => tileset.previousEmptyTiles.push(t));
         tileset.requestedTiles.length = 0;
         tileset.selectedTiles.length = 0;
         tileset.selectedTilesToStyle.length = 0;

@@ -110,7 +110,7 @@ export class BoundingRegionVolume implements IBoundingVolume {
     }
 
 
-    public createBoundingMesh (material: Material): Mesh<BufferGeometry, Material | Material[]> {
+    public createDebugBoundingVolumeMesh (material: Material): Mesh<BufferGeometry, Material | Material[]> {
         const box = this.aabb;
         const v = Cartesian3.subtract(scratchVec3, box.max, box.min);
         const geoemtry = new BoxGeometry(v.x / 2, v.y / 2, v.z / 2);
