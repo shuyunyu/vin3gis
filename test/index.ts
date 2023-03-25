@@ -31,7 +31,7 @@ window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
     // const initCameraPosition = new Vector3(wgs84LngLat[0], wgs84LngLat[1], 16500000);
     // const initCameraPosition = new Vector3(118.256, 24.418, 165000);
-    const initCameraPosition = new Vector3(121.556, 31.268, 16500 * 3);
+    const initCameraPosition = new Vector3(121.356, 31.268, 16500 * 3);
     // const initCameraPosition = new Vector3(0, 0, Transform.getMetersPerUnit() * 1.65);
     // const initCameraPosition = new Vector3(0, 0, Transform.carCoordToWorldCoord(1.65));
     const initCameraOrientation = new Vector3(0, -90, 0);
@@ -46,8 +46,8 @@ window.onload = () => {
         // imageryTileProivder: new OSMImageryTileProvider(),
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
-        imageryTileProivder: new EmptyImageryTileProvider(),
-        // imageryTileProivder: new ArcGISImageryTileProvider({ url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer" }),
+        // imageryTileProivder: new EmptyImageryTileProvider(),
+        imageryTileProivder: new ArcGISImageryTileProvider({ url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer" }),
         // imageryTileProivder: new TdtImageryTileProvider({
         //     style: "street",
         //     key: "1d109683f4d84198e37a38c442d68311",
@@ -1016,7 +1016,9 @@ class GISTest {
         const tileset = new Earth3DTileset({
             url: 'http://data.mars3d.cn/3dtiles/jzw-shanghai/tileset.json',
             dracoLoader: dracoLoader,
-            // maximumScreenSpaceError: 10
+            // skipLevelOfDetail: true,
+            // maximumScreenSpaceError: 10,
+            // immediatelyLoadDesiredLevelOfDetail: true
         });
         mapViewer.scene.primitives.add(tileset);
     }

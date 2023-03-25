@@ -303,9 +303,9 @@ export class Earth3DTilesetTraversal {
             // ancestorWithContent is an ancestor that has content or has the potential to have
             // content. Used in conjunction with tileset.skipLevels to know when to skip a tile.
             // ancestorWithContentAvailable is an ancestor that is rendered if a desired tile is not loaded.
-            let hasContent = !this.hasUnloadedContent(parent!) || parent!.requestedFrame === frameState.frameNumber;
-            tile.ancestorWithContent = hasContent ? parent : parent!.ancestorWithContent;
-            tile.ancestorWithContentAvailable = parent!.contentAvailable ? parent : parent!.ancestorWithContentAvailable;
+            let hasContent = !this.hasUnloadedContent(parent) || parent.requestedFrame === frameState.frameNumber;
+            tile.ancestorWithContent = hasContent ? parent : parent.ancestorWithContent;
+            tile.ancestorWithContentAvailable = parent.contentAvailable ? parent : parent.ancestorWithContentAvailable;
         }
 
     }
@@ -330,7 +330,7 @@ export class Earth3DTilesetTraversal {
         }
         if (tile.screenSpaceError === 0.0) {
             // If a leaf, use parent's SSE
-            return tile.parent!.screenSpaceError > baseScreenSpaceError;
+            return tile.parent.screenSpaceError > baseScreenSpaceError;
         }
         return tile.screenSpaceError > baseScreenSpaceError;
     }
@@ -704,14 +704,14 @@ export class Earth3DTilesetTraversal {
         while (stack.length > 0) {
             traversal.stackMaximumLength = Math.max(traversal.stackMaximumLength, stack.length);
 
-            let tile = stack.pop()!;
+            let tile = stack.pop();
             this.updateTileAncestorContentLinks(tile, frameState);
             let baseTraversal = this.inBaseTraversal(tileset, tile, baseScreenSpaceError);
 
             let add = tile.refine === Earth3DTileRefine.ADD;
             let replace = tile.refine === Earth3DTileRefine.REPLACE;
             let parent = tile.parent;
-            let parentRefines = !Utils.defined(parent) || parent!.refines;
+            let parentRefines = !Utils.defined(parent) || parent.refines;
             let refines = false;
 
             if (this.canTraverse(tileset, tile)) {
@@ -719,6 +719,7 @@ export class Earth3DTilesetTraversal {
             }
 
             let stoppedRefining = !refines && parentRefines;
+
             if (this.hasEmptyContent(tile)) {
                 // Add empty tile just to show its debug bounding volume
                 // If the tile has tileset content load the external tileset

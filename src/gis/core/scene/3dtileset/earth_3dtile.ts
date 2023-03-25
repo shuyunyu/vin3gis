@@ -1235,7 +1235,7 @@ export class Earth3DTile {
         }
 
         if (Utils.defined(this.content)) {
-            this.content!.destroy();
+            this.content.destroy();
             this._content = undefined;
         }
         this._contentState = Earth3DTileContentState.UNLOADED;

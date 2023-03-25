@@ -72,8 +72,8 @@ export enum Earth3DTilesetGltfUpAxis {
 
 //3DTILE替换类型
 export enum Earth3DTileRefine {
-    REPLACE = 1,
-    ADD
+    REPLACE = "REPLACE",
+    ADD = "ADD"
 }
 
 /**

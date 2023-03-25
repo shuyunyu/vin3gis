@@ -1,5 +1,6 @@
-import { Matrix4, Object3D, Vector3 } from "three";
+import { Color, DoubleSide, Material, Matrix4, Mesh, MeshBasicMaterial, Object3D, Vector3 } from "three";
 import { MatConstants } from "../../../../core/constants/mat_constants";
+import { disposeSystem } from "../../../../core/system/dispose_system";
 import { Utils } from "../../../../core/utils/utils";
 import { Earth3DTilesetGltfUpAxis } from "../../../@types/core/earth_3dtileset";
 import { GltfUtils } from "../../../utils/gltf_utils";
@@ -306,6 +307,25 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
         this.tileset.gltfLoader.parseAsync(gltfView.buffer, '').then(gltf => {
             this._gltf = gltf;
             this._group = this._gltf.scene;
+
+            const mtl = new MeshBasicMaterial({
+                color: new Color('#ffffff'),
+                depthTest: false,
+                transparent: true,
+                side: DoubleSide
+            });
+
+            if (this._group.children) {
+                for (let i = 0; i < this._group.children.length; i++) {
+                    const ele = this._group.children[i];
+                    if (ele instanceof Mesh) {
+                        ele.material = mtl;
+                        ele.renderOrder = 40000
+                    }
+                }
+            }
+
+
             this.updateContentMatrix(this.tile, gltf);
             this._readyPromise_resolve(this);
         }).catch(err => {
@@ -361,30 +381,31 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
         let cCar = scratchCartesian3;
         let wVec = Transform.geoCar3ToWorldVec3(cCar, scratchVec3);
 
-        if (this._group) {
-            this._group.position.copy(wVec);
-            this._group.matrixWorldNeedsUpdate = true;
-        }
 
         Matrix4Utils.setTranslation(computedContentMatrix, wVec, computedContentMatrix);
 
         this._computedMartix = computedContentMatrix;
 
+        if (this._group) {
+            this._group.applyMatrix4(this._computedMartix);
+            this._group.matrixWorldNeedsUpdate = true;
+        }
+
     }
 
 
     public show (tileset: Earth3DTileset): void {
-        // if (this._group && !this._group.parent) {
-        //     tileset.container.add(this._group);
-        // }
+        if (this._group && !this._group.parent) {
+            tileset.container.add(this._group);
+        }
     }
 
 
 
     public hide (tileset: Earth3DTileset) {
-        // if (this._group && this._group.parent) {
-        //     this._group.removeFromParent();
-        // }
+        if (this._group && this._group.parent) {
+            this._group.removeFromParent();
+        }
     }
 
     /**
@@ -400,7 +421,15 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
      * 释放节点资源
      */
     private releaseResource () {
-
+        this.hide(this._tileset);
+        if (this._group && this._group.children) {
+            for (let i = 0; i < this._group.children.length; i++) {
+                const ele = this._group.children[i];
+                if (ele instanceof Mesh) {
+                    disposeSystem.disposeObj(ele.material as Material);
+                }
+            }
+        }
     }
 
     public destroy (): void {
