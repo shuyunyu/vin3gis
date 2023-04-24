@@ -30,7 +30,7 @@ export class RendererSystem extends System {
     }
 
     public init (): void {
-        global.addEventListener('resize', () => this.onWindowResize());
+        globalThis.addEventListener('resize', () => this.onWindowResize());
     }
 
     private onWindowResize () {

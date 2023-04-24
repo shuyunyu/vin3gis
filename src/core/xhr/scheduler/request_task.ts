@@ -102,7 +102,7 @@ export class RequestTask {
     private executeImageTask () {
         const img = document.createElementNS('http://www.w3.org/1999/xhtml', "img") as HTMLImageElement;
 
-        if (global.location.protocol !== 'file:') {
+        if (globalThis.location.protocol !== 'file:') {
             img.crossOrigin = 'anonymous';
         }
 

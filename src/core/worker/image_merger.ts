@@ -42,7 +42,7 @@ export class ImageMerger extends BaseWorker {
      */
     public merge (images: Blob[] | ImageBitmap[], colCount: number, rowCount: number, imageWidth: number, imageHeight: number, options?: ImageBitmapOptions[]) {
         //优先使用OffscreenCanvas合并图片
-        if (global.OffscreenCanvas) {
+        if (globalThis.OffscreenCanvas) {
             this.init();
             const finalWidth = imageWidth * colCount;
             const finalHeight = imageHeight * rowCount;

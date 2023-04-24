@@ -66,7 +66,7 @@ window.onload = () => {
     });
     // mapViewer.scene.imageryProviders.add(new AMapImageryTileProvider({ style: 'note' }));
     // mapViewer.scene.imageryProviders.add(new GridImageryTileProvider());
-    global.mapViewer = mapViewer;
+    globalThis.mapViewer = mapViewer;
     GISTest.run(mapViewer.renderer, mapViewer);
 
     // mapViewer.renderer.scene.fog = new FogExp2(0xFF0000, 0.02);
@@ -86,7 +86,7 @@ class GISTest {
         // this.testShader(render);
         // this.testTileGeometry(render);
         // this.testWorker();
-        // global.testImageMerger = () => this.testWorker();
+        // globalThis.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
         this.testEngineLoader(mapViewer);
         this.test3dtiles(mapViewer);
@@ -456,7 +456,7 @@ class GISTest {
             })
         });
         mapViewer.scene.entities.add(entity1);
-        global.multiLineEntity = entity1;
+        globalThis.multiLineEntity = entity1;
 
         AssetLoader.loadJSON({ url: "https://geojson.cn/api/data/china.json" }).then((json: any) => {
             const positionsArray = [];
@@ -627,7 +627,7 @@ class GISTest {
             })
         });
         mapViewer.scene.entities.add(entity);
-        global.pointEntity = entity;
+        globalThis.pointEntity = entity;
         mapViewer.scene.entities.suspendEvents();
         const pointCount = 100;
         // for (let i = 0; i < pointCount; i++) {
@@ -1007,7 +1007,7 @@ class GISTest {
         });
         console.log(tiledTexture.tileImage(res2.canvas));
 
-        global.tiledTexture = tiledTexture;
+        globalThis.tiledTexture = tiledTexture;
     }
 
     public static test3dtiles (mapViewer: MapViewer) {
