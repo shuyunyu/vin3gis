@@ -24,8 +24,6 @@ const fromPointsMaxBoxPt = new Cartesian3();
 const fromPointsNaiveCenterScratch = new Cartesian3();
 const volumeConstant = (4.0 / 3.0) * math.PI;
 
-const scracthVec3 = new Vector3();
-
 export class BoundingSphereVolume implements IBoundingVolume {
 
     private _tilingScheme: ITilingScheme;
@@ -89,7 +87,7 @@ export class BoundingSphereVolume implements IBoundingVolume {
         Transform.wgs84ToCartesian(this._tilingScheme.projection, this.center, coordinateOffsetType, this._center);
         this._radius = radius;
         let metersPerUnit = Transform.getMetersPerUnit();
-        let centerVec = Transform.geoCar3ToWorldVec3(center, scracthVec3);
+        let centerVec = Transform.geoCar3ToWorldVec3(center);
         this._sphere = new Sphere(centerVec, this._radius / metersPerUnit);
         this._boundingSphereCenter = this._sphere.center.clone();
         this._boundingSphereRadius = this._sphere.radius;
@@ -97,7 +95,7 @@ export class BoundingSphereVolume implements IBoundingVolume {
     }
 
     public createDebugBoundingVolumeMesh (material: Material): Mesh<BufferGeometry, Material | Material[]> {
-        const geometry = new SphereGeometry(this.radius);
+        const geometry = new SphereGeometry(this.boundingSphere.radius);
         const mesh = new Mesh(geometry, material);
         mesh.position.copy(this.boundingSphere.center);
         mesh.matrixWorldNeedsUpdate = true;

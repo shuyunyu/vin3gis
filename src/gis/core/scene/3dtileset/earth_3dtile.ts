@@ -596,7 +596,7 @@ export class Earth3DTile {
 
     public getBoundingVolume () {
         if (!Utils.defined(this._boundingVolume2D)) {
-            this._boundingVolume2D = BoundingSphereUtils.project2D(this.tileset.tilingScheme, this.tileset.coordinateOffsetType, this.boundingVolume.boundingSphereRadius, this.boundingVolume.boundingSphereCenter);;
+            this._boundingVolume2D = BoundingSphereUtils.project2D(this.tileset.tilingScheme, this.tileset.coordinateOffsetType, this.boundingVolume.boundingSphereRadius, this.boundingVolume.boundingSphereCenter);
         }
         return this._boundingVolume2D;
     }
