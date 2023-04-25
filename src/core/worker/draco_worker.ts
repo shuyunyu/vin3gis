@@ -20,9 +20,6 @@ export type DracoGeometry = {
     }[]
 }
 
-//定义 jsContent处理对象 可以替换默认的jsContent
-type WorkerJsContentHandler = (jsContent: string) => string;
-
 export class DracoWorker extends BaseWorker {
 
     protected _taskProcessor: TaskProcessor<InputParams, DracoGeometry>;
@@ -33,11 +30,6 @@ export class DracoWorker extends BaseWorker {
 
     private _inited: boolean;
 
-    private _jsContentHandler?: WorkerJsContentHandler;
-
-    public get hasHandler () {
-        return !!this._jsContentHandler;
-    }
 
     public constructor (jsContent: string, decoderConfig: Record<string, any>) {
         super();
@@ -54,10 +46,6 @@ export class DracoWorker extends BaseWorker {
         this._taskProcessor.scheduleTask({ type: 'init', decoderConfig: this._decoderConfig }, null);
     }
 
-    public setJsContentHandler (handler?: WorkerJsContentHandler) {
-        this._jsContentHandler = handler;
-    }
-
     private getWorkerScript () {
         const fn = DRACOWorkerFunc.toString();
         let body = [
@@ -67,20 +55,17 @@ export class DracoWorker extends BaseWorker {
             '/* worker */',
             fn.substring(fn.indexOf('{') + 1, fn.lastIndexOf('}'))
         ].join('\n');
-        if (this._jsContentHandler) {
-            body = this._jsContentHandler(this._jsContent);
-        }
         return body;
     }
 
-    public decode (buffer: ArrayBuffer, taskConfig: Record<string, any>, externalParams?: Record<string, any>) {
+    public decode (buffer: ArrayBuffer, taskConfig: Record<string, any>) {
         this.init();
         return new Promise<DracoGeometry>((resolve, reject) => {
-            this._taskProcessor.scheduleTask(Object.assign({}, {
+            this._taskProcessor.scheduleTask({
                 type: 'decode',
                 buffer: buffer,
                 taskConfig: taskConfig
-            }, externalParams) as InputParams, [buffer]).then((res: DracoGeometry) => {
+            }, [buffer]).then((res: DracoGeometry) => {
                 resolve(res);
             }).catch(err => {
                 reject(err);

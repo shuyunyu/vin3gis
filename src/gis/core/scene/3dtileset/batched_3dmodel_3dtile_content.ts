@@ -315,19 +315,29 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
                 side: DoubleSide
             });
 
+            const meshes: Mesh[] = [];
+
             if (this._group.children) {
                 for (let i = 0; i < this._group.children.length; i++) {
                     const ele = this._group.children[i];
                     if (ele instanceof Mesh) {
                         ele.material = mtl;
                         ele.renderOrder = 40000
+                        meshes.push(ele);
                     }
                 }
             }
 
-
             this.updateContentMatrix(this.tile, gltf);
+
+            //重投影
+            // reprojectWorker.reprojectMesh(meshes, this.tileset.gltfUpAxis, this._contentModelMatrix, this.tileset.coordinateOffsetType).then(_ => {
+
+            //     this._readyPromise_resolve(this);
+            // });
+
             this._readyPromise_resolve(this);
+
         }).catch(err => {
             this._readyPromise_reject(err);
         });
