@@ -3,7 +3,6 @@ import { AssetDefines } from "../../../@types/core/asset/asset";
 import { DRACOLoader } from "../../../core/loader/draco_loader";
 import { KTX2Loader } from "../../../core/loader/ktx2_loader";
 import { Utils } from "../../../core/utils/utils";
-import { XHRRequestOptions } from "../../../core/xhr/xhr_request";
 import { Earth3DTile } from "../../core/scene/3dtileset/earth_3dtile";
 import { Earth3DTileset } from "../../core/scene/3dtileset/earth_3dtileset";
 import { PointCloudShading } from "../../core/scene/3dtileset/pointcloud_shading";

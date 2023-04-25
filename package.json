@@ -8,6 +8,7 @@
     "server": "webpack-dev-server --hot",
     "build": "webpack --config webpack.config.js",
     "build-prod": "webpack --config webpack.config.prod.js",
+    "build-worker": "webpack --config webpack.config.worker.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

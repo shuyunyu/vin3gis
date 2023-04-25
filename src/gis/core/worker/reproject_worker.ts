@@ -1,95 +1,23 @@
-import { BaseWorker } from "./base_worker";
-import { TaskProcessor } from "./task_processor";
+import { Mesh } from "three";
+import { DRACOLoader } from "../../../core/loader/draco_loader.js";
+import { DracoWorker } from "../../../core/worker/draco_worker.js";
+import { DracokWorkerPool } from "../../../core/worker/pool/draco_worker_pool.js";
+import TransformWorker from "./transform_worker.js";
 
-type InputParams = {
-    type: 'init' | 'decode',
-    buffer?: ArrayBuffer;
-    decoderConfig?: Record<string, any>,
-    taskConfig?: Record<string, any>;
-}
+//把打包进去的THREE对象都替换掉
+const transformWorkerStr = (TransformWorker as string).replace(/THREE/g, '{}')
 
-export type DracoGeometry = {
-    index: {
-        array: number[];
-    };
-    attributes: {
-        name: string;
-        array: number[];
-        itemSize: number;
-        vertexColorSpace: number;
-    }[]
-}
+/**
+ * 重投影Worker
+ */
+class ReprojectWorker {
 
-//定义 jsContent处理对象 可以替换默认的jsContent
-type WorkerJsContentHandler = (jsContent: string) => string;
+    //重投影mesh
+    public reprojectMesh (mesh: Mesh) {
 
-export class DracoWorker extends BaseWorker {
-
-    protected _taskProcessor: TaskProcessor<InputParams, DracoGeometry>;
-
-    private _jsContent: string;
-
-    private _decoderConfig: Record<string, any>;
-
-    private _inited: boolean;
-
-    private _jsContentHandler?: WorkerJsContentHandler;
-
-    public get hasHandler () {
-        return !!this._jsContentHandler;
-    }
-
-    public constructor (jsContent: string, decoderConfig: Record<string, any>) {
-        super();
-        this._jsContent = jsContent;
-        this._decoderConfig = decoderConfig;
-        this._inited = false;
-    }
-
-    private init () {
-        if (this._inited) return;
-        this._inited = true;
-        this._taskProcessor = new TaskProcessor(this.getWorkerScript());
-        //post init message
-        this._taskProcessor.scheduleTask({ type: 'init', decoderConfig: this._decoderConfig }, null);
-    }
-
-    public setJsContentHandler (handler?: WorkerJsContentHandler) {
-        this._jsContentHandler = handler;
-    }
-
-    private getWorkerScript () {
-        const fn = DRACOWorkerFunc.toString();
-        let body = [
-            '/* draco decoder */',
-            this._jsContent,
-            '',
-            '/* worker */',
-            fn.substring(fn.indexOf('{') + 1, fn.lastIndexOf('}'))
-        ].join('\n');
-        if (this._jsContentHandler) {
-            body = this._jsContentHandler(this._jsContent);
-        }
-        return body;
-    }
-
-    public decode (buffer: ArrayBuffer, taskConfig: Record<string, any>, externalParams?: Record<string, any>) {
-        this.init();
-        return new Promise<DracoGeometry>((resolve, reject) => {
-            this._taskProcessor.scheduleTask(Object.assign({}, {
-                type: 'decode',
-                buffer: buffer,
-                taskConfig: taskConfig
-            }, externalParams) as InputParams, [buffer]).then((res: DracoGeometry) => {
-                resolve(res);
-            }).catch(err => {
-                reject(err);
-            });
-        });
     }
 
 }
-
 
 /* WEB WORKER */
 
@@ -129,6 +57,7 @@ function DRACOWorkerFunc () {
             case 'decode':
                 const buffer = params.buffer;
                 const taskConfig = params.taskConfig;
+                const gltfUpAxis = params.gltfUpAxis;
                 decoderPending.then((module) => {
 
                     const draco = module.draco;
@@ -137,7 +66,8 @@ function DRACOWorkerFunc () {
                     try {
 
                         const geometry = decodeGeometry(draco, decoder, new Int8Array(buffer), taskConfig);
-
+                        //@ts-ignore
+                        reprojectGeometry(geometry, transform_worker.gltfUpAxis.Z, transform_worker.webMercatorProjection);
                         const buffers = geometry.attributes.map((attr) => attr.array.buffer);
 
                         if (geometry.index) buffers.push(geometry.index.array.buffer);
@@ -311,4 +241,51 @@ function DRACOWorkerFunc () {
 
     }
 
+    /**
+     * geometry重投影
+     * @param geometry
+     */
+    function reprojectGeometry (geometry, gltfUpAxis, projection, coordinateOffsetType, transformArray) {
+        return
+        //@ts-ignore
+        const transform = transform_worker.fromArray(transformArray);
+        const reprojectAttrs = geometry.attributes.filter(attr => attr.name === "position" || attr.name === "normal");
+        if (!reprojectAttrs || !reprojectAttrs.length) return;
+        //@ts-ignore
+        let scratchCartesian_0 = new transform_worker.Cartesian3();
+        //@ts-ignore
+        let scratchCartesian_1 = new transform_worker.Cartesian3();
+        reprojectAttrs.forEach(attr => {
+            const buffer = attr.array as Float32Array;
+            for (let i = 0; i < buffer.length; i += 3) {
+                const x = buffer[i];
+                const y = buffer[i + 1];
+                const z = buffer[i + 2];
+                //@ts-ignore
+                if (gltfUpAxis === transform_worker.gltfUpAxis.Z) {
+                    scratchCartesian_0.x = x;
+                    scratchCartesian_0.y = y;
+                    scratchCartesian_0.z = z;
+                    //@ts-ignore
+                    let projected_pos = transform_worker.worker_transfrom.projectRtcCartesian3(projection, coordinateOffsetType, transform, scratchCartesian_0, scratchCartesian_1);
+                    buffer[i] = projected_pos.x;
+                    buffer[i + 1] = projected_pos.y;
+                    buffer[i + 2] = projected_pos.z;
+                    //@ts-ignore
+                } else if (gltfUpAxis === transform_worker.gltfUpAxis.Y) {
+                    scratchCartesian_0.x = x;
+                    scratchCartesian_0.y = z;
+                    scratchCartesian_0.z = y;
+                    //@ts-ignore
+                    let projected_pos = transform_worker.worker_transfrom.projectRtcCartesian3(projection, coordinateOffsetType, transform, scratchCartesian_0, scratchCartesian_1);
+                    buffer[i] = projected_pos.x;
+                    buffer[i + 1] = projected_pos.y;
+                    buffer[i + 2] = projected_pos.z;
+                }
+            }
+        });
+    }
+
 }
+
+export const reprojectWorker = new ReprojectWorker();

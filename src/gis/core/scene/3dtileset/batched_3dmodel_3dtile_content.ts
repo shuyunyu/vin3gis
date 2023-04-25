@@ -309,7 +309,7 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
             this._group = this._gltf.scene;
 
             const mtl = new MeshBasicMaterial({
-                color: new Color('#000000'),
+                color: new Color('#ffffff'),
                 depthTest: false,
                 transparent: true,
                 side: DoubleSide
