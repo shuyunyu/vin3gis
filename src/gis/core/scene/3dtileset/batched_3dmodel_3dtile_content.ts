@@ -371,7 +371,7 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
             let centerCar = tilingScheme.projection.unproject(centerC, scratchCartographic);
             let center = tilingScheme.projection.ellipsoid.cartographicToCartesian(centerCar);
             let to2D = Transform.wgs84To2DModelMatrix(tilingScheme.projection, center, scratchComputedMatrixIn2D);
-            computedContentMatrix = Matrix4Utils.multiply(scratchComputedMatrixIn2D, to2D, computedContentMatrix);
+            computedContentMatrix = Matrix4Utils.multiply(to2D, computedContentMatrix, scratchComputedMatrixIn2D);
             if (Utils.defined(this._rtcCenter)) {
                 Matrix4Utils.setTranslation(computedContentMatrix, Cartesian4.UNIT_W, computedContentMatrix);
                 this._rtcCenter = this._rctCenter2D;
