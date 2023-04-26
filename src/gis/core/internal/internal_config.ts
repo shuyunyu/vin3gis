@@ -1,4 +1,4 @@
-import { Color, DoubleSide, MeshBasicMaterial } from "three";
+import { Color, DoubleSide, FrontSide, MeshBasicMaterial, MeshLambertMaterial } from "three";
 import { math } from "../../../core/math/math";
 
 /**
@@ -102,6 +102,19 @@ export class InternalConfig {
             transparent: true,
             depthTest: false,
         })
+    }
+
+    /**
+     * 获取b3dm的材质
+     */
+    public static getB3dmMaterial () {
+        return new MeshLambertMaterial({
+            color: new Color('#AAA'),
+            depthTest: false,
+            transparent: true,
+            opacity: 1,
+            side: DoubleSide
+        });
     }
 
 }

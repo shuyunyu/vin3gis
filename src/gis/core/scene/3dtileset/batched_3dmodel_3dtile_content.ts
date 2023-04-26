@@ -19,6 +19,8 @@ import { Earth3DTileBatchTable } from "./earth_3dtile_batch_table";
 import { IEarth3DTileContent } from "./earth_3dtile_content";
 import { Earth3DTileFeatureTable } from "./earth_3dtile_feature_table";
 import { reprojectWorkerPool } from "../../worker/pool/reproject_worker_pool";
+import { InternalConfig } from "../../internal/internal_config";
+import { EARTH_3DTILE_B3DM_RENDER_ORDER } from "../../misc/render_order";
 
 
 const sizeOfUint32 = Uint32Array.BYTES_PER_ELEMENT;
@@ -309,13 +311,7 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
             this._gltf = gltf;
             this._group = this._gltf.scene;
 
-            const mtl = new MeshLambertMaterial({
-                color: new Color('#ffffff'),
-                depthTest: false,
-                transparent: true,
-                opacity: 1,
-                side: DoubleSide
-            });
+            const mtl = InternalConfig.getB3dmMaterial();
 
             const meshes: Mesh[] = [];
 
@@ -324,7 +320,7 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
                     const ele = this._group.children[i];
                     if (ele instanceof Mesh) {
                         ele.material = mtl;
-                        ele.renderOrder = 40000
+                        ele.renderOrder = EARTH_3DTILE_B3DM_RENDER_ORDER;
                         meshes.push(ele);
                     }
                 }

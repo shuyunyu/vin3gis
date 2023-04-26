@@ -1023,26 +1023,7 @@ class GISTest {
             // maximumScreenSpaceError: 10,
             // immediatelyLoadDesiredLevelOfDetail: true
         });
-        tileset.readyPromise.then(() => {
-            //模型贴地
-            let center = tileset.boundingSphere.center;
-            // 中心点经纬度
-            let centerCartographic = Transform.worldCar3ToCartographic(center, mapViewer.scene.tilingScheme);
-            // Transform.cartographicToWgs84(centerCartographic, tileset.coordinateOffsetType, centerCartographic);
-            // Transform.wgs84ToCartographic(centerCartographic, tileset.coordinateOffsetType, centerCartographic);
-            //中心点笛卡尔坐标
-            let centerCartesian3 = mapViewer.scene.tilingScheme.projection.ellipsoid.cartographicToCartesian(centerCartographic);
-            //表面经纬度
-            let surfaceCartographic = new Cartographic(centerCartographic.longitude, centerCartographic.latitude, 70);
-            //表面笛卡尔坐标
-            let surfaceCartesian3 = mapViewer.scene.tilingScheme.projection.ellipsoid.cartographicToCartesian(surfaceCartographic);
-            let translation = Cartesian3.subtract(new Cartesian3(), surfaceCartesian3, centerCartesian3);
-
-            if (tileset.gltfUpAxis === Earth3DTilesetGltfUpAxis.Z) {
-                // Transform.worldCar3ToEarthVec3(translation, translation);
-            }
-            tileset.modelMatrix = new Matrix4().makeTranslation(translation.x, translation.y, translation.z);
-        });
+        tileset.adjustHeight(71);
         mapViewer.scene.primitives.add(tileset);
     }
 

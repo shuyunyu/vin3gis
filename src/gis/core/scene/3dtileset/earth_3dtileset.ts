@@ -20,6 +20,9 @@ import { Earth3DTilesetMetadata } from "./earth_3dtileset_metadata";
 import { Earth3DTilesetStatistics } from "./earth_3dtileset_statistics";
 import { Earth3DTilesetTraversal } from "./earth_3dtileset_traversal";
 import { PointCloudShading } from "./pointcloud_shading";
+import { Transform } from "../../transform/transform";
+import { Cartographic } from "../../cartographic";
+import { Cartesian3 } from "../../cartesian/cartesian3";
 
 enum RootTileLoadState {
     UNLOAD = 1,//未加载
@@ -578,6 +581,27 @@ export class Earth3DTileset implements IPrimitive {
         // let boundingVolume = this._root.createBoundingVolume(tilesetJson.root.boundingVolume, MatConstants.Mat4_IDENTITY);
         //TODO 处理3dtile与地形的关系
 
+    }
+
+    /**
+     * 调整3dtiles的高度(贴地处理)
+     * @param height 
+     */
+    public adjustHeight (height: number) {
+        this.readyPromise.then(_ => {
+            let center = this.boundingSphere.center;
+            // 中心点经纬度
+            let centerCartographic = Transform.worldCar3ToCartographic(center, this.tilingScheme);
+            //中心点笛卡尔坐标
+            let centerCartesian3 = this.tilingScheme.projection.ellipsoid.cartographicToCartesian(centerCartographic);
+            //表面经纬度
+            let surfaceCartographic = new Cartographic(centerCartographic.longitude, centerCartographic.latitude, height);
+            //表面笛卡尔坐标
+            let surfaceCartesian3 = this.tilingScheme.projection.ellipsoid.cartographicToCartesian(surfaceCartographic);
+            let translation = Cartesian3.subtract(new Cartesian3(), surfaceCartesian3, centerCartesian3);
+
+            this.modelMatrix = new Matrix4().makeTranslation(translation.x, translation.y, translation.z);
+        });
     }
 
     /**
