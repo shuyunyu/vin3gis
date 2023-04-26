@@ -1,6 +1,5 @@
 import { Matrix4, Mesh } from "three";
 import TransformWorker from "./transform_worker.js";
-import { Earth3DTilesetGltfUpAxis } from "../../@types/core/earth_3dtileset";
 import { CoordinateOffsetType } from "../../@types/core/gis";
 import { BaseWorker } from "../../../core/worker/base_worker";
 import { TaskProcessor } from "../../../core/worker/task_processor";
@@ -10,7 +9,6 @@ const transformWorkerStr = (TransformWorker as string).replace(/THREE/g, '{}')
 
 type InputParams = {
     buffer: Float32Array;
-    gltfUpAxis: Earth3DTilesetGltfUpAxis;
     transform: number[];
     coordinateOffsetType: CoordinateOffsetType;
 }
@@ -49,13 +47,12 @@ export class ReprojectWorker extends BaseWorker {
     }
 
     //重投影mesh
-    public project (data: Float32Array, transform: Matrix4, gltfUpAxis: Earth3DTilesetGltfUpAxis, coordinateOffsetType: CoordinateOffsetType) {
+    public project (data: Float32Array, transform: Matrix4, coordinateOffsetType: CoordinateOffsetType) {
         this.init();
         return new Promise<Float32Array>((resolve, reject) => {
             this._taskProcessor.scheduleTask({
                 buffer: data,
                 transform: transform.toArray(),
-                gltfUpAxis: gltfUpAxis,
                 coordinateOffsetType: coordinateOffsetType
             }, [data.buffer]).then(out => {
                 resolve(out);
@@ -69,7 +66,7 @@ export class ReprojectWorker extends BaseWorker {
      * 重投影mesh
      * @param mesh 
      */
-    public projectMesh (mesh: Mesh, transform: Matrix4, gltfUpAxis: Earth3DTilesetGltfUpAxis, coordinateOffsetType: CoordinateOffsetType) {
+    public projectMesh (mesh: Mesh, transform: Matrix4, coordinateOffsetType: CoordinateOffsetType) {
         return new Promise<Mesh>((resolve, reject) => {
             const geometry = mesh.geometry;
             if (!geometry) {
@@ -79,10 +76,10 @@ export class ReprojectWorker extends BaseWorker {
                 const normalAttr = geometry.getAttribute('normal');
                 const promiseList: Promise<Float32Array>[] = [];
                 if (positionAttr) {
-                    promiseList.push(this.project(positionAttr.array as Float32Array, transform, gltfUpAxis, coordinateOffsetType))
+                    promiseList.push(this.project(positionAttr.array as Float32Array, transform, coordinateOffsetType))
                 }
                 if (normalAttr) {
-                    promiseList.push(this.project(normalAttr.array as Float32Array, transform, gltfUpAxis, coordinateOffsetType));
+                    promiseList.push(this.project(normalAttr.array as Float32Array, transform, coordinateOffsetType));
                 }
                 Promise.all(promiseList).then((res: Float32Array[]) => {
                     if (positionAttr) {
@@ -101,8 +98,8 @@ export class ReprojectWorker extends BaseWorker {
         });
     }
 
-    public projectMeshes (meshes: Mesh[], transform: Matrix4, gltfUpAxis: Earth3DTilesetGltfUpAxis, coordinateOffsetType: CoordinateOffsetType) {
-        const promiseList = meshes.map(mesh => this.projectMesh(mesh, transform, gltfUpAxis, coordinateOffsetType));
+    public projectMeshes (meshes: Mesh[], transform: Matrix4, coordinateOffsetType: CoordinateOffsetType) {
+        const promiseList = meshes.map(mesh => this.projectMesh(mesh, transform, coordinateOffsetType));
         return Promise.all(promiseList);
     }
 
@@ -124,11 +121,10 @@ function ProjectFunc () {
     function handleMessage (data, params) {
         // debugger;
         const buffer = params.buffer;
-        const gltfUpAxis = params.gltfUpAxis;
         const coordinateOffsetType = params.coordinateOffsetType;
         const transformArr = params.transform;
         //@ts-ignore
-        const rpBuffer = reprojectGeometry(buffer, gltfUpAxis, transform_worker.webMercatorProjection, coordinateOffsetType, transformArr);
+        const rpBuffer = reprojectGeometry(buffer, transform_worker.webMercatorProjection, coordinateOffsetType, transformArr);
         postMessage({
             id: data.id,
             error: null,
@@ -142,7 +138,7 @@ function ProjectFunc () {
      * geometry重投影
      * @param geometry
      */
-    function reprojectGeometry (buffer, gltfUpAxis, projection, coordinateOffsetType, transformArray) {
+    function reprojectGeometry (buffer, projection, coordinateOffsetType, transformArray) {
         //@ts-ignore
         const transform = (new transform_worker.Matrix4()).fromArray(transformArray);
         //@ts-ignore
@@ -153,27 +149,14 @@ function ProjectFunc () {
             const x = buffer[i];
             const y = buffer[i + 1];
             const z = buffer[i + 2];
+            scratchCartesian_0.x = x;
+            scratchCartesian_0.y = y;
+            scratchCartesian_0.z = z;
             //@ts-ignore
-            if (gltfUpAxis === transform_worker.gltfUpAxis.Z) {
-                scratchCartesian_0.x = x;
-                scratchCartesian_0.y = y;
-                scratchCartesian_0.z = z;
-                //@ts-ignore
-                let projected_pos = transform_worker.WorkerTransform.projectRtcCartesian3(projection, coordinateOffsetType, transform, scratchCartesian_0, scratchCartesian_1);
-                buffer[i] = projected_pos.x;
-                buffer[i + 1] = projected_pos.y;
-                buffer[i + 2] = projected_pos.z;
-                //@ts-ignore
-            } else if (gltfUpAxis === transform_worker.gltfUpAxis.Y) {
-                scratchCartesian_0.x = x;
-                scratchCartesian_0.y = z;
-                scratchCartesian_0.z = y;
-                //@ts-ignore
-                let projected_pos = transform_worker.WorkerTransform.projectRtcCartesian3(projection, coordinateOffsetType, transform, scratchCartesian_0, scratchCartesian_1);
-                buffer[i] = projected_pos.x;
-                buffer[i + 1] = projected_pos.y;
-                buffer[i + 2] = projected_pos.z;
-            }
+            let projected_pos = transform_worker.WorkerTransform.projectRtcCartesian3(projection, coordinateOffsetType, transform, scratchCartesian_0, scratchCartesian_1);
+            buffer[i] = projected_pos.x;
+            buffer[i + 1] = projected_pos.y;
+            buffer[i + 2] = projected_pos.z;
         }
         return buffer;
     }

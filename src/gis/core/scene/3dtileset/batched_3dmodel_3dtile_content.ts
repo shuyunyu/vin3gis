@@ -333,7 +333,7 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
             this.updateContentMatrix(this.tile, gltf);
 
             //重投影
-            reprojectWorkerPool.getInstance().projectMeshes(meshes, this._contentModelMatrix, this.tileset.gltfUpAxis, this.tileset.coordinateOffsetType).then(ms => {
+            reprojectWorkerPool.getInstance().projectMeshes(meshes, this._contentModelMatrix, this.tileset.coordinateOffsetType).then(ms => {
                 this._readyPromise_resolve(this);
             });
 
