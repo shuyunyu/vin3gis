@@ -50,6 +50,10 @@ export * from "./core/datasource/geometry/multi_polyline_geometry";
 export * from "./core/datasource/geometry/polygon_geometry";
 export * from "./core/datasource/geometry/multi_polygon_geometry";
 
+//3dtiles
+export * from "./core/scene/3dtileset/earth_3dtileset";
+export * from "./core/scene/3dtileset/earth_3dtile";
+
 //datasource misc
 export * from "./core/datasource/misc/polygon_shape";
 
