@@ -1,3 +1,5 @@
+import { CoordinateOffsetType } from "./@types/core/gis";
+
 export const version = '0.0.1';
 
 export * from "./core/cartographic";
@@ -50,6 +52,11 @@ export * from "./core/datasource/geometry/multi_polygon_geometry";
 
 //datasource misc
 export * from "./core/datasource/misc/polygon_shape";
+
+//enums 
+export const enums = {
+    CoordinateOffsetType
+}
 
 export * from "./core/loader/geojson_loader";
 
