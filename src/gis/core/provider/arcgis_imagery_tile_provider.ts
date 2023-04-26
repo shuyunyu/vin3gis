@@ -12,10 +12,6 @@ const resetUrl = function (options: ImageryTileProviderOptions) {
  */
 export class ArcGISImageryTileProvider extends UrlTemplateImageryProvider {
 
-    public minimumLevel: number = 3;
-
-    public maximumLevel: number = 18;
-
     private _token: string;
 
     public get token () {
@@ -25,7 +21,10 @@ export class ArcGISImageryTileProvider extends UrlTemplateImageryProvider {
     public constructor (options?: ImageryTileProviderOptions) {
         options = options || {};
         resetUrl(options);
-        super(options);
+        super(Object.assign({
+            minimumLevel: 3,
+            maximumLevel: 18
+        }, options));
         this._token = options.token;
     }
 

@@ -1,6 +1,6 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Euler, Float32BufferAttribute, Fog, FogExp2, FrontSide, Matrix3, Matrix4, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, MeshStandardMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, Vector2, Vector3 } from "three";
 import { AssetLoader, DRACOLoader, FileLoader, FrameRenderer, GLTFLoader, ImageBitmapLoader, ImageLoader, KTX2Loader, KTXLoader, math, OBB, requestSystem, TextureLoader, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
-import { AMapImageryTileProvider, AnchorConstant, ArcGISImageryTileProvider, BillboardGeometry, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
+import { AMapImageryTileProvider, AnchorConstant, ArcGISImageryTileProvider, BillboardGeometry, Cartesian3, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
@@ -27,6 +27,7 @@ import { xhrWorkerPool } from "../src/core/worker/pool/xhr_worker_pool";
 import { Earth3DTileset } from "../src/gis/core/scene/3dtileset/earth_3dtileset";
 import { InternalConfig } from "../src/gis/core/internal/internal_config";
 import { CoordinateOffsetType } from "../src/gis/@types/core/gis";
+import { Earth3DTilesetGltfUpAxis } from "../src/gis/@types/core/earth_3dtileset";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -48,7 +49,7 @@ window.onload = () => {
         imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
         // imageryTileProivder: new EmptyImageryTileProvider(),
-        // imageryTileProivder: new ArcGISImageryTileProvider({ url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer" }),
+        // imageryTileProivder: new ArcGISImageryTileProvider({ url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer", maximumLevel: 16 }),
         // imageryTileProivder: new TdtImageryTileProvider({
         //     style: "street",
         //     key: "1d109683f4d84198e37a38c442d68311",
@@ -1022,6 +1023,25 @@ class GISTest {
             // maximumScreenSpaceError: 10,
             // immediatelyLoadDesiredLevelOfDetail: true
         });
+        // tileset.readyPromise.then(() => {
+        //     //模型贴地
+        //     let center = tileset.boundingSphere.center;
+        //     // 中心点经纬度
+        //     let centerCartographic = Transform.worldCar3ToCartographic(center, mapViewer.scene.tilingScheme);
+        //     // Transform.wgs84ToCartographic(centerCartographic, tileset.coordinateOffsetType, centerCartographic);
+        //     //中心点笛卡尔坐标
+        //     let centerCartesian3 = mapViewer.scene.tilingScheme.projection.ellipsoid.cartographicToCartesian(centerCartographic);
+        //     //表面经纬度
+        //     let surfaceCartographic = new Cartographic(centerCartographic.longitude, centerCartographic.latitude, 0);
+        //     //表面笛卡尔坐标
+        //     let surfaceCartesian3 = mapViewer.scene.tilingScheme.projection.ellipsoid.cartographicToCartesian(surfaceCartographic);
+        //     let translation = Cartesian3.subtract(new Cartesian3(), surfaceCartesian3, centerCartesian3);
+
+        //     if (tileset.gltfUpAxis === Earth3DTilesetGltfUpAxis.Z) {
+        //         Transform.earthCar3ToWorldCar3(translation, translation);
+        //     }
+        //     tileset.modelMatrix = new Matrix4().makeTranslation(translation.x, translation.y, translation.z);
+        // });
         mapViewer.scene.primitives.add(tileset);
     }
 

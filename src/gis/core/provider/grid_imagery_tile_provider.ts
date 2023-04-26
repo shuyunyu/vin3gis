@@ -18,10 +18,6 @@ type GridImageryTileProviderOptions = {
  */
 export class GridImageryTileProvider extends BaseImageryTileProvider {
 
-    public minimumLevel: number = 0;
-
-    public maximumLevel: number = 21;
-
     private borderWidth: number;
 
     private borderColor: string;
@@ -33,10 +29,10 @@ export class GridImageryTileProvider extends BaseImageryTileProvider {
 
     public constructor (options?: GridImageryTileProviderOptions) {
         options = options || {};
-        super({
-            minimumLevel: options.minimumLevel,
-            maximumLevel: options.maximumLevel
-        });
+        super(Object.assign({
+            minimumLevel: 0,
+            maximumLevel: 21
+        }, options));
         this.borderWidth = Utils.defaultValue(options.borderWidth, 2);
         this.borderColor = Utils.defaultValue(options.borderColor, "#FFD700");
         this.font = Utils.defaultValue(options.font, "30px serif");

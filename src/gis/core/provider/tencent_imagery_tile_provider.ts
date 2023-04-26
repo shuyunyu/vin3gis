@@ -12,7 +12,10 @@ export class TencentImageryTileProvider extends UrlTemplateImageryProvider {
     public constructor (options?: ImageryTileProviderOptions) {
         options = options || {};
         options.tms = true;
-        super(options);
+        super(Object.assign({
+            minimumLevel: 3,
+            maximumLevel: 18
+        }, options));
         // options.tms = true;
         this._subdomains = Utils.defaultValue(options.subdomains, ["0", "1", "2", "3"]);
         this._style = Utils.defaultValue(options.style, "normal");

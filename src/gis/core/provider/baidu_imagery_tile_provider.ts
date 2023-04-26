@@ -14,10 +14,6 @@ interface BaiduImageryTileProviderOptions extends ImageryTileProviderOptions {
 
 export class BaiduImageryTileProvider extends UrlTemplateImageryProvider {
 
-    public minimumLevel: number = 3;
-
-    public maximumLevel: number = 18;
-
     private _style: string;
 
     private _correction: boolean;
@@ -31,7 +27,10 @@ export class BaiduImageryTileProvider extends UrlTemplateImageryProvider {
         } else {
             options.tilingScheme = new WebMercatorTilingScheme();
         }
-        super(options);
+        super(Object.assign({
+            minimumLevel: 3,
+            maximumLevel: 18
+        }, options));
         this._correction = correction;
         this._style = Utils.defaultValue(options.style, 'street');
         this._url = Utils.defaultValue(options.url, this.getUrlTemplate(this._style));

@@ -10,16 +10,15 @@ export class TdtImageryTileProvider extends UrlTemplateImageryProvider {
     //地图密钥
     private _key: string = '';
 
-    public minimumLevel: number = 3;
-
-    public maximumLevel: number = 18;
-
     public get style () {
         return this._style;
     }
 
     constructor (imageryTileProviderOptions: ImageryTileProviderOptions) {
-        super(imageryTileProviderOptions);
+        super(Object.assign({
+            minimumLevel: 3,
+            maximumLevel: 18
+        }, imageryTileProviderOptions));
         this._style = Utils.defaultValue(imageryTileProviderOptions.style, 'Aerial');
         this._key = Utils.defaultValue(imageryTileProviderOptions.key, '');
         this._url = Utils.defaultValue(imageryTileProviderOptions.url, this.getUrlTemplate(this._style, this._key));

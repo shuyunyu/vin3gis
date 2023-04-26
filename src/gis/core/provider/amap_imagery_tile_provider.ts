@@ -6,17 +6,16 @@ export class AMapImageryTileProvider extends UrlTemplateImageryProvider {
     //地图风格  Aerial:影像地图 street:街道地图 note:注记地图
     private _style: string = '';
 
-    public minimumLevel: number = 3;
-
-    public maximumLevel: number = 18;
-
     public get style () {
         return this._style;
     }
 
     constructor (options?: ImageryTileProviderOptions) {
         options = options || {};
-        super(options);
+        super(Object.assign({
+            minimumLevel: 3,
+            maximumLevel: 18
+        }, options));
         this._style = Utils.defaultValue(options?.style, 'Aerial');
         this._url = Utils.defaultValue(options.url, this.getUrlTemplate(this._style));
         this._subdomains = Utils.defaultValue(options.subdomains, ['1', '2', '3', '4']);

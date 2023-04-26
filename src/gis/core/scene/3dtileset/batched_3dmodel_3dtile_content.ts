@@ -1,4 +1,4 @@
-import { Color, DoubleSide, Material, Matrix4, Mesh, MeshBasicMaterial, Object3D, Vector3 } from "three";
+import { Color, DoubleSide, Material, Matrix4, Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D, Vector3 } from "three";
 import { MatConstants } from "../../../../core/constants/mat_constants";
 import { disposeSystem } from "../../../../core/system/dispose_system";
 import { Utils } from "../../../../core/utils/utils";
@@ -309,10 +309,11 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
             this._gltf = gltf;
             this._group = this._gltf.scene;
 
-            const mtl = new MeshBasicMaterial({
+            const mtl = new MeshLambertMaterial({
                 color: new Color('#ffffff'),
                 depthTest: false,
                 transparent: true,
+                opacity: 1,
                 side: DoubleSide
             });
 
