@@ -6,7 +6,7 @@ import { TaskProcessor } from "../../../core/worker/task_processor";
 
 //把打包进去的THREE对象都替换掉
 //在webworker环境下 生成全局的transform_worker对象(打包后，transform_worker对象可能改变名称，所以需要全局保存)
-const transformWorkerStr = (TransformWorker as string).replace(/THREE/g, '{}').replace(/transform_worker=s/g, 'globalThis.transform_worker=transform_worker=s');
+const transformWorkerStr = (TransformWorker as string).replace(/THREE/g, '{}').replace(/transform_worker=s/g, 'globalThis["transform_worker"]=transform_worker=s');
 
 type InputParams = {
     buffer: Float32Array;
