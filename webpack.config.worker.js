@@ -3,7 +3,7 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 module.exports = {
     mode: 'production',
     entry: {
-        "transform_worker": "./src/gis/core/transform/worker_transform.ts",
+        "transform_worker": "./src/gis/core/transform/worker_transform_index.ts",
     },
     output: {
         path: __dirname + '/src/gis/core/worker',
