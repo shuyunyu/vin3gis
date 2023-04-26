@@ -320,10 +320,13 @@ export class Transform {
      * @param out
      */
     public static wgs84ToCartographic (cartographic: Cartographic, coordinateOffsetType: CoordinateOffsetType, out?: Cartographic) {
-        if (coordinateOffsetType === CoordinateOffsetType.NONE) return cartographic;
+        out = out || new Cartographic();
+        if (coordinateOffsetType === CoordinateOffsetType.NONE) {
+            Cartographic.clone(cartographic, out);
+            return out;
+        }
         let lng = math.toDegree(cartographic.longitude);
         let lat = math.toDegree(cartographic.latitude);
-        out = out || new Cartographic();
         let resLng: number = 0;
         let resLat: number = 0;
         if (coordinateOffsetType === CoordinateOffsetType.GCJ02) {
@@ -332,6 +335,38 @@ export class Transform {
             resLat = res[1];
         } else if (coordinateOffsetType === CoordinateOffsetType.BD09) {
             let res = CoordinateTransform.wgs84tobd09(lng, lat);
+            resLng = res[0];
+            resLat = res[1];
+        }
+        out.longitude = math.toRadian(resLng);
+        out.latitude = math.toRadian(resLat);
+        out.height = cartographic.height;
+        return out;
+    }
+
+    /**
+     * 转换坐标到wgs84
+     * @param cartographic 
+     * @param coordinateOffsetType 
+     * @param out 
+     * @returns 
+     */
+    public static cartographicToWgs84 (cartographic: Cartographic, coordinateOffsetType: CoordinateOffsetType, out?: Cartographic) {
+        out = out || new Cartographic();
+        if (coordinateOffsetType === CoordinateOffsetType.NONE) {
+            Cartographic.clone(cartographic, out);
+            return out;
+        }
+        let lng = math.toDegree(cartographic.longitude);
+        let lat = math.toDegree(cartographic.latitude);
+        let resLng: number = 0;
+        let resLat: number = 0;
+        if (coordinateOffsetType === CoordinateOffsetType.GCJ02) {
+            let res = CoordinateTransform.gcj02towgs84(lng, lat);
+            resLng = res[0];
+            resLat = res[1];
+        } else if (coordinateOffsetType === CoordinateOffsetType.BD09) {
+            let res = CoordinateTransform.bd09towgs84(lng, lat);
             resLng = res[0];
             resLat = res[1];
         }
