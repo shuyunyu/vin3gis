@@ -72,7 +72,7 @@ export * from "./core/loader/gltf_loader";
 export * from "./tools/debug_tools";
 export * from "./tools/stats";
 
-
+export * from "./gis/index";
 
 
 
