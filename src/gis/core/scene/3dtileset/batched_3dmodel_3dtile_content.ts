@@ -405,16 +405,17 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
 
 
     public show (tileset: Earth3DTileset): void {
-        if (this._group && !this._group.parent) {
-            tileset.container.add(this._group);
+        if (this._group) {
+            if (!this._group.parent) tileset.container.add(this._group);
+            if (!this._group.visible) this._group.visible = true;
         }
     }
 
 
 
     public hide (tileset: Earth3DTileset) {
-        if (this._group && this._group.parent) {
-            this._group.removeFromParent();
+        if (this._group) {
+            this._group.visible = false;
         }
     }
 
@@ -431,7 +432,7 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
      * 释放节点资源
      */
     private releaseResource () {
-        this.hide(this._tileset);
+        if (this._group.parent) this._group.removeFromParent();
         if (this._group && this._group.children) {
             for (let i = 0; i < this._group.children.length; i++) {
                 const ele = this._group.children[i];
