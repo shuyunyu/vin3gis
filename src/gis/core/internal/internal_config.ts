@@ -68,7 +68,10 @@ export class InternalConfig {
     public static DEFAULT_FOG_DENSITY = 0.0002;
 
     //是否显示3dtile的包围盒
-    public static SHOW_3DTILE_BOUNDING_VOLUME = true;
+    public static SHOW_3DTILE_BOUNDING_VOLUME = false;
+
+    //3dtiles重投影webworker个数
+    public static REPROJECT_WORKER_COUNT = 4;
 
     /**
      * 校验相机的pitch是否有效

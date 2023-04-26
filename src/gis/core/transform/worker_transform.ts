@@ -14,7 +14,7 @@ export * from "../projection/web_mercator_projection";
 export * from "../cartesian/cartesian3";
 
 
-class Matrix4 {
+export class Matrix4 {
 
     public elements = [];
 

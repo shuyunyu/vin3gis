@@ -26,6 +26,7 @@ import { SystemDefines } from "../src/@types/core/system/system";
 import { xhrWorkerPool } from "../src/core/worker/pool/xhr_worker_pool";
 import { Earth3DTileset } from "../src/gis/core/scene/3dtileset/earth_3dtileset";
 import { InternalConfig } from "../src/gis/core/internal/internal_config";
+import { CoordinateOffsetType } from "../src/gis/@types/core/gis";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
@@ -44,10 +45,10 @@ window.onload = () => {
         // imageryTileProivder: new AMapImageryTileProvider({ style: 'street' }),
         // imageryTileProivder: new BaiduImageryTileProvider({ correction: true }),
         // imageryTileProivder: new OSMImageryTileProvider(),
-        // imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
+        imageryTileProivder: new AMapImageryTileProvider({ style: 'aerial' }),
         // imageryTileProivder: new GridImageryTileProvider(),
         // imageryTileProivder: new EmptyImageryTileProvider(),
-        imageryTileProivder: new ArcGISImageryTileProvider({ url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer" }),
+        // imageryTileProivder: new ArcGISImageryTileProvider({ url: "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer" }),
         // imageryTileProivder: new TdtImageryTileProvider({
         //     style: "street",
         //     key: "1d109683f4d84198e37a38c442d68311",
@@ -1016,6 +1017,7 @@ class GISTest {
         const tileset = new Earth3DTileset({
             url: 'http://data.mars3d.cn/3dtiles/jzw-shanghai/tileset.json',
             dracoLoader: dracoLoader,
+            coordinateOffsetType: CoordinateOffsetType.GCJ02
             // skipLevelOfDetail: true,
             // maximumScreenSpaceError: 10,
             // immediatelyLoadDesiredLevelOfDetail: true

@@ -1,9 +1,9 @@
-import { Matrix4 } from "three";
+import { Matrix4, Mesh } from "three";
 import TransformWorker from "./transform_worker.js";
-import { Earth3DTilesetGltfUpAxis } from "../../@types/core/earth_3dtileset.js";
-import { CoordinateOffsetType } from "../../@types/core/gis.js";
-import { BaseWorker } from "../../../core/worker/base_worker.js";
-import { TaskProcessor } from "../../../core/worker/task_processor.js";
+import { Earth3DTilesetGltfUpAxis } from "../../@types/core/earth_3dtileset";
+import { CoordinateOffsetType } from "../../@types/core/gis";
+import { BaseWorker } from "../../../core/worker/base_worker";
+import { TaskProcessor } from "../../../core/worker/task_processor";
 
 //把打包进去的THREE对象都替换掉
 const transformWorkerStr = (TransformWorker as string).replace(/THREE/g, '{}')
@@ -65,16 +65,52 @@ export class ReprojectWorker extends BaseWorker {
         });
     }
 
+    /**
+     * 重投影mesh
+     * @param mesh 
+     */
+    public projectMesh (mesh: Mesh, transform: Matrix4, gltfUpAxis: Earth3DTilesetGltfUpAxis, coordinateOffsetType: CoordinateOffsetType) {
+        return new Promise<Mesh>((resolve, reject) => {
+            const geometry = mesh.geometry;
+            if (!geometry) {
+                resolve(mesh);
+            } else {
+                const positionAttr = geometry.getAttribute('position');
+                const normalAttr = geometry.getAttribute('normal');
+                const promiseList: Promise<Float32Array>[] = [];
+                if (positionAttr) {
+                    promiseList.push(this.project(positionAttr.array as Float32Array, transform, gltfUpAxis, coordinateOffsetType))
+                }
+                if (normalAttr) {
+                    promiseList.push(this.project(normalAttr.array as Float32Array, transform, gltfUpAxis, coordinateOffsetType));
+                }
+                Promise.all(promiseList).then((res: Float32Array[]) => {
+                    if (positionAttr) {
+                        //@ts-ignore
+                        positionAttr.array = res[0];
+                    }
+                    if (normalAttr) {
+                        //@ts-ignore
+                        normalAttr.array = res[1];
+                    }
+                    resolve(mesh);
+                }).catch(err => {
+                    resolve(mesh);
+                });
+            }
+        });
+    }
 
+    public projectMeshes (meshes: Mesh[], transform: Matrix4, gltfUpAxis: Earth3DTilesetGltfUpAxis, coordinateOffsetType: CoordinateOffsetType) {
+        const promiseList = meshes.map(mesh => this.projectMesh(mesh, transform, gltfUpAxis, coordinateOffsetType));
+        return Promise.all(promiseList);
+    }
 
 }
 
 /* WEB WORKER */
 
 function ProjectFunc () {
-
-    let decoderConfig;
-    let decoderPending;
 
     onmessage = function (event) {
         const data = event.data;
@@ -86,10 +122,19 @@ function ProjectFunc () {
     };
 
     function handleMessage (data, params) {
+        // debugger;
         const buffer = params.buffer;
         const gltfUpAxis = params.gltfUpAxis;
         const coordinateOffsetType = params.coordinateOffsetType;
         const transformArr = params.transform;
+        //@ts-ignore
+        const rpBuffer = reprojectGeometry(buffer, gltfUpAxis, transform_worker.webMercatorProjection, coordinateOffsetType, transformArr);
+        postMessage({
+            id: data.id,
+            error: null,
+            result: params.buffer
+            //@ts-ignore
+        }, [rpBuffer.buffer])
     }
 
 
@@ -99,7 +144,7 @@ function ProjectFunc () {
      */
     function reprojectGeometry (buffer, gltfUpAxis, projection, coordinateOffsetType, transformArray) {
         //@ts-ignore
-        const transform = transform_worker.fromArray(transformArray);
+        const transform = (new transform_worker.Matrix4()).fromArray(transformArray);
         //@ts-ignore
         let scratchCartesian_0 = new transform_worker.Cartesian3();
         //@ts-ignore
@@ -114,7 +159,7 @@ function ProjectFunc () {
                 scratchCartesian_0.y = y;
                 scratchCartesian_0.z = z;
                 //@ts-ignore
-                let projected_pos = transform_worker.worker_transfrom.projectRtcCartesian3(projection, coordinateOffsetType, transform, scratchCartesian_0, scratchCartesian_1);
+                let projected_pos = transform_worker.WorkerTransform.projectRtcCartesian3(projection, coordinateOffsetType, transform, scratchCartesian_0, scratchCartesian_1);
                 buffer[i] = projected_pos.x;
                 buffer[i + 1] = projected_pos.y;
                 buffer[i + 2] = projected_pos.z;
@@ -124,7 +169,7 @@ function ProjectFunc () {
                 scratchCartesian_0.y = z;
                 scratchCartesian_0.z = y;
                 //@ts-ignore
-                let projected_pos = transform_worker.worker_transfrom.projectRtcCartesian3(projection, coordinateOffsetType, transform, scratchCartesian_0, scratchCartesian_1);
+                let projected_pos = transform_worker.WorkerTransform.projectRtcCartesian3(projection, coordinateOffsetType, transform, scratchCartesian_0, scratchCartesian_1);
                 buffer[i] = projected_pos.x;
                 buffer[i + 1] = projected_pos.y;
                 buffer[i + 2] = projected_pos.z;

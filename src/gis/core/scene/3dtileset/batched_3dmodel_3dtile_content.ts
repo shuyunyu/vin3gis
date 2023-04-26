@@ -18,6 +18,7 @@ import { Earth3DTileset } from "./earth_3dtileset";
 import { Earth3DTileBatchTable } from "./earth_3dtile_batch_table";
 import { IEarth3DTileContent } from "./earth_3dtile_content";
 import { Earth3DTileFeatureTable } from "./earth_3dtile_feature_table";
+import { reprojectWorkerPool } from "../../worker/pool/reproject_worker_pool";
 
 
 const sizeOfUint32 = Uint32Array.BYTES_PER_ELEMENT;
@@ -331,12 +332,10 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
             this.updateContentMatrix(this.tile, gltf);
 
             //重投影
-            // reprojectWorker.reprojectMesh(meshes, this.tileset.gltfUpAxis, this._contentModelMatrix, this.tileset.coordinateOffsetType).then(_ => {
+            reprojectWorkerPool.getInstance().projectMeshes(meshes, this._contentModelMatrix, this.tileset.gltfUpAxis, this.tileset.coordinateOffsetType).then(ms => {
+                this._readyPromise_resolve(this);
+            });
 
-            //     this._readyPromise_resolve(this);
-            // });
-
-            this._readyPromise_resolve(this);
 
         }).catch(err => {
             this._readyPromise_reject(err);
