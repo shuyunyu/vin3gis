@@ -1,4 +1,4 @@
-import { Object3D } from "three";
+import { Group } from "three";
 import { TWEEN } from "../../../core/tween/Index";
 import Tween from "../../../core/tween/Tween";
 import { ImageryTileRenderParam } from "../../@types/core/gis";
@@ -42,7 +42,7 @@ export class TileNodeRenderer {
     private _fog: Fog;
 
     public constructor (fog: Fog) {
-        this.root = new Object3D();
+        this.root = new Group();
         this.root.name = `${TileNodeRenderer.name}_root`;
         this._fog = fog;
         this._fog.changedEvent.addEventListener(this.updateByFog, this);

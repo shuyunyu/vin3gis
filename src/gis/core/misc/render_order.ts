@@ -1,3 +1,4 @@
+//render order越小 越先渲染
 //瓦片节点的render-order
 export const TILE_NODE_RENDER_ORDER = 0;
 //瓦片节点的fadeout效果的render-order

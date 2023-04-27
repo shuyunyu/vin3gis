@@ -1,4 +1,4 @@
-import { Object3D } from "three";
+import { Group, Object3D } from "three";
 import { Collection } from "../misc/collection";
 import { IPrimitive } from "./primitive";
 
@@ -11,7 +11,7 @@ export class PrimitiveCollection extends Collection<IPrimitive> {
 
     public constructor () {
         super();
-        this.root = new Object3D();
+        this.root = new Group();
         this.root.name = `${PrimitiveCollection.name}_root`;
     }
 

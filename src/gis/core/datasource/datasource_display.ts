@@ -1,4 +1,4 @@
-import { Object3D } from "three";
+import { Group } from "three";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { EntityGeometryRenderDriver } from "../../@types/core/gis";
 import { ITilingScheme } from "../tilingscheme/tiling_scheme";
@@ -12,7 +12,7 @@ import { BaseGeometry } from "./geometry/base_geometry";
 export class DataSourceDisplay {
 
     //挂载实体对象的节点
-    public readonly root = new Object3D();
+    public readonly root = new Group();
 
     private _entities: EntityCollection;
 
@@ -21,6 +21,7 @@ export class DataSourceDisplay {
     private _renderer: FrameRenderer;
 
     public constructor (entityCollection: EntityCollection, tilingScheme: ITilingScheme, renderer: FrameRenderer) {
+        this.root.name = "DataSourceDisplay_root";
         this._entities = entityCollection;
         this._entities.collectionChangedEvent.addEventListener(this.onEntityCollectionChanged, this);
         this._tilingScheme = tilingScheme;

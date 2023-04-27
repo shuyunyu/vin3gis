@@ -1,4 +1,4 @@
-import { Matrix4, Object3D } from "three";
+import { Group, Matrix4, Object3D } from "three";
 import { AssetLoader } from "../../../../core/asset/asset_loader";
 import { GenericEvent } from "../../../../core/event/generic_event";
 import { DRACOLoader } from "../../../../core/loader/draco_loader";
@@ -456,7 +456,8 @@ export class Earth3DTileset implements IPrimitive {
 
     constructor (options: Earth3DTilesetOptions) {
         this._id = Utils.createGuid();
-        this._container = new Object3D();
+        this._container = new Group();
+        this._container.name = `3dtileset_root`;
         this._url = options.url;
         this._coordinateOffsetType = Utils.defaultValue(options.coordinateOffsetType, CoordinateOffsetType.NONE);
         this.dracoLoader = options.dracoLoader;
