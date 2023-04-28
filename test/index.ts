@@ -33,10 +33,12 @@ window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
     // const initCameraPosition = new Vector3(wgs84LngLat[0], wgs84LngLat[1], 16500000);
     // const initCameraPosition = new Vector3(118.256, 24.418, 165000);
-    const initCameraPosition = new Vector3(121.356, 31.268, 16500 * 3);
+    // const initCameraPosition = new Vector3(121.356, 31.268, 16500 * 3);
+    const initCameraPosition = new Vector3(102.65197, 25.073691, 1058.83878 * 1.5);
     // const initCameraPosition = new Vector3(0, 0, Transform.getMetersPerUnit() * 1.65);
     // const initCameraPosition = new Vector3(0, 0, Transform.carCoordToWorldCoord(1.65));
-    const initCameraOrientation = new Vector3(0, -90, 0);
+    // const initCameraOrientation = new Vector3(0, -90, 0);
+    const initCameraOrientation = new Vector3(-27.330569, -47.4, 0);
     const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), Orientation.fromDegreeEulerAngles(initCameraOrientation));
     const mapViewer = new MapViewer({
         target: document.body,
@@ -62,7 +64,10 @@ window.onload = () => {
         enablePan: true,
         enableZoom: true,
         enableRotate: true,
-        enableDamping: true
+        enableDamping: true,
+        camera: {
+            near: 0.00001
+        }
         // dampingFactor: 0.1
         // maxDistance: 16000000
     });
@@ -91,7 +96,8 @@ class GISTest {
         // globalThis.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
         this.testEngineLoader(mapViewer);
-        this.test3dtiles(mapViewer);
+        // this.test3dtiles(mapViewer);
+        this.testQXSY(mapViewer);
         // this.testOBB(mapViewer);
     }
 
@@ -1026,6 +1032,24 @@ class GISTest {
         tileset.adjustHeight(71);
         mapViewer.scene.primitives.add(tileset);
     }
+
+    public static testQXSY (mapViewer: MapViewer) {
+        const dracoLoader = new DRACOLoader()
+        dracoLoader.setDecoderPath("http://124.223.202.45/Vin3GIS/v0.0.1/libs/draco/");
+        const tileset = new Earth3DTileset({
+            url: 'http://data.mars3d.cn/3dtiles/qx-xiaoqu/tileset.json',
+            dracoLoader: dracoLoader,
+            coordinateOffsetType: CoordinateOffsetType.GCJ02,
+            maximumMemoryUsage: 1024,
+            maximumScreenSpaceError: 128
+            // skipLevelOfDetail: true,
+            // maximumScreenSpaceError: 10,
+            // immediatelyLoadDesiredLevelOfDetail: true
+        });
+        tileset.adjustHeight(50);
+        mapViewer.scene.primitives.add(tileset);
+    }
+
 
     public static testOBB (mapViewer: MapViewer) {
         const euler = new Euler(math.toRadian(0), math.toRadian(45), math.toRadian(0));

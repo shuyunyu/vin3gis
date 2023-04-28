@@ -311,15 +311,16 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
             this._gltf = gltf;
             this._group = this._gltf.scene;
 
-            const mtl = InternalConfig.getB3dmMaterial();
-
             const meshes: Mesh[] = [];
 
             if (this._group.children) {
                 for (let i = 0; i < this._group.children.length; i++) {
                     const ele = this._group.children[i];
                     if (ele instanceof Mesh) {
-                        ele.material = mtl;
+                        if (!ele.material) ele.material = InternalConfig.getB3dmMaterial();
+                        else {
+                            ele.material = InternalConfig.handleB3dmMaterial(ele.material);
+                        }
                         ele.renderOrder = EARTH_3DTILE_B3DM_RENDER_ORDER;
                         meshes.push(ele);
                     }

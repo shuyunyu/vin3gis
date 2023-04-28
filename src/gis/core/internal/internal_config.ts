@@ -1,4 +1,4 @@
-import { Color, DoubleSide, FrontSide, MeshBasicMaterial, MeshLambertMaterial } from "three";
+import { Color, DoubleSide, FrontSide, Material, MeshBasicMaterial, MeshLambertMaterial, MeshPhysicalMaterial, MeshStandardMaterial } from "three";
 import { math } from "../../../core/math/math";
 
 /**
@@ -115,6 +115,29 @@ export class InternalConfig {
             opacity: 1,
             side: DoubleSide
         });
+    }
+
+    /**
+     * 处理b3dm中自带的材质
+     * @param material 
+     */
+    public static handleB3dmMaterial (material: Material) {
+        if (material instanceof MeshBasicMaterial) {
+            if (material.map) {
+                // material.depthTest = true;
+                // material.transparent = false;
+                // material.depthWrite = true;
+                material.side = DoubleSide;
+                return material;
+            } else {
+                return material;
+            }
+        } else if (material instanceof MeshPhysicalMaterial) {
+            return material;
+        } else if (material instanceof MeshStandardMaterial) {
+            return material;
+        }
+        return material;
     }
 
 }
