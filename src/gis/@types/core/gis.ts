@@ -59,6 +59,7 @@ export type EarthCameraOptions = {
 
 export type EarthCameraFlyToOptions = {
     duration?: number; //default 3 seconds
+    onStart?: () => void;
     onUpdate?: (ratio: number) => void;
     onComplete?: () => void;
     easing?: EasingFunction;

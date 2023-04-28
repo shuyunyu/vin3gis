@@ -26,6 +26,10 @@ const tempCar2 = new Cartesian2();
 
 type FlyToTweenObj = { ratio: number };
 
+const tempPosCartographic = new Cartographic();
+
+const tempOrientation = new Orientation(0, 0, 0);
+
 /**
  * 定义地图相机
  */
@@ -70,6 +74,39 @@ export class EarthCamera {
     public set far (val: number) {
         this._far = val;
         this.updateRenderer();
+    }
+
+    /**
+     * 获取当前相机的坐标位置 只读
+     */
+    public get position () {
+        const pos = this._renderer.camera.position;
+        return Transform.worldCar3ToCartographic(pos, this._tilingScheme, tempPosCartographic);
+    }
+
+    /**
+     * 获取当前相机的欧拉角 只读
+     */
+    public get rotation () {
+        return this._renderer.camera.rotation;
+    }
+
+    /**
+     * 获取当前相机的四元数旋转 只读
+     */
+    public get quaternion () {
+        return this._renderer.camera.quaternion;
+    }
+
+    /**
+     * 获取当前相机的方向角 只读
+     */
+    public get orientation () {
+        const euler = this.rotation;
+        tempOrientation.yaw = euler.y;
+        tempOrientation.pitch = euler.x;
+        tempOrientation.roll = euler.z;
+        return tempOrientation;
     }
 
     private _homeViewPort: ViewPort;
@@ -175,9 +212,11 @@ export class EarthCamera {
                 options.onUpdate && options.onUpdate(obj.ratio);
             })
             .onComplete(() => {
+                this._flyToTween = null;
                 options.onComplete && options.onComplete();
             })
             .start();
+        options.onStart && options.onStart();
         this._flyToTween = tween;
     }
 
