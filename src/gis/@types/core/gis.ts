@@ -50,6 +50,12 @@ export enum CoordinateOffsetType {
     BD09     //百度90偏移
 }
 
+export type EarthCameraOptions = {
+    fov?: number;
+    near?: number;
+    far?: number;
+}
+
 export type MapViewerOptions = {
     //没threejs单位距离代表实际的多少米
     UNIT_PER_METERS?: number;
@@ -80,8 +86,8 @@ export type MapViewerOptions = {
     homeViewPort: ViewPort;
     //瓦片缓存数量 默认100
     tileCacheSize?: number;
-    //相机的fov
-    fov?: number;
+    //相机参数
+    camera?: EarthCameraOptions,
     //背景
     background?: {
         //不透明度

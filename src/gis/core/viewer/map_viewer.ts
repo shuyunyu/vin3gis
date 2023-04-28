@@ -1,9 +1,8 @@
-import { Color, PerspectiveCamera, Scene } from "three";
+import { Color } from "three";
 import { Engine } from "../../../core/engine";
 import { math } from "../../../core/math/math";
 import { FrameRenderer } from "../../../core/renderer/frame_renderer";
 import { interactionSystem } from "../../../core/system/interaction_system";
-import { rendererSystem } from "../../../core/system/renderer_system";
 import { createScheduler, removeScheduler } from "../../../core/utils/schedule_utils";
 import { Utils } from "../../../core/utils/utils";
 import { DebugTools } from "../../../tools/debug_tools";
@@ -61,8 +60,6 @@ export class MapViewer {
 
     //视角能推进的最大距离
     private _maxDistance: number;
-
-    private _fov: number;
 
     private _scheduleId?: number;
 
@@ -160,14 +157,6 @@ export class MapViewer {
         interactionSystem.updateControlsProps(this.renderer, { maxDistance: val });
     }
 
-    public get fov () {
-        return this._fov;
-    }
-
-    public set fov (val: number) {
-        this._fov = val;
-        this.renderer.updateCameraProps({ fov: val });
-    }
 
     public set imageryTileProivder (provider: IImageryTileProvider) {
         let oldImageryTileProvider = this._imageryTileProvider;
@@ -175,12 +164,13 @@ export class MapViewer {
         this.scene?.setBaseImageryTileProvider(this._imageryTileProvider, oldImageryTileProvider);
     }
 
-    constructor (viewerOptions: MapViewerOptions) {
+    public constructor (viewerOptions: MapViewerOptions) {
         Engine.DEBUG = InternalConfig.DEBUG;
         Engine.init();
         Transform.THREEJS_UNIT_PER_METERS = Utils.defaultValue(viewerOptions.UNIT_PER_METERS, 10000);
-        this._fov = Utils.defaultValue(viewerOptions.fov, InternalConfig.DEFAULT_CAMERA_FOV);
-        this.renderer = this.createRenderer(viewerOptions.target);
+        this._imageryTileProvider = viewerOptions.imageryTileProivder;
+        this.camera = new EarthCamera(this._imageryTileProvider.tilingScheme, viewerOptions.target, viewerOptions.camera);
+        this.renderer = this.camera.renderer;
         const defaultBackgroundColor = new Color(255, 255, 255);
         const background = viewerOptions.background || {
             alpha: 1,
@@ -190,8 +180,7 @@ export class MapViewer {
         this.setBackgroundAlpha(Utils.defaultValue(background.alpha, 1));
         this.renderFPS = math.clamp(Utils.defaultValue(viewerOptions.RENDER_RPS, InternalConfig.VIEWER_RENDER_FPS), 20, 60);
         this._terrainProvider = new SimpleTerrainProvider();
-        this._imageryTileProvider = viewerOptions.imageryTileProivder;
-        this.scene = new EarthScene(this.renderer, this.imageryTileProivder, this._terrainProvider, Utils.defaultValue(viewerOptions.tileCacheSize, InternalConfig.DEFAUTL_MAX_TILE_CACHE_COUNT));
+        this.scene = new EarthScene(this.camera, this.imageryTileProivder, this._terrainProvider, Utils.defaultValue(viewerOptions.tileCacheSize, InternalConfig.DEFAUTL_MAX_TILE_CACHE_COUNT));
 
         this.camera = this.scene.camera;
         this.enablePan = Utils.defaultValue(viewerOptions.enablePan, true);
@@ -212,20 +201,6 @@ export class MapViewer {
 
         this._scheduleId = createScheduler(this.renderFrame, 1000 / this.renderFPS, this);
 
-    }
-
-    /**
-     * 创建渲染对象
-     * @param target 
-     */
-    private createRenderer (target: string | HTMLElement) {
-        const ele = (Utils.isString(target) ? document.getElementById(target as string) : target) as HTMLElement;
-        const scene = new Scene();
-        const camera = new PerspectiveCamera(this._fov, ele.clientWidth / ele.clientHeight, 0.00000001, Transform.THREEJS_UNIT_PER_METERS * 100);
-        const renderer = new FrameRenderer(scene, camera, ele);
-        rendererSystem.addRenderTarget(renderer)
-        interactionSystem.enableInteraction(renderer);
-        return renderer;
     }
 
     /**

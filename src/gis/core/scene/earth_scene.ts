@@ -69,8 +69,9 @@ export class EarthScene {
 
     public readonly fog: Fog;
 
-    constructor (renderer: FrameRenderer, imageryTileProvider: IImageryTileProvider, terrainProvider: ITerrainProvider, tileCacheSize: number) {
-        this._renderer = renderer;
+    public constructor (camera: EarthCamera, imageryTileProvider: IImageryTileProvider, terrainProvider: ITerrainProvider, tileCacheSize: number) {
+        this.camera = camera;
+        this._renderer = camera.renderer;
         //add fog to renderer scene
         this.fog = new Fog(this._renderer.scene, new Color(InternalConfig.DEFAULT_FOG_COLOR), InternalConfig.DEFAULT_FOG_DENSITY);
         this.tileNodeRenderer = new TileNodeRenderer(this.fog);
@@ -84,9 +85,8 @@ export class EarthScene {
         this._renderer.scene.add(this.primitives.root);
         this.quadtreePrimitive = new QuadtreePrimitive(this.imageryProviders.get(0)!, tileCacheSize);
         this.tilingScheme = this.quadtreePrimitive.tileProvider.tilingScheme;
-        this.camera = new EarthCamera(this._renderer, this.tilingScheme);
         this.globleSurfaceManager = new GlobeSurfaceTileManager(this.quadtreePrimitive, terrainProvider, this);
-        this.dataSourceDisplay = new DataSourceDisplay(this.entities, this.tilingScheme, renderer);
+        this.dataSourceDisplay = new DataSourceDisplay(this.entities, this.tilingScheme, this._renderer);
         //将DataSource的渲染根节点添加到场景中
         this._renderer.scene.add(this.dataSourceDisplay.root);
         this.setSunLightPosition();
