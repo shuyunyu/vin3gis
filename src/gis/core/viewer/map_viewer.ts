@@ -15,6 +15,7 @@ import { EarthScene } from "../scene/earth_scene";
 import { SimpleTerrainProvider } from "../terrain/simple_terrain_provider";
 import { ITerrainProvider } from "../terrain/terrain_provider";
 import { Transform } from "../transform/transform";
+import { eventSystem } from "../../../core/system/event_system";
 
 export class MapViewer {
 
@@ -214,6 +215,14 @@ export class MapViewer {
 
     private renderLateUpdate (delay: number) {
         this.scene.renderLateUpdate(delay);
+    }
+
+    /**
+     * 获取输入对象(通过输入对象绑定事件)
+     * @returns 
+     */
+    public getInput () {
+        return eventSystem.getInput(this.renderer);
     }
 
     /**
