@@ -169,7 +169,7 @@ export class MapViewer {
         Engine.init();
         Transform.THREEJS_UNIT_PER_METERS = Utils.defaultValue(viewerOptions.UNIT_PER_METERS, 10000);
         this._imageryTileProvider = viewerOptions.imageryTileProivder;
-        this.camera = new EarthCamera(this._imageryTileProvider.tilingScheme, viewerOptions.target, viewerOptions.camera);
+        this.camera = new EarthCamera(this._imageryTileProvider.tilingScheme, viewerOptions.target, viewerOptions.homeViewPort, viewerOptions.camera);
         this.renderer = this.camera.renderer;
         const defaultBackgroundColor = new Color(255, 255, 255);
         const background = viewerOptions.background || {

@@ -12,6 +12,7 @@ import { PolylineGeometry } from "../../core/datasource/geometry/polyline_geomet
 import { ViewPort } from "../../core/misc/view_port";
 import { IImageryTileProvider } from "../../core/provider/imagery_tile_provider";
 import { Imagery } from "../../core/scene/imagery";
+import { EasingFunction } from "../../../core/tween/Easing";
 
 export interface ICartesian2Like {
     x: number;
@@ -54,6 +55,13 @@ export type EarthCameraOptions = {
     fov?: number;
     near?: number;
     far?: number;
+}
+
+export type EarthCameraFlyToOptions = {
+    duration?: number; //default 3 seconds
+    onUpdate?: (ratio: number) => void;
+    onComplete?: () => void;
+    easing?: EasingFunction;
 }
 
 export type MapViewerOptions = {

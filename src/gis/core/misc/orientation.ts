@@ -1,3 +1,4 @@
+import { Euler, Quaternion } from "three";
 import { math } from "../../../core/math/math";
 import { ICartesian3Like } from "../../@types/core/gis";
 import { Log } from "../../log/log";
@@ -52,6 +53,12 @@ export class Orientation {
      */
     public static fromArray (radiansArray: number[], offset: number = 0) {
         return new Orientation(radiansArray[offset + 0], radiansArray[offset + 1], radiansArray[offset + 2]);
+    }
+
+    public toQuaternion (out?: Quaternion) {
+        out = out || new Quaternion();
+        out.setFromEuler(new Euler(this.pitch, this.yaw, this.roll));
+        return out;
     }
 
     /**

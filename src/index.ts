@@ -69,6 +69,13 @@ export * from "./core/loader/ktx_loader";
 export * from "./core/loader/ktx2_loader";
 export * from "./core/loader/gltf_loader";
 
+//tween
+import Easing from "./core/tween/Easing";
+export const Tween = {
+    Easing
+}
+
+
 export * from "./tools/debug_tools";
 export * from "./tools/stats";
 

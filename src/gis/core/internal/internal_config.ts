@@ -73,6 +73,9 @@ export class InternalConfig {
     //3dtiles重投影webworker个数
     public static REPROJECT_WORKER_COUNT = 4;
 
+    //相机flyto默认duration 单位s
+    public static CAMERA_FLYTO_DEFAULT_DURATION = 0.3;
+
     /**
      * 校验相机的pitch是否有效
      * @param pitch 
