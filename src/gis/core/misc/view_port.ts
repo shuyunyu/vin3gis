@@ -20,7 +20,7 @@ export class ViewPort {
         return this._orientation;
     }
 
-    constructor (cartographic: Cartographic, orientation: Orientation) {
+    public constructor (cartographic: Cartographic = new Cartographic(), orientation: Orientation = new Orientation()) {
         this._cartographic = cartographic;
         this._orientation = orientation;
     }

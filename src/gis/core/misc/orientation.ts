@@ -22,7 +22,7 @@ export class Orientation {
      * @param pitch 
      * @param roll 
      */
-    constructor (yaw: number, pitch: number, roll: number) {
+    public constructor (yaw: number = 0, pitch: number = 0, roll: number = 0) {
         this.yaw = yaw;
         if (!InternalConfig.checkCameraPitch(pitch)) {
             Log.warn(Orientation, `pitch value must between ${InternalConfig.MIN_PITCH} and ${InternalConfig.MAX_PITCH}, current value is : ${pitch}`);
