@@ -160,6 +160,23 @@ export class InteractionSystem extends System {
     }
 
     /**
+     * 终止惯性
+     * @param target 
+     */
+    public stopDamping (target: FrameRenderer) {
+        const c = this.findControls(target);
+        if (!c) return;
+        const oldEnableDamping = c.controls.enableDamping;
+        if (oldEnableDamping) {
+            c.controls.enableDamping = false;
+            c.controls.update();
+            c.controls.enableDamping = oldEnableDamping;
+        } else {
+            c.controls.update();
+        }
+    }
+
+    /**
      * 查找controls
      * @param target 
      * @returns 

@@ -207,6 +207,7 @@ export class EarthCamera {
         const startQuat = this._renderer.camera.quaternion.clone();
         const targetPos = Transform.cartographicToWorldVec3(viewPort.cartogarphic, this._tilingScheme);
         const targetQuat = viewPort.orientation.toQuaternion();
+        interactionSystem.stopDamping(this._renderer);
         tween.to({ ratio: 1.0 }, duration)
             .easing(Utils.defaultValue(options.easing, Easing.Linear.None))
             .onUpdate(() => {
