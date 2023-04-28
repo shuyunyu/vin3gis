@@ -2,6 +2,7 @@ import { Vector2 } from "three";
 import { math } from "../../../core/math/math";
 import { ICartesian2Like, ICartesian3Like } from "../../@types/core/gis";
 import { Cartesian3 } from "./cartesian3";
+import { Utils } from "../../../core/utils/utils";
 
 /**
  * 二维笛卡尔坐标
@@ -602,6 +603,28 @@ export class Cartesian2 implements ICartesian2Like {
 
     public static toVec2 (car2: Cartesian2, out?: Vector2) {
         return car2.toVec2(out);
+    }
+
+    public static magnitude (cartesian: ICartesian2Like) {
+        return Math.sqrt(this.magnitudeSquared(cartesian));
+    }
+
+    public static magnitudeSquared (cartesian: ICartesian2Like) {
+        return cartesian.x * cartesian.x + cartesian.y * cartesian.y;
+    }
+
+    public static fromElements (x: number, y: number, result?: Cartesian2) {
+        if (!Utils.defined(result)) {
+            return new Cartesian2(x, y);
+        }
+
+        result.x = x;
+        result.y = y;
+        return result;
+    }
+
+    public static maximumComponent (cartesian: ICartesian2Like) {
+        return Math.max(cartesian.x, cartesian.y);
     }
 
 }

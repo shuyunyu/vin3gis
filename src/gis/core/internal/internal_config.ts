@@ -113,8 +113,7 @@ export class InternalConfig {
     public static getB3dmMaterial () {
         return new MeshLambertMaterial({
             color: new Color('#AAA'),
-            depthTest: false,
-            transparent: true,
+            transparent: false,
             opacity: 1,
             side: DoubleSide
         });

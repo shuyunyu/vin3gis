@@ -67,7 +67,8 @@ window.onload = () => {
         enableRotate: true,
         enableDamping: true,
         camera: {
-            near: 0.00001
+            // near: 0.00001
+            near: 0.001
         }
         // dampingFactor: 0.1
         // maxDistance: 16000000
