@@ -82,7 +82,7 @@ export class FrameState {
 
     public readonly fog: Fog;
 
-    constructor (camera: PerspectiveCamera, size: Size, fog: Fog) {
+    public constructor (camera: PerspectiveCamera, size: Size, fog: Fog) {
         this.camera = camera;
         this.drawContextHeihgt = size.height;
         this.cameraWorldRTS.position = camera.getWorldPosition(vec3_1);

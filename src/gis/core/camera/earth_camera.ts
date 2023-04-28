@@ -17,6 +17,7 @@ import { TWEEN } from "../../../core/tween/Index";
 import Tween from "../../../core/tween/Tween";
 import { Cartesian3 } from "../cartesian/cartesian3";
 import Easing from "../../../core/tween/Easing";
+import { GenericEvent } from "../../../core/event/generic_event";
 
 const tempRay = new Ray();
 
@@ -34,6 +35,9 @@ const tempOrientation = new Orientation(0, 0, 0);
  * 定义地图相机
  */
 export class EarthCamera {
+
+    //相机改变事件
+    public changedEvent: GenericEvent<any> = new GenericEvent();
 
     private _renderer: FrameRenderer;
 
