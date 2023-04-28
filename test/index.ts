@@ -1,6 +1,6 @@
 import { BoxGeometry, BufferAttribute, BufferGeometry, Color, DoubleSide, Euler, Float32BufferAttribute, Fog, FogExp2, FrontSide, Matrix3, Matrix4, Mesh, MeshBasicMaterial, MeshLambertMaterial, MeshPhongMaterial, MeshStandardMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, Texture, Vector2, Vector3 } from "three";
 import { AssetLoader, DRACOLoader, FileLoader, FrameRenderer, GLTFLoader, ImageBitmapLoader, ImageLoader, KTX2Loader, KTXLoader, math, OBB, requestSystem, TextureLoader, TiledTexture, VecConstants, XHRCancelToken, XHRResponseType } from "../src";
-import { AMapImageryTileProvider, AnchorConstant, ArcGISImageryTileProvider, BillboardGeometry, Cartesian3, Cartographic, CoordinateTransform, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
+import { AMapImageryTileProvider, AnchorConstant, ArcGISImageryTileProvider, BillboardGeometry, Cartesian3, Cartographic, CoordinateTransform, Earth3DTile, EmptyImageryTileProvider, MapViewer, MultiPointGeometry, MultiPolygonGeometry, Orientation, OSMImageryTileProvider, TdtImageryTileProvider, ViewPort } from "../src/gis";
 
 import verShader from "../src/gis/core/shader/tile.vt.glsl"
 import fsShader from "../src/gis/core/shader/tile.fs.glsl"
@@ -28,17 +28,18 @@ import { Earth3DTileset } from "../src/gis/core/scene/3dtileset/earth_3dtileset"
 import { InternalConfig } from "../src/gis/core/internal/internal_config";
 import { CoordinateOffsetType } from "../src/gis/@types/core/gis";
 import { Earth3DTilesetGltfUpAxis } from "../src/gis/@types/core/earth_3dtileset";
+import { IEarth3DTileContent } from "../src/gis/core/scene/3dtileset/earth_3dtile_content";
 
 window.onload = () => {
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
     // const initCameraPosition = new Vector3(wgs84LngLat[0], wgs84LngLat[1], 16500000);
     // const initCameraPosition = new Vector3(118.256, 24.418, 165000);
-    // const initCameraPosition = new Vector3(121.356, 31.268, 16500 * 3);
-    const initCameraPosition = new Vector3(102.65197, 25.073691, 1058.83878 * 1.5);
+    const initCameraPosition = new Vector3(121.356, 31.268, 16500 * 3);
+    // const initCameraPosition = new Vector3(102.65197, 25.073691, 1058.83878 * 1.5);
     // const initCameraPosition = new Vector3(0, 0, Transform.getMetersPerUnit() * 1.65);
     // const initCameraPosition = new Vector3(0, 0, Transform.carCoordToWorldCoord(1.65));
-    // const initCameraOrientation = new Vector3(0, -90, 0);
-    const initCameraOrientation = new Vector3(-27.330569, -47.4, 0);
+    const initCameraOrientation = new Vector3(0, -90, 0);
+    // const initCameraOrientation = new Vector3(-27.330569, -47.4, 0);
     const homeViewPort = new ViewPort(Cartographic.fromDegrees(initCameraPosition.x, initCameraPosition.y, initCameraPosition.z), Orientation.fromDegreeEulerAngles(initCameraOrientation));
     const mapViewer = new MapViewer({
         target: document.body,
@@ -96,8 +97,8 @@ class GISTest {
         // globalThis.testImageMerger = () => this.testWorker();
         // this.testDataTexture(render);
         this.testEngineLoader(mapViewer);
-        // this.test3dtiles(mapViewer);
-        this.testQXSY(mapViewer);
+        this.test3dtiles(mapViewer);
+        // this.testQXSY(mapViewer);
         // this.testOBB(mapViewer);
     }
 
@@ -1024,7 +1025,10 @@ class GISTest {
         const tileset = new Earth3DTileset({
             url: 'http://data.mars3d.cn/3dtiles/jzw-shanghai/tileset.json',
             dracoLoader: dracoLoader,
-            coordinateOffsetType: CoordinateOffsetType.GCJ02
+            coordinateOffsetType: CoordinateOffsetType.GCJ02,
+            customMaterial: (tileset: Earth3DTileset, tile: Earth3DTile, content: IEarth3DTileContent) => {
+                return InternalConfig.getB3dmMaterial();
+            },
             // skipLevelOfDetail: true,
             // maximumScreenSpaceError: 10,
             // immediatelyLoadDesiredLevelOfDetail: true

@@ -317,9 +317,15 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
                 for (let i = 0; i < this._group.children.length; i++) {
                     const ele = this._group.children[i];
                     if (ele instanceof Mesh) {
-                        if (!ele.material) ele.material = InternalConfig.getB3dmMaterial();
-                        else {
-                            ele.material = InternalConfig.handleB3dmMaterial(ele.material);
+                        if (!Utils.defined(this.tileset.customMaterial)) {
+                            if (!ele.material) ele.material = InternalConfig.getB3dmMaterial();
+                            else {
+                                ele.material = InternalConfig.handleB3dmMaterial(ele.material);
+                            }
+                        } else {
+                            //dispose old
+                            disposeSystem.disposeObj(ele.material);
+                            ele.material = this.tileset.customMaterial(this.tileset, this.tile, this);
                         }
                         ele.renderOrder = EARTH_3DTILE_B3DM_RENDER_ORDER;
                         meshes.push(ele);

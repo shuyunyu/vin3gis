@@ -7,7 +7,7 @@ import { KTX2Loader } from "../../../../core/loader/ktx2_loader";
 import { math } from "../../../../core/math/math";
 import { Utils } from "../../../../core/utils/utils";
 import { XHRRequestOptions } from "../../../../core/xhr/xhr_request";
-import { Earth3DTileContentState, Earth3DTileRefine, Earth3DTilesetGltfUpAxis, Earth3DTilesetOptions, Earth3DTilesetPriority, has3DTilesExtension } from "../../../@types/core/earth_3dtileset";
+import { Earth3DTileContentState, Earth3DTileCustomMaterialFunc, Earth3DTileRefine, Earth3DTilesetGltfUpAxis, Earth3DTilesetOptions, Earth3DTilesetPriority, has3DTilesExtension } from "../../../@types/core/earth_3dtileset";
 import { CoordinateOffsetType } from "../../../@types/core/gis";
 import { Log } from "../../../log/log";
 import { InternalConfig } from "../../internal/internal_config";
@@ -221,6 +221,8 @@ export class Earth3DTileset implements IPrimitive {
 
     //遍历对象
     private _traversal: Earth3DTilesetTraversal = new Earth3DTilesetTraversal();
+
+    private _customMaterial?: Earth3DTileCustomMaterialFunc;
 
     public get baseScreenSpaceError () {
         return this._baseScreenSpaceError;
@@ -454,6 +456,10 @@ export class Earth3DTileset implements IPrimitive {
         this._updatedVisibilityFrame = updatedVisibilityFrame;
     }
 
+    public get customMaterial () {
+        return this._customMaterial;
+    }
+
     constructor (options: Earth3DTilesetOptions) {
         this._id = Utils.createGuid();
         this._container = new Group();
@@ -505,6 +511,7 @@ export class Earth3DTileset implements IPrimitive {
         this._skipLevels = Utils.defaultValue(options.skipLevels, 1);
         this._baseScreenSpaceError = Utils.defaultValue(options.baseScreenSpaceError, 1024);
         this._pointCloudShading = options.pointCloudShading;
+        this._customMaterial = options.customMaterial;
     }
 
     /**

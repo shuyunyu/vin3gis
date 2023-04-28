@@ -1,4 +1,4 @@
-import { Matrix4 } from "three";
+import { Material, Matrix4 } from "three";
 import { AssetDefines } from "../../../@types/core/asset/asset";
 import { DRACOLoader } from "../../../core/loader/draco_loader";
 import { KTX2Loader } from "../../../core/loader/ktx2_loader";
@@ -7,6 +7,10 @@ import { Earth3DTile } from "../../core/scene/3dtileset/earth_3dtile";
 import { Earth3DTileset } from "../../core/scene/3dtileset/earth_3dtileset";
 import { PointCloudShading } from "../../core/scene/3dtileset/pointcloud_shading";
 import { CoordinateOffsetType } from "./gis";
+import { IEarth3DTileContent } from "../../core/scene/3dtileset/earth_3dtile_content";
+
+//自定义材质的方法
+export type Earth3DTileCustomMaterialFunc = (tileset: Earth3DTileset, tile: Earth3DTile, content: IEarth3DTileContent) => Material;
 
 /**
  * Earth3DTileset类构造参数
@@ -48,6 +52,8 @@ export interface Earth3DTilesetOptions {
     baseScreenSpaceError?: number;
     assetLoadParams?: AssetDefines.LoadAssetParams;
     pointCloudShading?: PointCloudShading;
+    //自定义材质的方法
+    customMaterial?: Earth3DTileCustomMaterialFunc;
 }
 
 
