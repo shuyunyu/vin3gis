@@ -1,4 +1,4 @@
-import { Color, DoubleSide, Material, Matrix4, Mesh, MeshBasicMaterial, MeshLambertMaterial, Object3D, Vector3 } from "three";
+import { Material, Matrix4, Mesh, Object3D, Vector3 } from "three";
 import { MatConstants } from "../../../../core/constants/mat_constants";
 import { disposeSystem } from "../../../../core/system/dispose_system";
 import { Utils } from "../../../../core/utils/utils";
@@ -21,6 +21,7 @@ import { Earth3DTileFeatureTable } from "./earth_3dtile_feature_table";
 import { reprojectWorkerPool } from "../../worker/pool/reproject_worker_pool";
 import { InternalConfig } from "../../internal/internal_config";
 import { EARTH_3DTILE_B3DM_RENDER_ORDER } from "../../misc/render_order";
+import { Earth3DTileFeature } from "./earth_3dtile_feature";
 
 
 const sizeOfUint32 = Uint32Array.BYTES_PER_ELEMENT;
@@ -60,7 +61,6 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
 
     private _computedMartix: Matrix4;
 
-    private _featuresLength: number = 0;
     private _pointsLength: number = 0;
     private _trianglesLength: number = 0;
     private _geometryByteLength: number = 0;
@@ -68,9 +68,13 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
     private _batchTableByteLength: number = 0;
     private _innerContents?: IEarth3DTileContent[];
     private _batchTable?: Earth3DTileBatchTable;
+    private _batchLength: number = 0;
+    private _featureTable: Earth3DTileFeatureTable;
+
+    private _features: Earth3DTileFeature[] = [];
 
     public get featuresLength () {
-        return this._featuresLength;
+        return this._featureTable.featuresLength;
     }
 
     public get pointsLength () {
@@ -99,6 +103,10 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
 
     public get batchTable () {
         return this._batchTable;
+    }
+
+    public get batchLength () {
+        return this._batchLength;
     }
 
     public get readyPromise () {
@@ -230,6 +238,7 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
             featureTableJson,
             featureTableBinary
         );
+        this._featureTable = featureTable;
 
         batchLength = featureTable.getGlobalProperty("BATCH_LENGTH");
         featureTable.featuresLength = batchLength;
@@ -271,7 +280,12 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
             this, batchLength, batchTableJson, batchTableBinary, colorChangedCallback
         );
         this._batchTable = batchTable;
+        this._batchLength = batchLength;
 
+        //init features
+        for (let i = 0; i < this._batchLength; i++) {
+            this._features.push(new Earth3DTileFeature(this, i));
+        }
 
         let gltfByteLength = byteStart + byteLength - byteOffset;
         if (gltfByteLength === 0) {
@@ -431,6 +445,14 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
         this.updateContentMatrix(this.tile, this._gltf);
     }
 
+    public getFeature (batchId: number) {
+        return this._features[batchId];
+    }
+
+    public hasProperty (batchId: number, name: string) {
+        return this._batchTable && this._batchTable.hasProperty(batchId, name);
+    }
+
     /**
      * 释放节点资源
      */
@@ -451,6 +473,12 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
         this._texturesByteLength = 0;
         this._geometryByteLength = 0;
         this._batchTableByteLength = 0;
+        this._pointsLength = 0;
+        this._trianglesLength = 0;
+        this._batchLength = 0;
+        this._batchTable = null;
+        this._featureTable = null;
+        this._features = null;
     }
 
 }

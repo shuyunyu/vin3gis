@@ -3,6 +3,7 @@ import { Earth3DTile } from "./earth_3dtile";
 import { Earth3DTileset } from "./earth_3dtileset";
 import { Earth3DTileBatchTable } from "./earth_3dtile_batch_table";
 import { IEarth3DTileContent } from "./earth_3dtile_content";
+import { Earth3DTileFeature } from "./earth_3dtile_feature";
 
 export class EarthEmpty3DTileContent implements IEarth3DTileContent {
     public _readyPromise: Promise<IEarth3DTileContent>;
@@ -108,6 +109,14 @@ export class EarthEmpty3DTileContent implements IEarth3DTileContent {
 
     public update (tileset: Earth3DTileset, frameState: FrameState) {
 
+    }
+
+    public getFeature (batchId: number) {
+        return null;
+    }
+
+    public hasProperty (batchId: number, name: string) {
+        return false;
     }
 
 }

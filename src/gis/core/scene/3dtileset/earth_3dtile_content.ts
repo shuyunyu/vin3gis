@@ -2,6 +2,7 @@ import { FrameState } from "../frame_state";
 import { Earth3DTile } from "./earth_3dtile";
 import { Earth3DTileset } from "./earth_3dtileset";
 import { Earth3DTileBatchTable } from "./earth_3dtile_batch_table";
+import { Earth3DTileFeature } from "./earth_3dtile_feature";
 
 export interface IEarth3DTileContent {
 
@@ -24,6 +25,8 @@ export interface IEarth3DTileContent {
 
     featuresLength: number;
 
+    getFeature: (batchId: number) => Earth3DTileFeature;
+
     pointsLength: number;
 
     trianglesLength: number;
@@ -37,4 +40,6 @@ export interface IEarth3DTileContent {
     innerContents?: IEarth3DTileContent[];
 
     batchTable?: Earth3DTileBatchTable;
+
+    hasProperty: (batchId: number, name: string) => boolean;
 }

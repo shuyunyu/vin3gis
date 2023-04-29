@@ -15,6 +15,10 @@ export class Earth3DTileBatchTableHierachy {
     // Total memory used by the typed arrays
     public _byteLength = 0;
 
+    public get byteLength () {
+        return this._byteLength;
+    }
+
     public constructor (options: any) {
 
         initialize(this, options.extension, options.binaryBody);
