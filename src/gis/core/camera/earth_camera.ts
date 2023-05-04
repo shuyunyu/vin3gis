@@ -195,10 +195,7 @@ export class EarthCamera {
 
     private _flyTo (viewPort: ViewPort, options?: EarthCameraFlyToOptions) {
         //stop before tween
-        if (Utils.defined(this._flyToTween)) {
-            this._flyToTween.stop();
-            this._flyToTween = null;
-        }
+        this.stopFlyTo();
         options = options || {};
         const obj = { ratio: 0.0 };
         const tween = new TWEEN.Tween(obj);
@@ -223,6 +220,16 @@ export class EarthCamera {
             .start();
         options.onStart && options.onStart();
         this._flyToTween = tween;
+    }
+
+    /**
+     * 停止当前的flyTo
+     */
+    public stopFlyTo () {
+        if (Utils.defined(this._flyToTween)) {
+            this._flyToTween.stop();
+            this._flyToTween = null;
+        }
     }
 
     /**
