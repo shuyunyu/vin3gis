@@ -1,4 +1,4 @@
-import { Material, Matrix4, Mesh, Object3D, Vector3 } from "three";
+import { Material, Matrix4, Mesh, Object3D, Texture, Vector3 } from "three";
 import { MatConstants } from "../../../../core/constants/mat_constants";
 import { disposeSystem } from "../../../../core/system/dispose_system";
 import { Utils } from "../../../../core/utils/utils";
@@ -458,11 +458,21 @@ export class Batched3DModel3DTileContent implements IEarth3DTileContent {
      */
     private releaseResource () {
         if (this._group.parent) this._group.removeFromParent();
+        //TODO cache gltf
         if (this._group && this._group.children) {
             for (let i = 0; i < this._group.children.length; i++) {
                 const ele = this._group.children[i];
                 if (ele instanceof Mesh) {
+                    //dispose objects
+                    const keys = Object.keys(ele.material);
+                    keys.forEach(key => {
+                        const val = ele.material[key];
+                        if (val instanceof Texture) {
+                            disposeSystem.disposeObj(val);
+                        }
+                    });
                     disposeSystem.disposeObj(ele.material as Material);
+                    disposeSystem.disposeObj(ele.geometry);
                 }
             }
         }
