@@ -2,6 +2,7 @@
 /dist/favicon.ico
 /dist/three.*
 /dist/prod.test.js
+/dist/TestCase.js
 /examples
 /loader
 /public

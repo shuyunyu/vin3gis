@@ -1,7 +1,5 @@
 import { CoordinateOffsetType } from "./@types/core/gis";
 
-export const version = '0.0.1';
-
 export * from "./core/cartographic";
 
 export * from "./core/cartesian/cartesian2";

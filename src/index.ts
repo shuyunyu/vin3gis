@@ -1,5 +1,3 @@
-export const version = "0.0.1";
-
 export * from "./core/director";
 
 export * from "./core/engine";
@@ -85,3 +83,4 @@ export * from "./gis/index";
 
 
 
+export const version = '0.0.1';

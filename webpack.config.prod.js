@@ -1,20 +1,29 @@
-const { resolve } = require('path');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const htmlwp = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-const fs = require('fs');
 const path = require('path');
+const packageJson = require('./package.json');
+const fs = require('fs');
 
-const version = ".0.0.1";
+const entryFile = "./src/index.ts";
+const exportVersionStr = "export const version = '" + packageJson.version + "';";
+const regex = /export const version = '\d+.\d+.\d+';/g;
+let indexContent = fs.readFileSync(entryFile, "utf-8");
+if (regex.test(indexContent)) {
+    indexContent = indexContent.replace(regex, exportVersionStr)
+    fs.writeFileSync(entryFile, indexContent);
+} else {
+    fs.appendFileSync(entryFile, exportVersionStr);
+}
 
 module.exports = {
     mode: 'production',
     entry: {
-        "Vin3GIS": "./src/index.ts"
+        "Vin3GIS": entryFile
     },
     output: {
         path: __dirname + '/dist',
-        filename: '[name]' + version + '.js',
+        filename: '[name].min.js',
         library: '[name]'
     },
     //不打包THREE
