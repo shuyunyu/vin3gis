@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./dist/Vin3",
+    "outDir": "./dist/Vin3GIS",
     "sourceMap": true,
     "declaration": true, //生成声明文件
     "moduleResolution": "node",
