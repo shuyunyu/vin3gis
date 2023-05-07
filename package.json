@@ -17,7 +17,14 @@
   },
   "keywords": [
     "gis",
-    "three.js"
+    "three.js",
+    "threejs",
+    "3dtiles",
+    "threejs-3dtiles",
+    "three-3dtiles",
+    "three-gis",
+    "three-map",
+    "map"
   ],
   "author": "shuyunyu",
   "license": "ISC",
