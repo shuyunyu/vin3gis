@@ -1,0 +1,15 @@
+/dist/libs/**
+/dist/favicon.ico
+/dist/three.*
+/dist/prod.test.js
+/examples
+/loader
+/public
+/test
+src/**/*
+.gitlab-ci.yml
+custom.d.ts
+index.html
+index-prod.html
+tsconfig.json
+webpack.*.js
