@@ -16,6 +16,8 @@ import { FrameState } from "./frame_state";
 import { GlobeSurfaceTileManager } from "./globe_surface_tile_manager";
 import { PrimitiveCollection } from "./primitive_collection";
 import { QuadtreePrimitive } from "./quad_tree_primitive";
+import { Picking } from "./picking";
+import { ICartesian2Like } from "../../@types/core/gis";
 
 export class EarthScene {
 
@@ -38,6 +40,8 @@ export class EarthScene {
     public readonly quadtreePrimitive: QuadtreePrimitive;
 
     public readonly lateUpdateEvent = new GenericEvent<number>;
+
+    private _picking: Picking;
 
     //瓦片节点渲染器
     public readonly tileNodeRenderer: TileNodeRenderer;
@@ -89,11 +93,16 @@ export class EarthScene {
         this.dataSourceDisplay = new DataSourceDisplay(this.entities, this.tilingScheme, this._renderer);
         //将DataSource的渲染根节点添加到场景中
         this._renderer.scene.add(this.dataSourceDisplay.root);
+        this._picking = new Picking(this);
         this.setSunLightPosition();
         //add light to renderer scene
         this._renderer.scene.add(this.ambientLight);
         this._renderer.scene.add(this.sunLight);
         this.ready = true;
+    }
+
+    public pick (screenPos: ICartesian2Like) {
+        return this._picking.pick(screenPos);
     }
 
     /**
