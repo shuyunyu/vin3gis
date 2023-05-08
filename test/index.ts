@@ -31,6 +31,7 @@ import { Earth3DTilesetGltfUpAxis } from "../src/gis/@types/core/earth_3dtileset
 import { IEarth3DTileContent } from "../src/gis/core/scene/3dtileset/earth_3dtile_content";
 
 window.onload = () => {
+    InternalConfig.DEBUG = true;
     // const wgs84LngLat = CoordinateTransform.bd09towgs84(118.256, 24.418);
     // const initCameraPosition = new Vector3(wgs84LngLat[0], wgs84LngLat[1], 16500000);
     // const initCameraPosition = new Vector3(118.256, 24.418, 165000);
