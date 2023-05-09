@@ -3,6 +3,7 @@
 /dist/three.*
 /dist/prod.test.js
 /dist/TestCase.js
+/dist/Vin3GIS/test/**
 /examples
 /loader
 /public
