@@ -4,17 +4,17 @@
 
 ![](./examples/vin3gis_demos.jpeg)
 
-## Start 
+## Install
+
++ NPM
 ```sh
-npm install
+npm install vin3gis --save
 ```
 
-## dev
-```sh
-npm run dev
-```
-
-## build
-```sh
-npm run build-prod
++ CDN
+```html
+<!-- three.js -->
+<script src="https://unpkg.com/three@0.146.0/build/three.min.js"></script>
+<!-- Vin3GIS.min.js -->
+<script src="https://unpkg.com/vin3gis/dist/Vin3GIS.min.js"></script>
 ```
