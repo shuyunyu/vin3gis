@@ -36,7 +36,7 @@ module.exports = {
     plugins: [
         new htmlwp({
             title: 'webgl',
-            template: 'index-prod.html',
+            template: 'index.html',
             scriptLoading: 'blocking'
         }),
         new UglifyJSPlugin({
@@ -52,8 +52,7 @@ module.exports = {
         new CopyPlugin({
             patterns: [
                 { from: "./public", to: "./" },
-                { from: './node_modules/three/build/three.min.js', to: "./" },
-                { from: "./test/prod.test.js", to: "./" },
+                { from: './node_modules/three/build/three.min.js', to: "./" }
             ]
         })
     ],
