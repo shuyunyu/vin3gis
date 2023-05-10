@@ -16,6 +16,9 @@ import { SimpleTerrainProvider } from "../terrain/simple_terrain_provider";
 import { ITerrainProvider } from "../terrain/terrain_provider";
 import { Transform } from "../transform/transform";
 import { eventSystem } from "../../../core/system/event_system";
+import { ViewPort } from "../misc/view_port";
+import { Cartographic } from "../cartographic";
+import { AMapImageryTileProvider } from "../provider/amap_imagery_tile_provider";
 
 export class MapViewer {
 
@@ -169,8 +172,9 @@ export class MapViewer {
         Engine.DEBUG = InternalConfig.DEBUG;
         Engine.init();
         Transform.THREEJS_UNIT_PER_METERS = Utils.defaultValue(viewerOptions.UNIT_PER_METERS, 10000);
-        this._imageryTileProvider = viewerOptions.imageryTileProivder;
-        this.camera = new EarthCamera(this._imageryTileProvider.tilingScheme, viewerOptions.target, viewerOptions.homeViewPort, viewerOptions.camera);
+        this._imageryTileProvider = viewerOptions.imageryTileProivder || new AMapImageryTileProvider({ style: 'aerial' });
+        const homeViewPort = viewerOptions.homeViewPort || new ViewPort(Cartographic.fromDegrees(118.256, 24.418, 1000000));
+        this.camera = new EarthCamera(this._imageryTileProvider.tilingScheme, viewerOptions.target, homeViewPort, viewerOptions.camera);
         this.renderer = this.camera.renderer;
         const defaultBackgroundColor = new Color(255, 255, 255);
         const background = viewerOptions.background || {
@@ -194,7 +198,7 @@ export class MapViewer {
         this.enableDamping = Utils.defaultValue(viewerOptions.enableDamping, true);
         this.minDistance = Transform.carCoordToWorldCoord(Utils.defaultValue(viewerOptions.minDistance, InternalConfig.MIN_DISTANCE));
         this.maxDistance = Transform.carCoordToWorldCoord(Utils.defaultValue(viewerOptions.maxDistance, InternalConfig.MAX_DISTANCE));
-        this.scene.camera.setViewPort(viewerOptions.homeViewPort);
+        this.scene.camera.setViewPort(homeViewPort);
         //start a monitor
         if (DebugTools.getRendererStats(this.renderer)) {
             this._mapStatsMonitor = new MapStatsMonitor(this.renderer, this.scene);

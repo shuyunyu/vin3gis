@@ -73,7 +73,7 @@ export type MapViewerOptions = {
     //地图渲染的html元素或者元素的id
     target: string | HTMLElement;
     //瓦片提供者
-    imageryTileProivder: IImageryTileProvider;
+    imageryTileProivder?: IImageryTileProvider;
     //是否允许平移地图
     enablePan?: boolean;
     panSpeed?: number;
@@ -92,7 +92,7 @@ export type MapViewerOptions = {
     //视角能推进的最大距离
     maxDistance?: number;
     //初始视角
-    homeViewPort: ViewPort;
+    homeViewPort?: ViewPort;
     //瓦片缓存数量 默认100
     tileCacheSize?: number;
     //相机参数
