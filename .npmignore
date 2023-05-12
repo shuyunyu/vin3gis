@@ -9,6 +9,7 @@
 /public
 /test
 src/**/*
+/docs
 .gitlab-ci.yml
 custom.d.ts
 index.html
