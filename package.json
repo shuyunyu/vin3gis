@@ -1,53 +1,54 @@
 {
-  "name": "vin3gis",
-  "version": "1.0.3",
-  "description": "my gis framework base on three.js",
-  "main": "./dist/Vin3GIS.min.js",
-  "types": "./dist/Vin3GIS/src/index.d.ts",
-  "scripts": {
-    "dev": "webpack-dev-server --hot",
-    "server": "webpack-dev-server --hot",
-    "build": "webpack --config webpack.config.js",
-    "build-prod": "webpack --config webpack.config.prod.js",
-    "build-worker": "webpack --config webpack.config.worker.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/shuyunyu/vin3gis"
-  },
-  "keywords": [
-    "gis",
-    "three.js",
-    "threejs",
-    "3dtiles",
-    "threejs-3dtiles",
-    "three-3dtiles",
-    "three-gis",
-    "three-map",
-    "map"
-  ],
-  "author": "shuyunyu",
-  "license": "ISC",
-  "dependencies": {
-    "@types/three": "^0.146.0",
-    "three": "^0.146.0"
-  },
-  "devDependencies": {
-    "add-asset-html-webpack-plugin": "^5.0.2",
-    "copy-webpack-plugin": "^10.2.4",
-    "css-loader": "^6.7.1",
-    "html-webpack-plugin": "^5.5.0",
-    "loader-utils": "^2.0.0",
-    "schema-utils": "^3.0.0",
-    "style-loader": "^3.3.1",
-    "ts-loader": "^9.2.8",
-    "typedoc": "^0.24.7",
-    "typescript": "^4.6.3",
-    "uglify-js": "^3.17.4",
-    "uglifyjs-webpack-plugin": "^2.2.0",
-    "webpack": "^5.71.0",
-    "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.7.4"
-  }
+    "name": "vin3gis",
+    "version": "1.0.3",
+    "description": "my gis framework base on three.js",
+    "main": "./dist/Vin3GIS.min.js",
+    "types": "./dist/Vin3GIS/src/index.d.ts",
+    "scripts": {
+        "dev": "webpack-dev-server --hot",
+        "server": "webpack-dev-server --hot",
+        "build": "webpack --config webpack.config.js",
+        "build-prod": "webpack --config webpack.config.prod.js",
+        "build-worker": "webpack --config webpack.config.worker.js",
+        "docs": "npx typedoc src/index.ts",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/shuyunyu/vin3gis"
+    },
+    "keywords": [
+        "gis",
+        "three.js",
+        "threejs",
+        "3dtiles",
+        "threejs-3dtiles",
+        "three-3dtiles",
+        "three-gis",
+        "three-map",
+        "map"
+    ],
+    "author": "shuyunyu",
+    "license": "ISC",
+    "dependencies": {
+        "@types/three": "^0.146.0",
+        "three": "^0.146.0"
+    },
+    "devDependencies": {
+        "add-asset-html-webpack-plugin": "^5.0.2",
+        "copy-webpack-plugin": "^10.2.4",
+        "css-loader": "^6.7.1",
+        "html-webpack-plugin": "^5.5.0",
+        "loader-utils": "^2.0.0",
+        "schema-utils": "^3.0.0",
+        "style-loader": "^3.3.1",
+        "ts-loader": "^9.2.8",
+        "typedoc": "^0.24.7",
+        "typescript": "^4.6.3",
+        "uglify-js": "^3.17.4",
+        "uglifyjs-webpack-plugin": "^2.2.0",
+        "webpack": "^5.71.0",
+        "webpack-cli": "^4.9.2",
+        "webpack-dev-server": "^4.7.4"
+    }
 }
