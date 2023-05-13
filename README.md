@@ -41,7 +41,7 @@ const mapViewer = new Vin3GIS.MapViewer({
     }
 });
 const dracoLoader = new Vin3GIS.DRACOLoader()
-dracoLoader.setDecoderPath("http://124.223.202.45Vin3GIS/v0.0.1/libs/draco/");
+dracoLoader.setDecoderPath("http://124.223.202.45/Vin3GIS/v0.0.1/libs/draco/");
 const tileset = new Vin3GIS.Earth3DTileset({
     url: 'http://data.mars3d.cn/3dtiles/jzw-shanghai/tileset.json',
     dracoLoader: dracoLoader,
