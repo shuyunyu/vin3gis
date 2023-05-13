@@ -25,6 +25,8 @@ export * from "./core/tilingscheme/tiling_scheme";
 export * from "./core/tilingscheme/web_mercator_tiling_scheme";
 export * from "./core/tilingscheme/bd09_mercator_tiling_scheme";
 
+export * from "./core/provider/imagery_tile_provider";
+export * from "./core/provider/imagery_tile_provider_options";
 export * from "./core/provider/base_imagery_tile_provider";
 export * from "./core/provider/empty_imagery_tile_provider";
 export * from "./core/provider/url_template_imagery_provider";
